@@ -174,6 +174,7 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
 <div class="tab-bar">
   <button class="tab-btn active" id="tab-btn-solicitacoes" onclick="mudarAba('solicitacoes')">📋 Solicitações</button>
   <button class="tab-btn" id="tab-btn-cobrancas" onclick="mudarAba('cobrancas')">📣 Cobranças</button>
+  <button class="tab-btn" id="tab-btn-valores" onclick="mudarAba('valores')">💰 Inserção de Valores</button>
 </div>
 
 <div class="main">
@@ -387,17 +388,6 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
           </div>
 
           <div class="mc-form-group">
-            <label>Provisão/Accrual Atual</label>
-            <input type="text" id="f-provisao-atual" placeholder="R$ 0,00">
-          </div>
-
-          <div class="mc-form-group">
-            <label>Novo Valor</label>
-            <input type="text" id="f-novo-valor" placeholder="R$ 0,00">
-            <div class="hint">Preencher se já houver um novo valor calculado.</div>
-          </div>
-
-          <div class="mc-form-group">
             <label>Advogado que Solicitou <span class="req">*</span></label>
             <select id="f-advogado" required>
               <option value="" disabled selected>Selecione…</option>
@@ -426,6 +416,7 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
               <option value="" disabled selected>Selecione…</option>
               <option value="Sim">Sim</option>
               <option value="Não">Não</option>
+              <option value="N/A">N/A</option>
             </select>
           </div>
 
@@ -434,6 +425,12 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
             <select id="f-tipo-calculo">
               <option value="" disabled selected>Selecione…</option>
             </select>
+          </div>
+
+          <div class="mc-form-group" id="wrap-data-retorno" style="display:none;">
+            <label>Data do Retorno do Cálculo</label>
+            <input type="date" id="f-data-retorno-calculo">
+            <div class="hint">Quando essa data chegar, o caso aparece automaticamente na aba Cobranças pra sermos lembrados de cobrar.</div>
           </div>
 
           <div class="mc-form-group" id="wrap-justificativa-calculo" style="display:none;">
@@ -498,6 +495,7 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
               <th>Área do Corpo</th>
               <th>Motivos do Laudo</th>
               <th>Cálculo Solicitado</th>
+              <th>Data Retorno Cálculo</th>
               <th>Justificativa</th>
               <th>Alteração de Prognóstico</th>
               <th>Prognóstico Atual</th>
@@ -541,6 +539,16 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
     <div class="dash-card" style="margin-bottom:18px;">
       <div class="dash-card-head">⚖️ Inserção de Decisão — Ainda Não Informada</div>
       <div id="cobranca-decisao"></div>
+    </div>
+
+    <div class="dash-card" style="margin-bottom:18px;">
+      <div class="dash-card-head">⏰ Retorno do Cálculo Vencido</div>
+      <div id="cobranca-retorno"></div>
+    </div>
+
+    <div class="dash-card" style="margin-bottom:18px;">
+      <div class="dash-card-head">📋 Cálculo Ainda Não Solicitado</div>
+      <div id="cobranca-nao-solicitado"></div>
     </div>
 
     <div class="dash-card">
@@ -611,6 +619,46 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
       <div id="cobranca-identificado"></div>
     </div>
 
+  </div>
+
+  <div id="view-insercao-valores" style="display:none;">
+    <div class="grid-main">
+
+      <div class="dash-card">
+        <div class="dash-card-head">💰 Inserir/Atualizar Valores</div>
+        <div class="dash-card-body">
+          <div class="mc-form-group">
+            <label>Processo <span class="req">*</span></label>
+            <select id="iv-processo">
+              <option value="" selected>Selecione um processo…</option>
+            </select>
+          </div>
+          <div id="iv-info" class="hint" style="margin-bottom:14px;"></div>
+          <div class="mc-form-group">
+            <label>Provisão/Accrual Atual</label>
+            <input type="text" id="iv-provisao-atual" placeholder="R$ 0,00" disabled>
+          </div>
+          <div class="mc-form-group">
+            <label>Novo Valor</label>
+            <input type="text" id="iv-novo-valor" placeholder="R$ 0,00" disabled>
+          </div>
+          <button type="button" class="btn-cyan" id="btn-salvar-valores" disabled>Salvar Valores</button>
+        </div>
+      </div>
+
+      <div class="dash-card">
+        <div class="dash-card-head">📊 Valores Lançados</div>
+        <div class="table-wrap">
+          <table class="sol-table">
+            <thead>
+              <tr><th>Cliente</th><th>Processo</th><th>Reclamante</th><th>Provisão/Accrual Atual</th><th>Novo Valor</th></tr>
+            </thead>
+            <tbody id="tbody-valores"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>
 
@@ -811,16 +859,25 @@ document.querySelector('#f-tipo-decisao').addEventListener('change', function(){
 
 document.querySelector('#f-calculo-solicitado').addEventListener('change', function(){
   const wrapTipo = document.querySelector('#wrap-tipo-calculo');
+  const wrapRetorno = document.querySelector('#wrap-data-retorno');
   const wrapJustificativa = document.querySelector('#wrap-justificativa-calculo');
   const tipoCalculo = document.querySelector('#f-tipo-calculo');
+  const dataRetorno = document.querySelector('#f-data-retorno-calculo');
   const justificativa = document.querySelector('#f-justificativa-calculo');
+
+  wrapTipo.style.display = 'none'; tipoCalculo.required = false;
+  wrapRetorno.style.display = 'none';
+  wrapJustificativa.style.display = 'none';
 
   if(this.value === 'Sim'){
     wrapTipo.style.display = ''; tipoCalculo.required = true;
-    wrapJustificativa.style.display = 'none'; justificativa.value = '';
+    wrapRetorno.style.display = '';
+    justificativa.value = '';
+  } else if(this.value === 'Não'){
+    wrapJustificativa.style.display = '';
+    tipoCalculo.value = ''; dataRetorno.value = '';
   } else {
-    wrapJustificativa.style.display = ''; wrapTipo.style.display = 'none';
-    tipoCalculo.required = false; tipoCalculo.value = '';
+    tipoCalculo.value = ''; dataRetorno.value = ''; justificativa.value = '';
   }
 });
 
@@ -933,6 +990,7 @@ function render(){
   document.querySelector('#st-400k').textContent = SOLICITACOES.filter(s=>s.acima_400k).length;
 
   renderCobrancas();
+  renderInsercaoValores();
 
   if(!lista.length){
     tbody.innerHTML = '';
@@ -964,7 +1022,8 @@ function render(){
       <td>${e(s.doenca_detectada)}</td>
       <td>${e(s.area_corpo)}</td>
       <td>${e(s.motivos_laudo)}</td>
-      <td>${s.calculo_solicitado ? '<span class="badge badge-orange">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
+      <td>${calcSolicitadoBadge(s.calculo_solicitado)}</td>
+      <td>${formatarData(s.data_retorno_calculo)}</td>
       <td>${e(s.justificativa_calculo)}</td>
       <td>${s.alteracao_prognostico ? '<span class="badge badge-orange">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
       <td>${e(s.prognostico_atual)}</td>
@@ -992,6 +1051,18 @@ function statusBadge(status){
   return '<span class="badge badge-orange">Pendente</span>';
 }
 
+function calcSolicitadoBadge(v){
+  if(v === true) return '<span class="badge badge-green">Sim</span>';
+  if(v === false) return '<span class="badge badge-red">Não</span>';
+  return '<span class="badge badge-nao">N/A</span>';
+}
+
+function calcSolicitadoTexto(v){
+  if(v === true) return 'Sim';
+  if(v === false) return 'Não';
+  return 'N/A';
+}
+
 function acoesStatus(s){
   const excluir = `<button class="action-btn excluir" onclick="excluirSolicitacao('${s.id}')" title="Excluir">🗑</button>`;
   if(s.status === 'Pendente'){
@@ -1014,11 +1085,12 @@ async function excluirSolicitacao(id){
 }
 
 function mudarAba(aba){
-  const solic = aba === 'solicitacoes';
-  document.querySelector('#view-solicitacoes').style.display = solic ? '' : 'none';
-  document.querySelector('#view-cobrancas').style.display = solic ? 'none' : '';
-  document.querySelector('#tab-btn-solicitacoes').classList.toggle('active', solic);
-  document.querySelector('#tab-btn-cobrancas').classList.toggle('active', !solic);
+  document.querySelector('#view-solicitacoes').style.display = aba === 'solicitacoes' ? '' : 'none';
+  document.querySelector('#view-cobrancas').style.display = aba === 'cobrancas' ? '' : 'none';
+  document.querySelector('#view-insercao-valores').style.display = aba === 'valores' ? '' : 'none';
+  document.querySelector('#tab-btn-solicitacoes').classList.toggle('active', aba === 'solicitacoes');
+  document.querySelector('#tab-btn-cobrancas').classList.toggle('active', aba === 'cobrancas');
+  document.querySelector('#tab-btn-valores').classList.toggle('active', aba === 'valores');
 }
 
 function itemCobranca(s, sub, tipo){
@@ -1033,15 +1105,77 @@ function itemCobranca(s, sub, tipo){
     </div>`;
 }
 
+function renderInsercaoValores(){
+  const sel = document.querySelector('#iv-processo');
+  const selecaoAtual = sel.value;
+
+  sel.innerHTML = '<option value="" selected>Selecione um processo…</option>'
+    + SOLICITACOES.map(s => `<option value="${s.id}">${e(s.cliente)} — ${e(s.processo)} — ${e(s.reclamante)}</option>`).join('');
+
+  if(selecaoAtual && SOLICITACOES.some(s => s.id === selecaoAtual)) sel.value = selecaoAtual;
+  else atualizarPainelValores();
+
+  const tbody = document.querySelector('#tbody-valores');
+  tbody.innerHTML = SOLICITACOES.map(s => `
+    <tr>
+      <td>${e(s.cliente)}</td>
+      <td class="mono">${e(s.processo)}</td>
+      <td>${e(s.reclamante)}</td>
+      <td>${e(s.provisao_atual)}</td>
+      <td>${e(s.novo_valor)}</td>
+    </tr>
+  `).join('');
+}
+
+function atualizarPainelValores(){
+  const s = SOLICITACOES.find(x => x.id === document.querySelector('#iv-processo').value);
+  const info = document.querySelector('#iv-info');
+  const provisao = document.querySelector('#iv-provisao-atual');
+  const novoValor = document.querySelector('#iv-novo-valor');
+  const btn = document.querySelector('#btn-salvar-valores');
+
+  if(!s){
+    info.textContent = '';
+    provisao.value = ''; provisao.disabled = true;
+    novoValor.value = ''; novoValor.disabled = true;
+    btn.disabled = true;
+    return;
+  }
+  info.innerHTML = `<b>${e(s.reclamante)}</b> x <b>${e(s.reclamada)}</b> — Advogado: ${e(s.advogado_solicitante)} · Assistente: ${e(s.assistente_responsavel)}`;
+  provisao.value = s.provisao_atual || ''; provisao.disabled = false;
+  novoValor.value = s.novo_valor || ''; novoValor.disabled = false;
+  btn.disabled = false;
+}
+
+document.querySelector('#iv-processo').addEventListener('change', atualizarPainelValores);
+
+document.querySelector('#btn-salvar-valores').addEventListener('click', async function(){
+  const id = document.querySelector('#iv-processo').value;
+  if(!id) return;
+  const provisao = document.querySelector('#iv-provisao-atual').value.trim();
+  const novoValor = document.querySelector('#iv-novo-valor').value.trim();
+  this.disabled = true; this.textContent = 'Salvando…';
+  const { error } = await getClient().from(TABLE).update({ provisao_atual: provisao, novo_valor: novoValor }).eq('id', id);
+  this.disabled = false; this.textContent = 'Salvar Valores';
+  if(error){ alert('Erro ao salvar: ' + error.message); return; }
+  await carregar();
+  alert('Valores salvos com sucesso.');
+});
+
 function renderCobrancas(){
+  const hoje = hojeISO();
   const pendCalculo = SOLICITACOES.filter(s => s.status === 'Pendente');
   const pendRevisao = SOLICITACOES.filter(s => s.status === 'Aguardando Revisão');
   const pendDecisao = SOLICITACOES.filter(s => !s.tipo_decisao);
+  const retornoVencido = SOLICITACOES.filter(s => s.calculo_solicitado === true && s.data_retorno_calculo && s.data_retorno_calculo <= hoje && s.status !== 'Revisado');
+  const naoSolicitado = SOLICITACOES.filter(s => s.calculo_solicitado === false);
   const identificados = SOLICITACOES.filter(s => s.origem === 'Identificado pelo Assistente');
 
   const elCalculo = document.querySelector('#cobranca-calculo');
   const elRevisao = document.querySelector('#cobranca-revisao');
   const elDecisao = document.querySelector('#cobranca-decisao');
+  const elRetorno = document.querySelector('#cobranca-retorno');
+  const elNaoSolicitado = document.querySelector('#cobranca-nao-solicitado');
   const elIdentificado = document.querySelector('#cobranca-identificado');
 
   elCalculo.innerHTML = pendCalculo.length
@@ -1055,6 +1189,14 @@ function renderCobrancas(){
   elDecisao.innerHTML = pendDecisao.length
     ? pendDecisao.map(s => itemCobranca(s, `Status: ${s.status}`, 'decisao')).join('')
     : '<div class="empty-state">Nenhuma decisão pendente de inserção.</div>';
+
+  elRetorno.innerHTML = retornoVencido.length
+    ? retornoVencido.map(s => itemCobranca(s, `Retorno previsto para ${formatarData(s.data_retorno_calculo)}`, 'retorno')).join('')
+    : '<div class="empty-state">Nenhum retorno de cálculo vencido.</div>';
+
+  elNaoSolicitado.innerHTML = naoSolicitado.length
+    ? naoSolicitado.map(s => itemCobranca(s, `Justificativa: ${naSeVazio(s.justificativa_calculo)}`, 'naosolicitado')).join('')
+    : '<div class="empty-state">Nenhum caso com cálculo não solicitado.</div>';
 
   elIdentificado.innerHTML = identificados.length
     ? identificados.map(s => itemCobranca(s, `Decisão: ${s.tipo_decisao} em ${formatarData(s.data_decisao)} · Status: ${s.status}`, 'identificado')).join('')
@@ -1076,6 +1218,12 @@ function cobrarSolicitacao(id, tipo){
   } else if(tipo === 'decisao'){
     assunto = `Cobrança — decisão do processo ainda não informada — ${s.cliente} — ${s.processo}`;
     corpo = `Olá, ${s.advogado_solicitante}.\n\nAinda não recebemos a informação do Tipo de Decisão para o processo abaixo. Por favor, nos informe assim que possível.\n\n${base}Controle de Decisões e Inclusão de Valores — LAWgico`;
+  } else if(tipo === 'retorno'){
+    assunto = `Cobrança — prazo de retorno do cálculo vencido — ${s.cliente} — ${s.processo}`;
+    corpo = `Olá, ${s.advogado_solicitante}.\n\nA data prevista de retorno do cálculo abaixo (${formatarData(s.data_retorno_calculo)}) já chegou. Por favor, nos dê um retorno assim que possível.\n\n${base}Controle de Decisões e Inclusão de Valores — LAWgico`;
+  } else if(tipo === 'naosolicitado'){
+    assunto = `Cobrança — cálculo ainda não solicitado — ${s.cliente} — ${s.processo}`;
+    corpo = `Olá, ${s.advogado_solicitante}.\n\nO processo abaixo está marcado como "Cálculo não solicitado" (justificativa: ${naSeVazio(s.justificativa_calculo)}). Se já for hora de solicitar o cálculo, por favor nos avise.\n\n${base}Controle de Decisões e Inclusão de Valores — LAWgico`;
   } else {
     assunto = `Cobrança — decisão identificada sem solicitação de cálculo — ${s.cliente} — ${s.processo}`;
     corpo = `Olá, ${s.advogado_solicitante}.\n\nO(a) assistente ${s.assistente_responsavel} identificou que saiu a decisão abaixo (${s.tipo_decisao}, em ${formatarData(s.data_decisao)}), mas ainda não recebemos a solicitação de cálculo pra esse processo.\n\n${base}Por favor, envie a solicitação assim que possível: https://peixotoecury.github.io/controleinsercaovalores/\n\nControle de Decisões e Inclusão de Valores — LAWgico`;
@@ -1142,6 +1290,9 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
   const cliente = clienteSel === 'Outro' ? document.querySelector('#f-cliente-outro').value.trim() : clienteSel;
   if(!cliente){ alert('Informe o cliente.'); return; }
 
+  const calcSolicitadoVal = document.querySelector('#f-calculo-solicitado').value;
+  const calcSolicitadoBool = calcSolicitadoVal === 'Sim' ? true : (calcSolicitadoVal === 'Não' ? false : null);
+
   const payload = {
     cliente,
     processo: document.querySelector('#f-processo').value.trim(),
@@ -1162,7 +1313,8 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
     doenca_detectada: document.querySelector('#f-doenca-detectada').value.trim(),
     area_corpo: document.querySelector('#f-area-corpo').value.trim(),
     motivos_laudo: document.querySelector('#f-motivos-laudo').value.trim(),
-    calculo_solicitado: document.querySelector('#f-calculo-solicitado').value === 'Sim',
+    calculo_solicitado: calcSolicitadoBool,
+    data_retorno_calculo: document.querySelector('#f-data-retorno-calculo').value || null,
     justificativa_calculo: document.querySelector('#f-justificativa-calculo').value.trim(),
     alteracao_prognostico: document.querySelector('#f-alteracao-prognostico').value === 'Sim',
     prognostico_atual: document.querySelector('#f-prognostico-atual').value,
@@ -1171,8 +1323,6 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
     fase_atual: document.querySelector('#f-fase-atual').value,
     nova_fase: document.querySelector('#f-nova-fase').value,
     acima_400k: document.querySelector('#f-400k').checked,
-    provisao_atual: document.querySelector('#f-provisao-atual').value.trim(),
-    novo_valor: document.querySelector('#f-novo-valor').value.trim(),
     advogado_solicitante: document.querySelector('#f-advogado').value,
     assistente_responsavel: document.querySelector('#f-assistente').value,
     responsavel_informacao: document.querySelector('#f-responsavel-informacao').value,
@@ -1202,6 +1352,7 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
   document.querySelector('#wrap-fases').style.display = 'none';
   document.querySelector('#wrap-tipo-calculo').style.display = 'none';
   document.querySelector('#wrap-justificativa-calculo').style.display = 'none';
+  document.querySelector('#wrap-data-retorno').style.display = 'none';
   document.querySelector('#f-tipo-calculo').required = false;
   await carregar();
 
@@ -1289,7 +1440,8 @@ function gerarExcel(lista, nomeArquivo){
     'Doença Detectada': naSeVazio(s.doenca_detectada),
     'Área do Corpo': naSeVazio(s.area_corpo),
     'Motivos do Laudo': naSeVazio(s.motivos_laudo),
-    'Cálculo Solicitado': s.calculo_solicitado ? 'Sim' : 'Não',
+    'Cálculo Solicitado': calcSolicitadoTexto(s.calculo_solicitado),
+    'Data Retorno do Cálculo': formatarData(s.data_retorno_calculo),
     'Justificativa': naSeVazio(s.justificativa_calculo),
     'Houve Alteração de Prognóstico': s.alteracao_prognostico ? 'Sim' : 'Não',
     'Prognóstico Atual': naSeVazio(s.prognostico_atual),
@@ -1312,7 +1464,7 @@ function gerarExcel(lista, nomeArquivo){
     'Observações Adicionais': naSeVazio(s.observacoes)
   }));
   const ws = XLSX.utils.json_to_sheet(dados);
-  ws['!cols'] = [{wch:24},{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:26},{wch:26},{wch:24},{wch:18},{wch:16},{wch:30},{wch:16},{wch:24},{wch:20},{wch:16},{wch:16},{wch:16},{wch:24},{wch:16},{wch:20},{wch:20},{wch:20},{wch:26},{wch:26},{wch:24},{wch:16},{wch:12},{wch:16},{wch:14},{wch:16},{wch:16},{wch:36}];
+  ws['!cols'] = [{wch:24},{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:26},{wch:26},{wch:24},{wch:18},{wch:16},{wch:30},{wch:16},{wch:16},{wch:24},{wch:20},{wch:16},{wch:16},{wch:16},{wch:24},{wch:16},{wch:20},{wch:20},{wch:20},{wch:26},{wch:26},{wch:24},{wch:16},{wch:12},{wch:16},{wch:14},{wch:16},{wch:16},{wch:36}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Solicitações');
   XLSX.writeFile(wb, `${nomeArquivo}.xlsx`);
