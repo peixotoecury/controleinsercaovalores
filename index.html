@@ -87,6 +87,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13
 
 /* ── FORM ── */
 .mc-form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.mc-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px;}
+@media (max-width: 700px){ .mc-form-grid{grid-template-columns:1fr;} }
 .mc-form-group label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
 .mc-form-group label .req{color:var(--red);}
 .mc-form-group input,.mc-form-group select,.mc-form-group textarea{
@@ -388,6 +390,7 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
           <thead>
             <tr>
               <th>Data Sol.</th>
+              <th>Origem</th>
               <th>Cliente</th>
               <th>Processo</th>
               <th>Reclamante</th>
@@ -438,9 +441,76 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
       <div id="cobranca-revisao"></div>
     </div>
 
-    <div class="dash-card">
+    <div class="dash-card" style="margin-bottom:18px;">
       <div class="dash-card-head">⚖️ Inserção de Decisão — Ainda Não Informada</div>
       <div id="cobranca-decisao"></div>
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-card-head">🔍 Decisão Identificada sem Solicitação</div>
+      <div class="dash-card-body">
+        <div class="hint" style="margin-bottom:12px;">Use isso quando você (assistente) ficar sabendo que saiu uma decisão num processo, mas ninguém enviou solicitação de cálculo pra ele — o caso ainda nem existe na aba "Solicitações". Registre aqui pra cobrar o advogado responsável.</div>
+        <form id="form-identificado">
+          <div class="mc-form-grid">
+            <div class="mc-form-group">
+              <label>Cliente <span class="req">*</span></label>
+              <select id="cf-cliente" required>
+                <option value="" disabled selected>Selecione…</option>
+                <option>Bridgestone</option>
+                <option>CBC</option>
+                <option>Embraer</option>
+                <option>T4F</option>
+                <option>Ferrero</option>
+                <option value="Outro">Outro…</option>
+              </select>
+            </div>
+            <div class="mc-form-group" id="wrap-cf-cliente-outro" style="display:none;">
+              <label>Nome do Cliente <span class="req">*</span></label>
+              <input type="text" id="cf-cliente-outro">
+            </div>
+            <div class="mc-form-group">
+              <label>Processo (CNJ) <span class="req">*</span></label>
+              <input type="text" id="cf-processo" required placeholder="0000000-00.0000.0.00.0000">
+            </div>
+            <div class="mc-form-group">
+              <label>Reclamante <span class="req">*</span></label>
+              <input type="text" id="cf-reclamante" required>
+            </div>
+            <div class="mc-form-group">
+              <label>Reclamada <span class="req">*</span></label>
+              <input type="text" id="cf-reclamada" required>
+            </div>
+            <div class="mc-form-group">
+              <label>Advogado Responsável <span class="req">*</span></label>
+              <select id="cf-advogado" required>
+                <option value="" disabled selected>Selecione…</option>
+              </select>
+            </div>
+            <div class="mc-form-group">
+              <label>Identificado por (Assistente) <span class="req">*</span></label>
+              <select id="cf-identificado-por" required>
+                <option value="" disabled selected>Selecione…</option>
+              </select>
+            </div>
+            <div class="mc-form-group">
+              <label>Tipo de Decisão <span class="req">*</span></label>
+              <select id="cf-tipo-decisao" required>
+                <option value="" disabled selected>Selecione…</option>
+              </select>
+            </div>
+            <div class="mc-form-group">
+              <label>Data da Decisão <span class="req">*</span></label>
+              <input type="date" id="cf-data-decisao" required>
+            </div>
+          </div>
+          <div class="mc-form-group">
+            <label>Observações Adicionais</label>
+            <textarea id="cf-observacoes" rows="2"></textarea>
+          </div>
+          <button type="submit" class="btn-cyan" style="width:auto;padding-left:24px;padding-right:24px;">Registrar e Cobrar Advogado</button>
+        </form>
+      </div>
+      <div id="cobranca-identificado"></div>
     </div>
 
   </div>
@@ -586,6 +656,9 @@ popularSelectProfissionais(document.querySelector('#f-assistente'), 'Assistente'
 popularSelectOpcoes(document.querySelector('#f-tipo-calculo'), TIPOS_CALCULO);
 popularSelectOpcoes(document.querySelector('#f-tipo-decisao'), TIPOS_DECISAO);
 popularSelectProfissionais(document.querySelector('#flt-assistente'), 'Assistente');
+popularSelectProfissionais(document.querySelector('#cf-advogado'), 'Advogado');
+popularSelectProfissionais(document.querySelector('#cf-identificado-por'), 'Assistente');
+popularSelectOpcoes(document.querySelector('#cf-tipo-decisao'), TIPOS_DECISAO);
 
 document.querySelector('#f-cliente').addEventListener('change', function(){
   const wrap = document.querySelector('#wrap-cliente-outro');
@@ -599,6 +672,13 @@ document.querySelector('#f-tipo-decisao').addEventListener('change', function(){
   const sel = document.querySelector('#f-tipo-laudo');
   if(this.value === 'Laudo Desfavorável'){ wrap.style.display = ''; }
   else { wrap.style.display = 'none'; sel.value = ''; }
+});
+
+document.querySelector('#cf-cliente').addEventListener('change', function(){
+  const wrap = document.querySelector('#wrap-cf-cliente-outro');
+  const outro = document.querySelector('#cf-cliente-outro');
+  if(this.value === 'Outro'){ wrap.style.display = ''; outro.required = true; }
+  else { wrap.style.display = 'none'; outro.required = false; outro.value = ''; }
 });
 
 let sbClient = null;
@@ -692,6 +772,7 @@ function render(){
   tbody.innerHTML = lista.map(s => `
     <tr>
       <td>${formatarData(s.data_solicitacao)}</td>
+      <td>${s.origem === 'Identificado pelo Assistente' ? '<span class="badge badge-blue">🔍 Identificado</span>' : '<span class="badge badge-nao">Advogado</span>'}</td>
       <td>${e(s.cliente)}</td>
       <td class="mono">${e(s.processo)}</td>
       <td>${e(s.reclamante)}</td>
@@ -764,10 +845,12 @@ function renderCobrancas(){
   const pendCalculo = SOLICITACOES.filter(s => s.status === 'Pendente');
   const pendRevisao = SOLICITACOES.filter(s => s.status === 'Aguardando Revisão');
   const pendDecisao = SOLICITACOES.filter(s => !s.tipo_decisao);
+  const identificados = SOLICITACOES.filter(s => s.origem === 'Identificado pelo Assistente');
 
   const elCalculo = document.querySelector('#cobranca-calculo');
   const elRevisao = document.querySelector('#cobranca-revisao');
   const elDecisao = document.querySelector('#cobranca-decisao');
+  const elIdentificado = document.querySelector('#cobranca-identificado');
 
   elCalculo.innerHTML = pendCalculo.length
     ? pendCalculo.map(s => itemCobranca(s, `Solicitado em ${formatarData(s.data_solicitacao)}`, 'calculo')).join('')
@@ -780,6 +863,10 @@ function renderCobrancas(){
   elDecisao.innerHTML = pendDecisao.length
     ? pendDecisao.map(s => itemCobranca(s, `Status: ${s.status}`, 'decisao')).join('')
     : '<div class="empty-state">Nenhuma decisão pendente de inserção.</div>';
+
+  elIdentificado.innerHTML = identificados.length
+    ? identificados.map(s => itemCobranca(s, `Decisão: ${s.tipo_decisao} em ${formatarData(s.data_decisao)} · Status: ${s.status}`, 'identificado')).join('')
+    : '<div class="empty-state">Nenhum caso identificado registrado ainda.</div>';
 }
 
 function cobrarSolicitacao(id, tipo){
@@ -794,9 +881,12 @@ function cobrarSolicitacao(id, tipo){
   } else if(tipo === 'revisao'){
     assunto = `Cobrança — cálculo aguardando sua revisão — ${s.cliente} — ${s.processo}`;
     corpo = `Olá, ${s.advogado_solicitante}.\n\nO cálculo abaixo já foi lançado pelo(a) assistente ${s.assistente_responsavel} e segue aguardando a sua revisão.\n\n${base}Acesse o painel para revisar: https://peixotoecury.github.io/controleinsercaovalores/\n\nControle de Inserção de Valores — LAWgico`;
-  } else {
+  } else if(tipo === 'decisao'){
     assunto = `Cobrança — decisão do processo ainda não informada — ${s.cliente} — ${s.processo}`;
     corpo = `Olá, ${s.advogado_solicitante}.\n\nAinda não recebemos a informação do Tipo de Decisão para o processo abaixo. Por favor, nos informe assim que possível.\n\n${base}Controle de Inserção de Valores — LAWgico`;
+  } else {
+    assunto = `Cobrança — decisão identificada sem solicitação de cálculo — ${s.cliente} — ${s.processo}`;
+    corpo = `Olá, ${s.advogado_solicitante}.\n\nO(a) assistente ${s.assistente_responsavel} identificou que saiu a decisão abaixo (${s.tipo_decisao}, em ${formatarData(s.data_decisao)}), mas ainda não recebemos a solicitação de cálculo pra esse processo.\n\n${base}Por favor, envie a solicitação assim que possível: https://peixotoecury.github.io/controleinsercaovalores/\n\nControle de Inserção de Valores — LAWgico`;
   }
   abrirEmail(email, assunto, corpo);
 }
@@ -887,7 +977,8 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
     observacoes: document.querySelector('#f-observacoes').value.trim(),
     data_solicitacao: hojeISO(),
     status: 'Pendente',
-    ok_assistente: false
+    ok_assistente: false,
+    origem: 'Advogado'
   };
 
   const btn = ev.target.querySelector('button[type="submit"]');
@@ -915,12 +1006,60 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
   abrirEmail(emailAssistente, assunto, corpo);
 });
 
+document.querySelector('#form-identificado').addEventListener('submit', async function(ev){
+  ev.preventDefault();
+  const clienteSel = document.querySelector('#cf-cliente').value;
+  const cliente = clienteSel === 'Outro' ? document.querySelector('#cf-cliente-outro').value.trim() : clienteSel;
+  if(!cliente){ alert('Informe o cliente.'); return; }
+
+  const payload = {
+    cliente,
+    processo: document.querySelector('#cf-processo').value.trim(),
+    reclamante: document.querySelector('#cf-reclamante').value.trim(),
+    reclamada: document.querySelector('#cf-reclamada').value.trim(),
+    advogado_solicitante: document.querySelector('#cf-advogado').value,
+    assistente_responsavel: document.querySelector('#cf-identificado-por').value,
+    tipo_decisao: document.querySelector('#cf-tipo-decisao').value,
+    data_decisao: document.querySelector('#cf-data-decisao').value,
+    observacoes: document.querySelector('#cf-observacoes').value.trim(),
+    calculo_solicitado: false,
+    data_solicitacao: hojeISO(),
+    status: 'Pendente',
+    ok_assistente: false,
+    origem: 'Identificado pelo Assistente'
+  };
+
+  const btn = ev.target.querySelector('button[type="submit"]');
+  btn.disabled = true; btn.textContent = 'Registrando…';
+
+  const { error } = await getClient().from(TABLE).insert(payload);
+
+  btn.disabled = false; btn.textContent = 'Registrar e Cobrar Advogado';
+
+  if(error){ alert('Erro ao registrar: ' + error.message); return; }
+
+  ev.target.reset();
+  document.querySelector('#wrap-cf-cliente-outro').style.display = 'none';
+  await carregar();
+
+  const emailAdvogado = emailPorNome(payload.advogado_solicitante);
+  const assunto = `Decisão identificada sem solicitação de cálculo — ${payload.cliente} — ${payload.processo}`;
+  const corpo = `Olá, ${payload.advogado_solicitante}.\n\n`
+    + `O(a) assistente ${payload.assistente_responsavel} identificou que saiu uma decisão no processo abaixo, mas não recebemos nenhuma solicitação de cálculo pra ele até agora.\n\n`
+    + `Cliente: ${payload.cliente}\nProcesso: ${payload.processo}\nReclamante: ${payload.reclamante}\nReclamada: ${payload.reclamada}\n`
+    + `Tipo de Decisão: ${payload.tipo_decisao}\nData da Decisão: ${formatarData(payload.data_decisao)}\n\n`
+    + `Por favor, envie a solicitação de cálculo assim que possível: https://peixotoecury.github.io/controleinsercaovalores/\n\n`
+    + `Controle de Inserção de Valores — LAWgico`;
+  abrirEmail(emailAdvogado, assunto, corpo);
+});
+
 ['#flt-cliente','#flt-status','#flt-assistente'].forEach(sel => document.querySelector(sel).addEventListener('change', render));
 document.querySelector('#flt-busca').addEventListener('input', render);
 
 function gerarExcel(lista, nomeArquivo){
   if(!lista.length){ return; }
   const dados = lista.map(s => ({
+    'Origem': s.origem === 'Identificado pelo Assistente' ? 'Identificado pelo Assistente' : 'Advogado',
     'Cliente': s.cliente,
     'Processo': s.processo,
     'Reclamante': s.reclamante,
@@ -951,7 +1090,7 @@ function gerarExcel(lista, nomeArquivo){
     'Observações Adicionais': s.observacoes
   }));
   const ws = XLSX.utils.json_to_sheet(dados);
-  ws['!cols'] = [{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:20},{wch:16},{wch:16},{wch:16},{wch:24},{wch:20},{wch:20},{wch:20},{wch:26},{wch:26},{wch:16},{wch:12},{wch:16},{wch:14},{wch:36}];
+  ws['!cols'] = [{wch:24},{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:20},{wch:16},{wch:16},{wch:16},{wch:24},{wch:20},{wch:20},{wch:20},{wch:26},{wch:26},{wch:16},{wch:12},{wch:16},{wch:14},{wch:36}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Solicitações');
   XLSX.writeFile(wb, `${nomeArquivo}.xlsx`);
