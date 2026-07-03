@@ -147,7 +147,7 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
       <div class="tb-tagline">lawyers at work</div>
     </div>
     <div class="topbar-divider"></div>
-    <div class="topbar-title">Controle de Inserção de Valores — Controladoria Jurídica</div>
+    <div class="topbar-title">Controle de Inserção de Valores — Jurídica</div>
   </div>
   <div class="topbar-right">
     <a class="logout-btn" href="../LAWgico_Hub.html">← Hub</a>
@@ -263,6 +263,23 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
           </div>
 
           <div class="check-row">
+            <input type="checkbox" id="f-alteracao-fase">
+            <label for="f-alteracao-fase">Houve alteração de fase</label>
+          </div>
+
+          <div class="mc-form-group">
+            <label>Fase Atual</label>
+            <select id="f-fase-atual">
+              <option value="" selected>Selecione…</option>
+              <option>Inicial</option>
+              <option>Instrução</option>
+              <option>Recursal</option>
+              <option>Recursal com Execução Provisória</option>
+              <option>Execução</option>
+            </select>
+          </div>
+
+          <div class="check-row">
             <input type="checkbox" id="f-400k">
             <label for="f-400k">Valor acima de R$ 400.000,00</label>
           </div>
@@ -325,6 +342,8 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
               <th>Tipo de Cálculo</th>
               <th>Data Decisão</th>
               <th>Tipo de Decisão</th>
+              <th>Alteração de Fase</th>
+              <th>Fase Atual</th>
               <th>Acima 400k</th>
               <th>Advogado</th>
               <th>Assistente</th>
@@ -533,6 +552,8 @@ function render(){
       <td>${e(s.tipo_calculo)}</td>
       <td>${formatarData(s.data_decisao)}</td>
       <td>${e(s.tipo_decisao)}</td>
+      <td>${s.alteracao_fase ? '<span class="badge badge-orange">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
+      <td>${e(s.fase_atual)}</td>
       <td>${s.acima_400k ? '<span class="badge badge-red">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
       <td>${e(s.advogado_solicitante)}</td>
       <td>${e(s.assistente_responsavel)}</td>
@@ -585,6 +606,8 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
     tipo_calculo: document.querySelector('#f-tipo-calculo').value,
     data_decisao: document.querySelector('#f-data-decisao').value,
     tipo_decisao: document.querySelector('#f-tipo-decisao').value,
+    alteracao_fase: document.querySelector('#f-alteracao-fase').checked,
+    fase_atual: document.querySelector('#f-fase-atual').value,
     acima_400k: document.querySelector('#f-400k').checked,
     advogado_solicitante: document.querySelector('#f-advogado').value,
     assistente_responsavel: document.querySelector('#f-assistente').value,
@@ -627,6 +650,8 @@ document.querySelector('#btn-exportar').addEventListener('click', function(){
     'Tipo de Cálculo': s.tipo_calculo,
     'Data da Decisão': formatarData(s.data_decisao),
     'Tipo de Decisão': s.tipo_decisao,
+    'Houve Alteração de Fase': s.alteracao_fase ? 'Sim' : 'Não',
+    'Fase Atual': s.fase_atual,
     'Acima de R$ 400.000,00': s.acima_400k ? 'Sim' : 'Não',
     'Advogado Solicitante': s.advogado_solicitante,
     'Assistente Responsável': s.assistente_responsavel,
@@ -636,7 +661,7 @@ document.querySelector('#btn-exportar').addEventListener('click', function(){
     'OK do Assistente': s.ok_assistente ? 'Sim' : 'Não'
   }));
   const ws = XLSX.utils.json_to_sheet(dados);
-  ws['!cols'] = [{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:20},{wch:26},{wch:26},{wch:16},{wch:12},{wch:16},{wch:14}];
+  ws['!cols'] = [{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:16},{wch:24},{wch:20},{wch:26},{wch:26},{wch:16},{wch:12},{wch:16},{wch:14}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Solicitações');
   const hoje = hojeISO();
