@@ -206,7 +206,7 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
           </div>
 
           <div class="mc-form-group">
-            <label>Juiz</label>
+            <label>Juiz/Desembargador/Ministro</label>
             <input type="text" id="f-juiz">
           </div>
 
@@ -216,7 +216,7 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
           </div>
 
           <div class="mc-form-group">
-            <label>Vara</label>
+            <label>Vara/Turma/Câmara</label>
             <input type="text" id="f-vara">
           </div>
 
@@ -260,6 +260,16 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
             <select id="f-tipo-decisao" required>
               <option value="" disabled selected>Selecione…</option>
             </select>
+          </div>
+
+          <div class="check-row">
+            <input type="checkbox" id="f-calculo-solicitado">
+            <label for="f-calculo-solicitado">Cálculo foi solicitado</label>
+          </div>
+
+          <div class="check-row">
+            <input type="checkbox" id="f-alteracao-prognostico">
+            <label for="f-alteracao-prognostico">Houve alteração de prognóstico</label>
           </div>
 
           <div class="check-row">
@@ -342,6 +352,8 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
               <th>Perito do Juízo</th>
               <th>Data Decisão</th>
               <th>Tipo de Decisão</th>
+              <th>Cálculo Solicitado</th>
+              <th>Alteração de Prognóstico</th>
               <th>Alteração de Fase</th>
               <th>Fase Atual</th>
               <th>Acima 400k</th>
@@ -370,7 +382,7 @@ const TABLE = 'solicitacoes_calculo';
 
 const TIPOS_CALCULO = ['Inicial','Sentença','Embargos','Acórdão TRT','Acórdão TST','Acordo','Cálculos Reclamante','Cálculos Reclamada','Cálculos do Perito Judicial','Cálculos Homologados em Execução','Carta de Sentença','Laudo Pericial Médico','Laudo Pericial Ergonômico','Laudo Pericial Técnico','Obrigação de Fazer','Ajuste de Provisão'];
 
-const TIPOS_DECISAO = ['Improcedente','Procedente em Parte','Extinção com Resolução do Mérito','Extinção Sem Resolução do Mérito','Acordo','Procedência Total','Lado Desfavorável','Laudo Desfavorável','Reintegração'];
+const TIPOS_DECISAO = ['Improcedente','Procedente em Parte','Extinção com Resolução do Mérito','Extinção Sem Resolução do Mérito','Acordo','Procedência Total','Laudo Desfavorável','Reintegração'];
 
 const PROFISSIONAIS = [
   {n:'Alícia Marcondes Hamati', g:'Equipe A', email:'alicia.hamati@peixotoecury.com.br', cargo:'Assistente'},
@@ -610,6 +622,8 @@ function render(){
       <td>${e(s.perito_juizo)}</td>
       <td>${formatarData(s.data_decisao)}</td>
       <td>${e(s.tipo_decisao)}</td>
+      <td>${s.calculo_solicitado ? '<span class="badge badge-orange">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
+      <td>${s.alteracao_prognostico ? '<span class="badge badge-orange">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
       <td>${s.alteracao_fase ? '<span class="badge badge-orange">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
       <td>${e(s.fase_atual)}</td>
       <td>${s.acima_400k ? '<span class="badge badge-red">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
@@ -678,6 +692,8 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
     tipo_calculo: document.querySelector('#f-tipo-calculo').value,
     data_decisao: document.querySelector('#f-data-decisao').value,
     tipo_decisao: document.querySelector('#f-tipo-decisao').value,
+    calculo_solicitado: document.querySelector('#f-calculo-solicitado').checked,
+    alteracao_prognostico: document.querySelector('#f-alteracao-prognostico').checked,
     alteracao_fase: document.querySelector('#f-alteracao-fase').checked,
     fase_atual: document.querySelector('#f-fase-atual').value,
     acima_400k: document.querySelector('#f-400k').checked,
@@ -731,6 +747,8 @@ function gerarExcel(lista, nomeArquivo){
     'Nome do Perito do Juízo': s.perito_juizo,
     'Data da Decisão': formatarData(s.data_decisao),
     'Tipo de Decisão': s.tipo_decisao,
+    'Cálculo Solicitado': s.calculo_solicitado ? 'Sim' : 'Não',
+    'Houve Alteração de Prognóstico': s.alteracao_prognostico ? 'Sim' : 'Não',
     'Houve Alteração de Fase': s.alteracao_fase ? 'Sim' : 'Não',
     'Fase Atual': s.fase_atual,
     'Acima de R$ 400.000,00': s.acima_400k ? 'Sim' : 'Não',
@@ -742,7 +760,7 @@ function gerarExcel(lista, nomeArquivo){
     'OK do Assistente': s.ok_assistente ? 'Sim' : 'Não'
   }));
   const ws = XLSX.utils.json_to_sheet(dados);
-  ws['!cols'] = [{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:16},{wch:24},{wch:20},{wch:26},{wch:26},{wch:16},{wch:12},{wch:16},{wch:14}];
+  ws['!cols'] = [{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:16},{wch:16},{wch:16},{wch:24},{wch:20},{wch:26},{wch:26},{wch:16},{wch:12},{wch:16},{wch:14}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Solicitações');
   XLSX.writeFile(wb, `${nomeArquivo}.xlsx`);
