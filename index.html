@@ -373,46 +373,91 @@ const TIPOS_CALCULO = ['Inicial','Sentença','Embargos','Acórdão TRT','Acórd�
 const TIPOS_DECISAO = ['Improcedente','Procedente em Parte','Extinção com Resolução do Mérito','Extinção Sem Resolução do Mérito','Acordo','Procedência Total','Lado Desfavorável','Laudo Desfavorável','Reintegração'];
 
 const PROFISSIONAIS = [
-  {n:'Aline Amorim Oliveira', g:'Grupo A3', email:'aline.oliveira@peixotoecury.com.br'}, {n:'Aline Cunha de Oliveira Borges', g:'Grupo B1', email:'aline.borges@peixotoecury.com.br'},
-  {n:'Aline Ferreira Miron', g:'Grupo E1', email:'aline.miron@peixotoecury.com.br'}, {n:'Alícia Marcondes Hamati', g:'Grupo A3', email:'alicia.hamati@peixotoecury.com.br'},
-  {n:'Amanda Mesquita de Lima Araujo', g:'Grupo E2', email:'amanda.araujo@peixotoecury.com.br'}, {n:'Anna Carolina Balbino Gatti Baani', g:'Grupo B2', email:'annacarolina.baani@peixotoecury.com.br'},
-  {n:'Arthur Rodrigues Rios Toledo de Castro', g:'Grupo E2', email:'arthur.castro@peixotoecury.com.br'}, {n:'Ana Julia Thomaz Carmona', g:'Grupo A1', email:'anajulia.carmona@peixotoecury.com.br'},
-  {n:'Bianca Bolanhi Camacho', g:'Grupo D1', email:'bianca.camacho@peixotoecury.com.br'}, {n:'Bruna Cembranelli Fazenda', g:'Grupo B2', email:'bruna.fazenda@peixotoecury.com.br'},
-  {n:'Brenna Braga Freitas Malta', g:'Grupo B3', email:'brenna.malta@peixotoecury.com.br'}, {n:'Beatriz Santiago de Souza', g:'Grupo B1', email:'beatriz.souza@peixotoecury.com.br'},
-  {n:'Brenda da Silva dos Santos', g:'Grupo E2', email:'brenda.santos@peixotoecury.com.br'}, {n:'Camila Alves Magalhães de Paula', g:'Grupo E2', email:'camila.paula@peixotoecury.com.br'},
-  {n:'Chris Carvalho', g:'Grupo A3', email:'chris.carvalho@peixotoecury.com.br'}, {n:'Cícera Gabriela Ferreira Vicente', g:'Grupo B1', email:'cicera.vicente@peixotoecury.com.br'},
-  {n:'Diana de Jesus Santos', g:'Grupo E1', email:'diana.santos@peixotoecury.com.br'}, {n:'Daniela Prandi Pedro Ricca', g:'Grupo E1', email:'daniela.ricca@peixotoecury.com.br'},
-  {n:'Erik Mota Coppi', g:'Grupo C', email:'erik.coppi@peixotoecury.com.br'}, {n:'Ellen Mary Maciel Silva', g:'Grupo E1', email:'ellenmary.silva@peixotoecury.com.br'},
-  {n:'Evandro Vecchio Vessoni', g:'Grupo B1', email:'evandro.vessoni@peixotoecury.com.br'}, {n:'Erick Yuji Nakama', g:'Grupo A2', email:'erick.nakama@peixotoecury.com.br'},
-  {n:'Fabiano Fritz Ferreira Filho', g:'Grupo E2', email:'fabiano.filho@peixotoecury.com.br'}, {n:'Fabrício Lima da Silva', g:'Grupo E1', email:'fabricio.silva@peixotoecury.com.br'},
-  {n:'Gabriel Fretas de Oliveira', g:'Grupo E1', email:'gabriel.oliveira@peixotoecury.com.br'}, {n:'Giovanna Teixeira Franco', g:'Grupo E2', email:'giovanna.teixeira@peixotoecury.com.br'},
-  {n:'Giovanni Comunale Oliveira', g:'Grupo A1', email:'giovanni.oliveira@peixotoecury.com.br'}, {n:'Giovanna Malheiros Gatto', g:'Grupo B1', email:'giovanna.gatto@peixotoecury.com.br'},
-  {n:'Gisela da Silva Freire', g:'Sócios', email:'gisela.freire@peixotoecury.com.br'}, {n:'Geovanna Rodrigues Silva', g:'Grupo B2', email:'geovanna.rodrigues@peixotoecury.com.br'},
-  {n:'Guilherme Silva Morimoto', g:'Grupo B1', email:'guilherme.morimoto@peixotoecury.com.br'}, {n:'Gabriela de Souza Pedroso', g:'Grupo E2', email:'gabriela.pedroso@peixotoecury.com.br'},
-  {n:'Giulia Vendramini Milani', g:'Grupo E1', email:'giulia.milani@peixotoecury.com.br'}, {n:'Hanyelle Alves da Silva', g:'Grupo A1', email:'hanyelle.silva@peixotoecury.com.br'},
-  {n:'Henrique Remorini Pantuzo', g:'Grupo A1', email:'henrique.pantuzo@peixotoecury.com.br'}, {n:'Isadora Silva Gagliardi', g:'Grupo B2', email:'isadora.gagliardi@peixotoecury.com.br'},
-  {n:'Jaqueline Jahel Moraes', g:'Grupo A1', email:'jaqueline.moraes@peixotoecury.com.br'}, {n:'Jenifer de Jesus Silva', g:'Grupo B1', email:'jenifer.silva@peixotoecury.com.br'},
-  {n:'Juan Leonardo Ikier Moraes', g:'Grupo E2', email:'juanleonardo.moraes@peixotoecury.com.br'}, {n:'Juliana Perucci', g:'Grupo B1', email:'juliana.perucci@peixotoecury.com.br'},
-  {n:'Júlia Priego Lopes da Silva', g:'Grupo E1', email:'julia.priego@peixotoecury.com.br'}, {n:'Jessica Cerqueira Silva', g:'Grupo D1', email:'jessica.cerqueira@peixotoecury.com.br'},
-  {n:'Joice Ramos Miranda', g:'Grupo E1', email:'joice.miranda@peixotoecury.com.br'}, {n:'Jackeline Romeu Torres', g:'Grupo E2', email:'jackeline.torres@peixotoecury.com.br'},
-  {n:'Keyla Maria Barbosa Silva Moraes', g:'Grupo E1', email:'keyla.moraes@peixotoecury.com.br'}, {n:'Karoline de Castro Torres', g:'Grupo E2', email:'karoline.torres@peixotoecury.com.br'},
-  {n:'Lorena Rodrigues Costa Gonçalves', g:'Grupo B1', email:'lorena.goncalves@peixotoecury.com.br'}, {n:'Larissa Lekich Lobenwein', g:'Grupo E1', email:'larissa.lekich@peixotoecury.com.br'},
-  {n:'Letícia Meneghini Fontes', g:'Grupo B3', email:'leticia.fontes@peixotoecury.com.br'}, {n:'Leonardo Pereira de Jesus', g:'Grupo E1', email:'leonardo.jesus@peixotoecury.com.br'},
-  {n:'Mariana Borges de Menezes Fávaro', g:'Grupo E2', email:'mariana.favaro@peixotoecury.com.br'}, {n:'Maria Carolina Silva Santos Dias', g:'Grupo B2', email:'mariacarolina.dias@peixotoecury.com.br'},
-  {n:'Matheus de Jesus Trindade', g:'Grupo E1', email:'matheus.trindade@peixotoecury.com.br'}, {n:'Marina de Novaes Brechiani', g:'Grupo A1', email:'marina.brechiani@peixotoecury.com.br'},
-  {n:'Marcel Tadeu Matos Alves da Silva', g:'Sócios', email:'marcel.alves@peixotoecury.com.br'}, {n:'Natalia Bezerra Baliero', g:'Grupo E2', email:'natalia.baliero@peixotoecury.com.br'},
-  {n:'Natália Biondi Gaggini Robles', g:'Grupo A2', email:'natalia.gaggini@peixotoecury.com.br'}, {n:'Nathalie Louise dos Santos Rodrigues Dias', g:'Grupo E1', email:'nathalie.louise@peixotoecury.com.br'},
-  {n:'Nicolau Rafael Guimarães Coelho', g:'Grupo B1, B2 e B3', email:'nicolau.coelho@peixotoecury.com.br'}, {n:'Poliana Banqueri da Silva Guimarães', g:'Sócios', email:'poliana.banqueri@peixotoecury.com.br'},
-  {n:'Paloma da Silva Santos', g:'Grupo E1', email:'paloma.santos@peixotoecury.com.br'}, {n:'Rafael Camargo Felisbino', g:'Grupo E2', email:'rafael.camargo@peixotoecury.com.br'},
-  {n:'Rafael Rocha Ferreira', g:'Grupo B1', email:'rafael.ferreira@peixotoecury.com.br'}, {n:'Raica Fernandes Kwok', g:'Grupo B3', email:'raica.kwok@peixotoecury.com.br'},
-  {n:'Richard Ruan Leo da Silva', g:'Grupo E2', email:'richard.silva@peixotoecury.com.br'}, {n:'Rodrigo Souichi Nishijima', g:'Grupo B1', email:'rodrigo.nishijima@peixotoecury.com.br'},
-  {n:'Rafaella Wittmann Domenicis', g:'Grupo B2', email:'rafaella.domenicis@peixotoecury.com.br'}, {n:'Rafael Yepez do Lago', g:'Grupo E2', email:'rafael.lago@peixotoecury.com.br'},
-  {n:'Sofia Freire', g:'Grupo A3', email:'sofia.freire@peixotoecury.com.br'}, {n:'Thais Catharine Cardozo Esteves', g:'Grupo A1', email:'thais.esteves@peixotoecury.com.br'},
-  {n:'Tamires Lins Costa', g:'Grupo E1', email:'tamireslins.costa@peixotoecury.com.br'}, {n:'Thiago Frid Figueiredo Rossi', g:'Grupo C', email:'thiago.rossi@peixotoecury.com.br'},
-  {n:'Tabata Neves Caramelli', g:'Grupo A2', email:'tabata.caramelli@peixotoecury.com.br'}, {n:'Vitoria Araujo Carvalho', g:'Grupo B1', email:'vitoria.carvalho@peixotoecury.com.br'},
-  {n:'Vanessa de Cassia Castrequini Rosa', g:'Grupo B2', email:'vanessa.rosa@peixotoecury.com.br'}, {n:'Vinicius Ferreira Garcia', g:'Grupo A1', email:'vinicius.garcia@peixotoecury.com.br'},
-  {n:'Vinícius Ronchi Arruda', g:'Grupo E1', email:'vinicius.ronchi@peixotoecury.com.br'}, {n:'Vinicius da Silva Cerqueira', g:'Grupo C', email:'vinicius.dasilva@peixotoecury.com.br'},
-  {n:'Washington Soares Silva Filho', g:'Grupo E2', email:'washington.soares@peixotoecury.com.br'}
+  {n:'Alícia Marcondes Hamati', g:'Equipe A', email:'alicia.hamati@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Aline Amorim Oliveira', g:'Equipe A', email:'aline.oliveira@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Aline Ferreira Miron', g:'Equipe E', email:'aline.miron@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Amanda Mesquita de Lima Araujo', g:'Equipe E', email:'amanda.araujo@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Ana Carolina Honório Martini', g:'Equipe B', email:'anacarolina.martini@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Ana Julia Thomaz Carmona', g:'Equipe A', email:'anajulia.carmona@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'André Alessandro de Paula', g:'Equipe E', email:'andre.alessandro@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Anna Carolina Balbino Gatti Baani', g:'Equipe B', email:'annacarolina.baani@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Antonio Carlos Aguiar', g:'TRABALHISTA', email:'antoniocarlos.aguiar@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Arthur Rodrigues Rios Toledo de Castro', g:'Equipe E', email:'arthur.castro@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Beatriz Helena Maguetta Feitosa', g:'Equipe C', email:'beatriz.feitosa@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Beatriz Rodrigues Luna', g:'Equipe Controladoria', email:'beatriz.rodrigues@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Beatriz Santiago de Souza', g:'Equipe B', email:'beatriz.souza@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Bianca Bolanhi Camacho', g:'Equipe D', email:'bianca.camacho@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Brenda da Silva dos Santos', g:'Equipe E', email:'brenda.santos@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Brenna Braga Freitas Malta', g:'Equipe B', email:'brenna.malta@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Bruna Cembranelli Fazenda', g:'Equipe B', email:'bruna.fazenda@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Camila Alves Magalhães de Paula', g:'Equipe E', email:'camila.paula@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Chris Carvalho', g:'Equipe A', email:'chris.carvalho@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Cícera Gabriela Ferreira Vicente', g:'Equipe B', email:'cicera.vicente@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Daniela Prandi Pedro Ricca', g:'Equipe E', email:'daniela.ricca@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Ellen Mary Maciel Silva', g:'Equipe E', email:'ellenmary.silva@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Erick Yuji Nakama', g:'Equipe A', email:'erick.nakama@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Erik Mota Coppi', g:'Equipe C', email:'erik.coppi@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Evandro Vecchio Vessoni', g:'Equipe B', email:'evandro.vessoni@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Fabiana Correia dos Anjos Gomes', g:'Equipe E', email:'fabiana.gomes@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Fabrício Lima da Silva', g:'Equipe E', email:'fabricio.silva@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Gabriel Fretas de Oliveira', g:'Equipe E', email:'gabriel.oliveira@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Gabriela de Souza Pedroso', g:'Equipe E', email:'gabriela.pedroso@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Geovanna Rodrigues Silva', g:'Equipe B', email:'geovanna.rodrigues@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Giovanna Malheiros Gatto', g:'Equipe B', email:'giovanna.gatto@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Giovanna Teixeira Franco', g:'Equipe E', email:'giovanna.teixeira@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Giovanni Comunale Oliveira', g:'Equipe A', email:'giovanni.oliveira@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Gisela da Silva Freire', g:'TRABALHISTA', email:'gisela.freire@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Giulia Vendramini Milani', g:'Equipe E', email:'giulia.milani@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Giullia Peleje Leme', g:'Equipe Controladoria', email:'giullia.leme@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Guilherme Silva Morimoto', g:'Equipe B', email:'guilherme.morimoto@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Hanyelle Alves da Silva', g:'Equipe A', email:'hanyelle.silva@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Henrique Remorini Pantuzo', g:'Equipe A', email:'henrique.pantuzo@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Isadora Silva Gagliardi', g:'Equipe B', email:'isadora.gagliardi@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Jackeline Romeu Torres', g:'Equipe E', email:'jackeline.torres@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Jaqueline Jahel Moraes', g:'Equipe A', email:'jaqueline.moraes@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Jenifer de Jesus Silva', g:'Equipe B', email:'jenifer.silva@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Jessica Cerqueira Silva', g:'Equipe D', email:'jessica.cerqueira@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Joice Ramos Miranda', g:'Equipe E', email:'joice.miranda@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Juan Leonardo Ikier Moraes', g:'Equipe E', email:'juanleonardo.moraes@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Júlia Priego Lopes da Silva', g:'Equipe E', email:'julia.priego@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Juliana Pereira Nascimento', g:'Equipe Relatórios', email:'juliana.nascimento@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Juliana Perucci', g:'Equipe B', email:'juliana.perucci@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Karoline de Castro Torres', g:'Equipe E', email:'karoline.torres@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Keyla Maria Barbosa Silva Moraes', g:'Equipe E', email:'keyla.moraes@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Larissa Lekich Lobenwein', g:'Equipe E', email:'larissa.lekich@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Letícia Meneghini Fontes', g:'Equipe B', email:'leticia.fontes@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Lorena Rodrigues Costa Gonçalves', g:'Equipe B', email:'lorena.goncalves@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Marcel Tadeu Matos Alves da Silva', g:'TRABALHISTA', email:'marcel.alves@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Maria Carolina Silva Santos Dias', g:'Equipe B', email:'mariacarolina.dias@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Mariana Borges de Menezes Fávaro', g:'Equipe E', email:'mariana.favaro@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Marina de Novaes Brechiani', g:'Equipe A', email:'marina.brechiani@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Matheus de Jesus Trindade', g:'Equipe E', email:'matheus.trindade@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Michael Oliveira Coqueiro', g:'Equipe Relatórios', email:'michael.coqueiro@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Natalia Bezerra Baliero', g:'Equipe E', email:'natalia.baliero@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Natália Biondi Gaggini Robles', g:'Equipe A', email:'natalia.gaggini@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Nathalie Louise dos Santos Rodrigues Dias', g:'Equipe E', email:'nathalie.louise@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Nicolau Rafael Guimarães Coelho', g:'Equipe B', email:'nicolau.coelho@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Paloma da Silva Santos', g:'Equipe E', email:'paloma.santos@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Poliana Banqueri da Silva Guimarães', g:'TRABALHISTA', email:'poliana.banqueri@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Rafael Camargo Felisbino', g:'Equipe E', email:'rafael.camargo@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Rafael Rocha Ferreira', g:'Equipe B', email:'rafael.ferreira@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Rafael Yepez do Lago', g:'Equipe E', email:'rafael.lago@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Rafaella Wittmann Domenicis', g:'Equipe B', email:'rafaella.domenicis@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Raica Fernandes Kwok', g:'Equipe B', email:'raica.kwok@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Richard Ruan Leo da Silva', g:'Equipe E', email:'richard.silva@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Rodrigo Souichi Nishijima', g:'Equipe B', email:'rodrigo.nishijima@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Sofia Freire', g:'Equipe A', email:'sofia.freire@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Tabata Neves Caramelli', g:'Equipe A', email:'tabata.caramelli@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Tamires Lins Costa', g:'Equipe E', email:'tamireslins.costa@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Tamara Silva Marcílio', g:'Equipe B1', email:'tamara.marcilio@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Thais Catharine Cardozo Esteves', g:'Equipe A', email:'thais.esteves@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Thiago Frid Figueiredo Rossi', g:'Equipe C', email:'thiago.rossi@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Vanessa de Cassia Castrequini Rosa', g:'Equipe B', email:'vanessa.rosa@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Vinicius da Silva Cerqueira', g:'Equipe A', email:'vinicius.dasilva@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Vinicius Ferreira Garcia', g:'Equipe A', email:'vinicius.garcia@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Vinícius Ronchi Arruda', g:'Equipe E', email:'vinicius.ronchi@peixotoecury.com.br', cargo:'Advogado'},
+  {n:'Vitoria Araujo Carvalho', g:'Equipe B', email:'vitoria.carvalho@peixotoecury.com.br', cargo:'Assistente'},
+  {n:'Washington Soares Silva Filho', g:'Equipe E', email:'washington.soares@peixotoecury.com.br', cargo:'Advogado'}
 ];
 
 function emailPorNome(nome){
@@ -428,9 +473,9 @@ function abrirEmail(destinatario, assunto, corpo){
 
 function e(v){ return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-function popularSelectProfissionais(select){
+function popularSelectProfissionais(select, cargo){
   const grupos = {};
-  PROFISSIONAIS.forEach(p => { (grupos[p.g] = grupos[p.g] || []).push(p.n); });
+  PROFISSIONAIS.filter(p => p.cargo === cargo).forEach(p => { (grupos[p.g] = grupos[p.g] || []).push(p.n); });
   Object.keys(grupos).sort().forEach(g => {
     const og = document.createElement('optgroup');
     og.label = g;
@@ -451,10 +496,11 @@ function popularSelectOpcoes(select, opcoes){
   });
 }
 
-['#f-advogado','#f-assistente'].forEach(sel => popularSelectProfissionais(document.querySelector(sel)));
+popularSelectProfissionais(document.querySelector('#f-advogado'), 'Advogado');
+popularSelectProfissionais(document.querySelector('#f-assistente'), 'Assistente');
 popularSelectOpcoes(document.querySelector('#f-tipo-calculo'), TIPOS_CALCULO);
 popularSelectOpcoes(document.querySelector('#f-tipo-decisao'), TIPOS_DECISAO);
-popularSelectProfissionais(document.querySelector('#flt-assistente'));
+popularSelectProfissionais(document.querySelector('#flt-assistente'), 'Assistente');
 
 document.querySelector('#f-cliente').addEventListener('change', function(){
   const wrap = document.querySelector('#wrap-cliente-outro');
