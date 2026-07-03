@@ -265,13 +265,6 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
           </div>
 
           <div class="mc-form-group">
-            <label>Tipo de Cálculo <span class="req">*</span></label>
-            <select id="f-tipo-calculo" required>
-              <option value="" disabled selected>Selecione…</option>
-            </select>
-          </div>
-
-          <div class="mc-form-group">
             <label>Nome do Perito do Juízo</label>
             <input type="text" id="f-perito">
           </div>
@@ -322,15 +315,6 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
               <label>Motivos</label>
               <textarea id="f-motivos-laudo" rows="2"></textarea>
             </div>
-          </div>
-
-          <div class="mc-form-group">
-            <label>Cálculo foi solicitado <span class="req">*</span></label>
-            <select id="f-calculo-solicitado" required>
-              <option value="" disabled selected>Selecione…</option>
-              <option value="Sim">Sim</option>
-              <option value="Não">Não</option>
-            </select>
           </div>
 
           <div class="mc-form-group">
@@ -437,6 +421,27 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
           </div>
 
           <div class="mc-form-group">
+            <label>Cálculo foi Solicitado? <span class="req">*</span></label>
+            <select id="f-calculo-solicitado" required>
+              <option value="" disabled selected>Selecione…</option>
+              <option value="Sim">Sim</option>
+              <option value="Não">Não</option>
+            </select>
+          </div>
+
+          <div class="mc-form-group" id="wrap-tipo-calculo" style="display:none;">
+            <label>Tipo de Cálculo <span class="req">*</span></label>
+            <select id="f-tipo-calculo">
+              <option value="" disabled selected>Selecione…</option>
+            </select>
+          </div>
+
+          <div class="mc-form-group" id="wrap-justificativa-calculo" style="display:none;">
+            <label>Justificativa</label>
+            <textarea id="f-justificativa-calculo" rows="2"></textarea>
+          </div>
+
+          <div class="mc-form-group">
             <label>Observações Adicionais</label>
             <textarea id="f-observacoes" rows="3"></textarea>
           </div>
@@ -493,6 +498,7 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
               <th>Área do Corpo</th>
               <th>Motivos do Laudo</th>
               <th>Cálculo Solicitado</th>
+              <th>Justificativa</th>
               <th>Alteração de Prognóstico</th>
               <th>Prognóstico Atual</th>
               <th>Novo Prognóstico</th>
@@ -803,6 +809,21 @@ document.querySelector('#f-tipo-decisao').addEventListener('change', function(){
   document.querySelector(sel).addEventListener('change', atualizarWrapsLaudo);
 });
 
+document.querySelector('#f-calculo-solicitado').addEventListener('change', function(){
+  const wrapTipo = document.querySelector('#wrap-tipo-calculo');
+  const wrapJustificativa = document.querySelector('#wrap-justificativa-calculo');
+  const tipoCalculo = document.querySelector('#f-tipo-calculo');
+  const justificativa = document.querySelector('#f-justificativa-calculo');
+
+  if(this.value === 'Sim'){
+    wrapTipo.style.display = ''; tipoCalculo.required = true;
+    wrapJustificativa.style.display = 'none'; justificativa.value = '';
+  } else {
+    wrapJustificativa.style.display = ''; wrapTipo.style.display = 'none';
+    tipoCalculo.required = false; tipoCalculo.value = '';
+  }
+});
+
 document.querySelector('#f-alteracao-prognostico').addEventListener('change', function(){
   const wrap = document.querySelector('#wrap-prognosticos');
   if(this.value === 'Sim'){ wrap.style.display = ''; }
@@ -944,6 +965,7 @@ function render(){
       <td>${e(s.area_corpo)}</td>
       <td>${e(s.motivos_laudo)}</td>
       <td>${s.calculo_solicitado ? '<span class="badge badge-orange">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
+      <td>${e(s.justificativa_calculo)}</td>
       <td>${s.alteracao_prognostico ? '<span class="badge badge-orange">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
       <td>${e(s.prognostico_atual)}</td>
       <td>${e(s.novo_prognostico)}</td>
@@ -1141,6 +1163,7 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
     area_corpo: document.querySelector('#f-area-corpo').value.trim(),
     motivos_laudo: document.querySelector('#f-motivos-laudo').value.trim(),
     calculo_solicitado: document.querySelector('#f-calculo-solicitado').value === 'Sim',
+    justificativa_calculo: document.querySelector('#f-justificativa-calculo').value.trim(),
     alteracao_prognostico: document.querySelector('#f-alteracao-prognostico').value === 'Sim',
     prognostico_atual: document.querySelector('#f-prognostico-atual').value,
     novo_prognostico: document.querySelector('#f-novo-prognostico').value,
@@ -1177,6 +1200,9 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
   document.querySelector('#wrap-medico-ergonomico').style.display = 'none';
   document.querySelector('#wrap-prognosticos').style.display = 'none';
   document.querySelector('#wrap-fases').style.display = 'none';
+  document.querySelector('#wrap-tipo-calculo').style.display = 'none';
+  document.querySelector('#wrap-justificativa-calculo').style.display = 'none';
+  document.querySelector('#f-tipo-calculo').required = false;
   await carregar();
 
   const emailAssistente = emailPorNome(payload.assistente_responsavel);
@@ -1264,6 +1290,7 @@ function gerarExcel(lista, nomeArquivo){
     'Área do Corpo': naSeVazio(s.area_corpo),
     'Motivos do Laudo': naSeVazio(s.motivos_laudo),
     'Cálculo Solicitado': s.calculo_solicitado ? 'Sim' : 'Não',
+    'Justificativa': naSeVazio(s.justificativa_calculo),
     'Houve Alteração de Prognóstico': s.alteracao_prognostico ? 'Sim' : 'Não',
     'Prognóstico Atual': naSeVazio(s.prognostico_atual),
     'Novo Prognóstico': naSeVazio(s.novo_prognostico),
@@ -1285,7 +1312,7 @@ function gerarExcel(lista, nomeArquivo){
     'Observações Adicionais': naSeVazio(s.observacoes)
   }));
   const ws = XLSX.utils.json_to_sheet(dados);
-  ws['!cols'] = [{wch:24},{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:26},{wch:26},{wch:24},{wch:18},{wch:16},{wch:30},{wch:16},{wch:20},{wch:16},{wch:16},{wch:16},{wch:24},{wch:16},{wch:20},{wch:20},{wch:20},{wch:26},{wch:26},{wch:24},{wch:16},{wch:12},{wch:16},{wch:14},{wch:16},{wch:16},{wch:36}];
+  ws['!cols'] = [{wch:24},{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:26},{wch:26},{wch:24},{wch:18},{wch:16},{wch:30},{wch:16},{wch:24},{wch:20},{wch:16},{wch:16},{wch:16},{wch:24},{wch:16},{wch:20},{wch:20},{wch:20},{wch:26},{wch:26},{wch:24},{wch:16},{wch:12},{wch:16},{wch:14},{wch:16},{wch:16},{wch:36}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Solicitações');
   XLSX.writeFile(wb, `${nomeArquivo}.xlsx`);
