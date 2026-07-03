@@ -212,6 +212,13 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
             </select>
           </div>
 
+          <div class="mc-form-group">
+            <label>Tipo de Decisão <span class="req">*</span></label>
+            <select id="f-tipo-decisao" required>
+              <option value="" disabled selected>Selecione…</option>
+            </select>
+          </div>
+
           <div class="check-row">
             <input type="checkbox" id="f-400k">
             <label for="f-400k">Valor acima de R$ 400.000,00</label>
@@ -267,6 +274,7 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
               <th>Reclamante</th>
               <th>Reclamada</th>
               <th>Tipo de Cálculo</th>
+              <th>Tipo de Decisão</th>
               <th>Acima 400k</th>
               <th>Advogado</th>
               <th>Assistente</th>
@@ -292,6 +300,8 @@ const SUPABASE_KEY = 'sb_publishable_kA_IDYtEdATSygg7EajrdQ_cEi4d57N';
 const TABLE = 'solicitacoes_calculo';
 
 const TIPOS_CALCULO = ['Inicial','Sentença','Embargos','Acórdão TRT','Acórdão TST','Acordo','Cálculos Reclamante','Cálculos Reclamada','Cálculos do Perito Judicial','Cálculos Homologados em Execução','Carta de Sentença','Laudo Pericial Médico','Laudo Pericial Ergonômico','Laudo Pericial Técnico'];
+
+const TIPOS_DECISAO = ['Improcedente','Procedente em Parte','Extinção com Resolução do Mérito','Extinção Sem Resolução do Mérito','Acordo','Procedência Total','Lado Desfavorável','Laudo Desfavorável','Reintegração'];
 
 const PROFISSIONAIS = [
   {n:'Aline Amorim Oliveira', g:'Grupo A3'}, {n:'Aline Cunha de Oliveira Borges', g:'Grupo B1'},
@@ -353,8 +363,8 @@ function popularSelectProfissionais(select){
   });
 }
 
-function popularSelectTipos(select){
-  TIPOS_CALCULO.forEach(t => {
+function popularSelectOpcoes(select, opcoes){
+  opcoes.forEach(t => {
     const opt = document.createElement('option');
     opt.value = t; opt.textContent = t;
     select.appendChild(opt);
@@ -362,7 +372,8 @@ function popularSelectTipos(select){
 }
 
 ['#f-advogado','#f-assistente'].forEach(sel => popularSelectProfissionais(document.querySelector(sel)));
-popularSelectTipos(document.querySelector('#f-tipo-calculo'));
+popularSelectOpcoes(document.querySelector('#f-tipo-calculo'), TIPOS_CALCULO);
+popularSelectOpcoes(document.querySelector('#f-tipo-decisao'), TIPOS_DECISAO);
 popularSelectProfissionais(document.querySelector('#flt-assistente'));
 
 document.querySelector('#f-cliente').addEventListener('change', function(){
@@ -464,6 +475,7 @@ function render(){
       <td>${e(s.reclamante)}</td>
       <td>${e(s.reclamada)}</td>
       <td>${e(s.tipo_calculo)}</td>
+      <td>${e(s.tipo_decisao)}</td>
       <td>${s.acima_400k ? '<span class="badge badge-red">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
       <td>${e(s.advogado_solicitante)}</td>
       <td>${e(s.assistente_responsavel)}</td>
@@ -508,6 +520,7 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
     reclamante: document.querySelector('#f-reclamante').value.trim(),
     reclamada: document.querySelector('#f-reclamada').value.trim(),
     tipo_calculo: document.querySelector('#f-tipo-calculo').value,
+    tipo_decisao: document.querySelector('#f-tipo-decisao').value,
     acima_400k: document.querySelector('#f-400k').checked,
     advogado_solicitante: document.querySelector('#f-advogado').value,
     assistente_responsavel: document.querySelector('#f-assistente').value,
@@ -542,6 +555,7 @@ document.querySelector('#btn-exportar').addEventListener('click', function(){
     'Reclamante': s.reclamante,
     'Reclamada': s.reclamada,
     'Tipo de Cálculo': s.tipo_calculo,
+    'Tipo de Decisão': s.tipo_decisao,
     'Acima de R$ 400.000,00': s.acima_400k ? 'Sim' : 'Não',
     'Advogado Solicitante': s.advogado_solicitante,
     'Assistente Responsável': s.assistente_responsavel,
@@ -551,7 +565,7 @@ document.querySelector('#btn-exportar').addEventListener('click', function(){
     'OK do Assistente': s.ok_assistente ? 'Sim' : 'Não'
   }));
   const ws = XLSX.utils.json_to_sheet(dados);
-  ws['!cols'] = [{wch:14},{wch:26},{wch:24},{wch:24},{wch:28},{wch:20},{wch:26},{wch:26},{wch:16},{wch:12},{wch:16},{wch:14}];
+  ws['!cols'] = [{wch:14},{wch:26},{wch:24},{wch:24},{wch:28},{wch:28},{wch:20},{wch:26},{wch:26},{wch:16},{wch:12},{wch:16},{wch:14}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Solicitações');
   const hoje = hojeISO();
