@@ -206,6 +206,7 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
               <option>Embraer</option>
               <option>T4F</option>
               <option>Ferrero</option>
+              <option>Telefônica</option>
               <option value="Outro">Outro…</option>
             </select>
           </div>
@@ -323,31 +324,77 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
             </div>
           </div>
 
-          <div class="check-row">
-            <input type="checkbox" id="f-calculo-solicitado">
-            <label for="f-calculo-solicitado">Cálculo foi solicitado</label>
-          </div>
-
-          <div class="check-row">
-            <input type="checkbox" id="f-alteracao-prognostico">
-            <label for="f-alteracao-prognostico">Houve alteração de prognóstico</label>
-          </div>
-
-          <div class="check-row">
-            <input type="checkbox" id="f-alteracao-fase">
-            <label for="f-alteracao-fase">Houve alteração de fase</label>
+          <div class="mc-form-group">
+            <label>Cálculo foi solicitado <span class="req">*</span></label>
+            <select id="f-calculo-solicitado" required>
+              <option value="" disabled selected>Selecione…</option>
+              <option value="Sim">Sim</option>
+              <option value="Não">Não</option>
+            </select>
           </div>
 
           <div class="mc-form-group">
-            <label>Fase Atual</label>
-            <select id="f-fase-atual">
-              <option value="" selected>Selecione…</option>
-              <option>Inicial</option>
-              <option>Instrução</option>
-              <option>Recursal</option>
-              <option>Recursal com Execução Provisória</option>
-              <option>Execução</option>
+            <label>Houve alteração de prognóstico <span class="req">*</span></label>
+            <select id="f-alteracao-prognostico" required>
+              <option value="" disabled selected>Selecione…</option>
+              <option value="Sim">Sim</option>
+              <option value="Não">Não</option>
             </select>
+          </div>
+
+          <div id="wrap-prognosticos" style="display:none;">
+            <div class="mc-form-group">
+              <label>Prognóstico Atual</label>
+              <select id="f-prognostico-atual">
+                <option value="" selected>Selecione…</option>
+                <option>Possível</option>
+                <option>Provável</option>
+                <option>Remoto</option>
+              </select>
+            </div>
+            <div class="mc-form-group">
+              <label>Novo Prognóstico</label>
+              <select id="f-novo-prognostico">
+                <option value="" selected>Selecione…</option>
+                <option>Possível</option>
+                <option>Provável</option>
+                <option>Remoto</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mc-form-group">
+            <label>Houve alteração de fase <span class="req">*</span></label>
+            <select id="f-alteracao-fase" required>
+              <option value="" disabled selected>Selecione…</option>
+              <option value="Sim">Sim</option>
+              <option value="Não">Não</option>
+            </select>
+          </div>
+
+          <div id="wrap-fases" style="display:none;">
+            <div class="mc-form-group">
+              <label>Fase Atual</label>
+              <select id="f-fase-atual">
+                <option value="" selected>Selecione…</option>
+                <option>Inicial</option>
+                <option>Instrução</option>
+                <option>Recursal</option>
+                <option>Recursal com Execução Provisória</option>
+                <option>Execução</option>
+              </select>
+            </div>
+            <div class="mc-form-group">
+              <label>Nova Fase</label>
+              <select id="f-nova-fase">
+                <option value="" selected>Selecione…</option>
+                <option>Inicial</option>
+                <option>Instrução</option>
+                <option>Recursal</option>
+                <option>Recursal com Execução Provisória</option>
+                <option>Execução</option>
+              </select>
+            </div>
           </div>
 
           <div class="check-row">
@@ -447,8 +494,11 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
               <th>Motivos do Laudo</th>
               <th>Cálculo Solicitado</th>
               <th>Alteração de Prognóstico</th>
+              <th>Prognóstico Atual</th>
+              <th>Novo Prognóstico</th>
               <th>Alteração de Fase</th>
               <th>Fase Atual</th>
+              <th>Nova Fase</th>
               <th>Acima 400k</th>
               <th>Provisão/Accrual Atual</th>
               <th>Novo Valor</th>
@@ -502,6 +552,7 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
                 <option>Embraer</option>
                 <option>T4F</option>
                 <option>Ferrero</option>
+              <option>Telefônica</option>
                 <option value="Outro">Outro…</option>
               </select>
             </div>
@@ -752,6 +803,26 @@ document.querySelector('#f-tipo-decisao').addEventListener('change', function(){
   document.querySelector(sel).addEventListener('change', atualizarWrapsLaudo);
 });
 
+document.querySelector('#f-alteracao-prognostico').addEventListener('change', function(){
+  const wrap = document.querySelector('#wrap-prognosticos');
+  if(this.value === 'Sim'){ wrap.style.display = ''; }
+  else {
+    wrap.style.display = 'none';
+    document.querySelector('#f-prognostico-atual').value = '';
+    document.querySelector('#f-novo-prognostico').value = '';
+  }
+});
+
+document.querySelector('#f-alteracao-fase').addEventListener('change', function(){
+  const wrap = document.querySelector('#wrap-fases');
+  if(this.value === 'Sim'){ wrap.style.display = ''; }
+  else {
+    wrap.style.display = 'none';
+    document.querySelector('#f-fase-atual').value = '';
+    document.querySelector('#f-nova-fase').value = '';
+  }
+});
+
 document.querySelector('#cf-cliente').addEventListener('change', function(){
   const wrap = document.querySelector('#wrap-cf-cliente-outro');
   const outro = document.querySelector('#cf-cliente-outro');
@@ -874,8 +945,11 @@ function render(){
       <td>${e(s.motivos_laudo)}</td>
       <td>${s.calculo_solicitado ? '<span class="badge badge-orange">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
       <td>${s.alteracao_prognostico ? '<span class="badge badge-orange">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
+      <td>${e(s.prognostico_atual)}</td>
+      <td>${e(s.novo_prognostico)}</td>
       <td>${s.alteracao_fase ? '<span class="badge badge-orange">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
       <td>${e(s.fase_atual)}</td>
+      <td>${e(s.nova_fase)}</td>
       <td>${s.acima_400k ? '<span class="badge badge-red">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
       <td>${e(s.provisao_atual)}</td>
       <td>${e(s.novo_valor)}</td>
@@ -1066,10 +1140,13 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
     doenca_detectada: document.querySelector('#f-doenca-detectada').value.trim(),
     area_corpo: document.querySelector('#f-area-corpo').value.trim(),
     motivos_laudo: document.querySelector('#f-motivos-laudo').value.trim(),
-    calculo_solicitado: document.querySelector('#f-calculo-solicitado').checked,
-    alteracao_prognostico: document.querySelector('#f-alteracao-prognostico').checked,
-    alteracao_fase: document.querySelector('#f-alteracao-fase').checked,
+    calculo_solicitado: document.querySelector('#f-calculo-solicitado').value === 'Sim',
+    alteracao_prognostico: document.querySelector('#f-alteracao-prognostico').value === 'Sim',
+    prognostico_atual: document.querySelector('#f-prognostico-atual').value,
+    novo_prognostico: document.querySelector('#f-novo-prognostico').value,
+    alteracao_fase: document.querySelector('#f-alteracao-fase').value === 'Sim',
     fase_atual: document.querySelector('#f-fase-atual').value,
+    nova_fase: document.querySelector('#f-nova-fase').value,
     acima_400k: document.querySelector('#f-400k').checked,
     provisao_atual: document.querySelector('#f-provisao-atual').value.trim(),
     novo_valor: document.querySelector('#f-novo-valor').value.trim(),
@@ -1098,6 +1175,8 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
   document.querySelector('#wrap-motivo-insalubridade').style.display = 'none';
   document.querySelector('#wrap-motivo-periculosidade').style.display = 'none';
   document.querySelector('#wrap-medico-ergonomico').style.display = 'none';
+  document.querySelector('#wrap-prognosticos').style.display = 'none';
+  document.querySelector('#wrap-fases').style.display = 'none';
   await carregar();
 
   const emailAssistente = emailPorNome(payload.assistente_responsavel);
@@ -1186,8 +1265,11 @@ function gerarExcel(lista, nomeArquivo){
     'Motivos do Laudo': naSeVazio(s.motivos_laudo),
     'Cálculo Solicitado': s.calculo_solicitado ? 'Sim' : 'Não',
     'Houve Alteração de Prognóstico': s.alteracao_prognostico ? 'Sim' : 'Não',
+    'Prognóstico Atual': naSeVazio(s.prognostico_atual),
+    'Novo Prognóstico': naSeVazio(s.novo_prognostico),
     'Houve Alteração de Fase': s.alteracao_fase ? 'Sim' : 'Não',
     'Fase Atual': naSeVazio(s.fase_atual),
+    'Nova Fase': naSeVazio(s.nova_fase),
     'Acima de R$ 400.000,00': s.acima_400k ? 'Sim' : 'Não',
     'Provisão/Accrual Atual': naSeVazio(s.provisao_atual),
     'Novo Valor': naSeVazio(s.novo_valor),
@@ -1203,7 +1285,7 @@ function gerarExcel(lista, nomeArquivo){
     'Observações Adicionais': naSeVazio(s.observacoes)
   }));
   const ws = XLSX.utils.json_to_sheet(dados);
-  ws['!cols'] = [{wch:24},{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:26},{wch:26},{wch:24},{wch:18},{wch:16},{wch:30},{wch:16},{wch:16},{wch:16},{wch:24},{wch:20},{wch:20},{wch:20},{wch:26},{wch:26},{wch:24},{wch:16},{wch:12},{wch:16},{wch:14},{wch:16},{wch:16},{wch:36}];
+  ws['!cols'] = [{wch:24},{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:26},{wch:26},{wch:24},{wch:18},{wch:16},{wch:30},{wch:16},{wch:20},{wch:16},{wch:16},{wch:16},{wch:24},{wch:16},{wch:20},{wch:20},{wch:20},{wch:26},{wch:26},{wch:24},{wch:16},{wch:12},{wch:16},{wch:14},{wch:16},{wch:16},{wch:36}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Solicitações');
   XLSX.writeFile(wb, `${nomeArquivo}.xlsx`);
