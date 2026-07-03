@@ -73,6 +73,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13
 .kpi-orange::before{background:linear-gradient(90deg,#E67E22,#B85C00);}
 .kpi-green::before{background:linear-gradient(90deg,var(--green),#0c5c4c);}
 .kpi-red::before{background:linear-gradient(90deg,var(--red),#8B1D1D);}
+.kpi-blue::before{background:linear-gradient(90deg,var(--azul-pc),#006080);}
 .kpi-icon{font-size:22px;flex-shrink:0;}
 .kpi-val{font-size:28px;font-weight:700;color:var(--escuro-pc);line-height:1;font-variant-numeric:tabular-nums;font-family:var(--mono);}
 .kpi-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:3px;font-weight:600;}
@@ -131,11 +132,23 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
 .badge-red{background:var(--red-lt);color:var(--red);border-color:rgba(192,57,43,.25);}
 .badge-orange{background:var(--orange-lt);color:var(--orange);border-color:rgba(230,126,34,.25);}
 .badge-green{background:var(--green-lt);color:var(--green);border-color:rgba(17,122,101,.25);}
+.badge-blue{background:rgba(0,169,224,.10);color:var(--escuro-pc);border-color:rgba(0,169,224,.3);}
 
 .empty-state{padding:48px 16px;text-align:center;color:var(--muted);font-size:13px;}
 .error-banner{background:var(--red-lt);border:1px solid rgba(192,57,43,.3);color:var(--red);border-radius:var(--radius);padding:14px 18px;margin-bottom:18px;font-size:12px;line-height:1.6;}
 .error-banner strong{color:var(--preto-pc);}
 .error-banner code{background:rgba(0,0,0,.06);padding:1px 6px;border-radius:4px;font-family:var(--mono);color:var(--preto-pc);}
+
+.tab-bar{background:var(--surface);border-bottom:1px solid var(--border2);padding:0 24px;display:flex;gap:4px;box-shadow:0 2px 10px rgba(0,59,92,.05);}
+.tab-btn{background:none;border:none;padding:14px 18px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;font-family:var(--font);border-bottom:3px solid transparent;transition:all .15s;}
+.tab-btn:hover{color:var(--escuro-pc);}
+.tab-btn.active{color:var(--escuro-pc);border-bottom-color:var(--azul-pc);}
+
+.cobranca-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border2);flex-wrap:wrap;}
+.cobranca-item:last-child{border-bottom:none;}
+.cobranca-info{flex:1;min-width:220px;font-size:12px;color:var(--preto-pc);}
+.cobranca-info b{color:var(--escuro-pc);}
+.cobranca-info .sub{color:var(--muted);font-size:11px;margin-top:2px;}
 </style>
 </head>
 <body>
@@ -154,14 +167,22 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
   </div>
 </div>
 
+<div class="tab-bar">
+  <button class="tab-btn active" id="tab-btn-solicitacoes" onclick="mudarAba('solicitacoes')">📋 Solicitações</button>
+  <button class="tab-btn" id="tab-btn-cobrancas" onclick="mudarAba('cobrancas')">📣 Cobranças</button>
+</div>
+
 <div class="main">
 
   <div id="erro-conexao"></div>
 
+  <div id="view-solicitacoes">
+
   <div class="kpi-row">
     <div class="kpi-card kpi-total"><div class="kpi-icon">📋</div><div><div class="kpi-val" id="st-total">0</div><div class="kpi-label">Total de solicitações</div></div></div>
     <div class="kpi-card kpi-orange"><div class="kpi-icon">⏳</div><div><div class="kpi-val" id="st-pendentes">0</div><div class="kpi-label">Pendentes</div></div></div>
-    <div class="kpi-card kpi-green"><div class="kpi-icon">✅</div><div><div class="kpi-val" id="st-concluidas">0</div><div class="kpi-label">Concluídas</div></div></div>
+    <div class="kpi-card kpi-blue"><div class="kpi-icon">🔎</div><div><div class="kpi-val" id="st-revisao">0</div><div class="kpi-label">Aguardando Revisão</div></div></div>
+    <div class="kpi-card kpi-green"><div class="kpi-icon">✅</div><div><div class="kpi-val" id="st-concluidas">0</div><div class="kpi-label">Revisado</div></div></div>
     <div class="kpi-card kpi-red"><div class="kpi-icon">💰</div><div><div class="kpi-val" id="st-400k">0</div><div class="kpi-label">Acima de R$ 400.000,00</div></div></div>
   </div>
 
@@ -355,7 +376,8 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
         <select class="filter-select" id="flt-status">
           <option value="">Todos os status</option>
           <option value="Pendente">Pendente</option>
-          <option value="Concluído">Concluído</option>
+          <option value="Aguardando Revisão">Aguardando Revisão</option>
+          <option value="Revisado">Revisado</option>
         </select>
         <select class="filter-select" id="flt-assistente"><option value="">Todos os assistentes</option></select>
         <input class="filter-input" type="search" id="flt-busca" placeholder="Buscar por processo, reclamante ou reclamada…">
@@ -399,6 +421,26 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
         </table>
         <div class="empty-state" id="empty-state" style="display:none;">Nenhuma solicitação encontrada.</div>
       </div>
+    </div>
+
+  </div>
+  </div>
+
+  <div id="view-cobrancas" style="display:none;">
+
+    <div class="dash-card" style="margin-bottom:18px;">
+      <div class="dash-card-head">📝 Solicitação de Cálculo — Pendentes de Lançamento</div>
+      <div id="cobranca-calculo"></div>
+    </div>
+
+    <div class="dash-card" style="margin-bottom:18px;">
+      <div class="dash-card-head">🔎 Revisão do Cálculo — Aguardando Confirmação do Advogado</div>
+      <div id="cobranca-revisao"></div>
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-card-head">⚖️ Inserção de Decisão — Ainda Não Informada</div>
+      <div id="cobranca-decisao"></div>
     </div>
 
   </div>
@@ -634,8 +676,11 @@ function render(){
 
   document.querySelector('#st-total').textContent = SOLICITACOES.length;
   document.querySelector('#st-pendentes').textContent = SOLICITACOES.filter(s=>s.status==='Pendente').length;
-  document.querySelector('#st-concluidas').textContent = SOLICITACOES.filter(s=>s.status==='Concluído').length;
+  document.querySelector('#st-revisao').textContent = SOLICITACOES.filter(s=>s.status==='Aguardando Revisão').length;
+  document.querySelector('#st-concluidas').textContent = SOLICITACOES.filter(s=>s.status==='Revisado').length;
   document.querySelector('#st-400k').textContent = SOLICITACOES.filter(s=>s.acima_400k).length;
+
+  renderCobrancas();
 
   if(!lista.length){
     tbody.innerHTML = '';
@@ -670,23 +715,97 @@ function render(){
       <td>${e(s.novo_valor)}</td>
       <td>${e(s.advogado_solicitante)}</td>
       <td>${e(s.assistente_responsavel)}</td>
-      <td>${s.status === 'Concluído' ? '<span class="badge badge-green">Concluído</span>' : '<span class="badge badge-orange">Pendente</span>'}</td>
+      <td>${statusBadge(s.status)}</td>
       <td>${formatarData(s.data_conclusao)}</td>
       <td>${e(s.observacoes)}</td>
-      <td>
-        ${s.status === 'Pendente'
-          ? `<button class="action-btn" onclick="concluir('${s.id}')">✓ Concluir</button>`
-          : `<button class="action-btn reabrir" onclick="reabrir('${s.id}')">↺ Reabrir</button>`}
-      </td>
+      <td>${acoesStatus(s)}</td>
     </tr>
   `).join('');
+}
+
+function statusBadge(status){
+  if(status === 'Revisado') return '<span class="badge badge-green">Revisado</span>';
+  if(status === 'Aguardando Revisão') return '<span class="badge badge-blue">Aguardando Revisão</span>';
+  return '<span class="badge badge-orange">Pendente</span>';
+}
+
+function acoesStatus(s){
+  if(s.status === 'Pendente'){
+    return `<button class="action-btn" onclick="concluir('${s.id}')">✓ Concluir</button>`;
+  }
+  if(s.status === 'Aguardando Revisão'){
+    return `<button class="action-btn" onclick="confirmarRevisao('${s.id}')">✓ Confirmar Revisão</button>
+      <button class="action-btn reabrir" onclick="reabrir('${s.id}')">↺ Reabrir</button>`;
+  }
+  return `<button class="action-btn reabrir" onclick="reabrir('${s.id}')">↺ Reabrir</button>`;
+}
+
+function mudarAba(aba){
+  const solic = aba === 'solicitacoes';
+  document.querySelector('#view-solicitacoes').style.display = solic ? '' : 'none';
+  document.querySelector('#view-cobrancas').style.display = solic ? 'none' : '';
+  document.querySelector('#tab-btn-solicitacoes').classList.toggle('active', solic);
+  document.querySelector('#tab-btn-cobrancas').classList.toggle('active', !solic);
+}
+
+function itemCobranca(s, sub, tipo){
+  return `
+    <div class="cobranca-item">
+      <div class="cobranca-info">
+        <b>${e(s.cliente)}</b> — ${e(s.processo)}<br>
+        ${e(s.reclamante)} x ${e(s.reclamada)}
+        <div class="sub">Advogado: ${e(s.advogado_solicitante)} · ${sub}</div>
+      </div>
+      <button class="action-btn" onclick="cobrarSolicitacao('${s.id}','${tipo}')">✉ Cobrar</button>
+    </div>`;
+}
+
+function renderCobrancas(){
+  const pendCalculo = SOLICITACOES.filter(s => s.status === 'Pendente');
+  const pendRevisao = SOLICITACOES.filter(s => s.status === 'Aguardando Revisão');
+  const pendDecisao = SOLICITACOES.filter(s => !s.tipo_decisao);
+
+  const elCalculo = document.querySelector('#cobranca-calculo');
+  const elRevisao = document.querySelector('#cobranca-revisao');
+  const elDecisao = document.querySelector('#cobranca-decisao');
+
+  elCalculo.innerHTML = pendCalculo.length
+    ? pendCalculo.map(s => itemCobranca(s, `Solicitado em ${formatarData(s.data_solicitacao)}`, 'calculo')).join('')
+    : '<div class="empty-state">Nenhuma solicitação pendente de lançamento.</div>';
+
+  elRevisao.innerHTML = pendRevisao.length
+    ? pendRevisao.map(s => itemCobranca(s, `Lançado em ${formatarData(s.data_conclusao)}`, 'revisao')).join('')
+    : '<div class="empty-state">Nenhum cálculo aguardando revisão.</div>';
+
+  elDecisao.innerHTML = pendDecisao.length
+    ? pendDecisao.map(s => itemCobranca(s, `Status: ${s.status}`, 'decisao')).join('')
+    : '<div class="empty-state">Nenhuma decisão pendente de inserção.</div>';
+}
+
+function cobrarSolicitacao(id, tipo){
+  const s = SOLICITACOES.find(x => x.id === id);
+  if(!s) return;
+  const email = emailPorNome(s.advogado_solicitante);
+  const base = `Cliente: ${s.cliente}\nProcesso: ${s.processo}\nReclamante: ${s.reclamante}\nReclamada: ${s.reclamada}\n\n`;
+  let assunto, corpo;
+  if(tipo === 'calculo'){
+    assunto = `Cobrança — solicitação de cálculo pendente de lançamento — ${s.cliente} — ${s.processo}`;
+    corpo = `Olá, ${s.advogado_solicitante}.\n\nA solicitação de cálculo abaixo ainda está pendente de lançamento. Se houver alguma informação faltando para o(a) assistente ${s.assistente_responsavel} dar andamento, por favor nos avise.\n\n${base}Controle de Inserção de Valores — LAWgico`;
+  } else if(tipo === 'revisao'){
+    assunto = `Cobrança — cálculo aguardando sua revisão — ${s.cliente} — ${s.processo}`;
+    corpo = `Olá, ${s.advogado_solicitante}.\n\nO cálculo abaixo já foi lançado pelo(a) assistente ${s.assistente_responsavel} e segue aguardando a sua revisão.\n\n${base}Acesse o painel para revisar: https://peixotoecury.github.io/controleinsercaovalores/\n\nControle de Inserção de Valores — LAWgico`;
+  } else {
+    assunto = `Cobrança — decisão do processo ainda não informada — ${s.cliente} — ${s.processo}`;
+    corpo = `Olá, ${s.advogado_solicitante}.\n\nAinda não recebemos a informação do Tipo de Decisão para o processo abaixo. Por favor, nos informe assim que possível.\n\n${base}Controle de Inserção de Valores — LAWgico`;
+  }
+  abrirEmail(email, assunto, corpo);
 }
 
 async function concluir(id){
   if(!confirm('Confirmar que o cálculo foi lançado no sistema?')) return;
   const registro = SOLICITACOES.find(s => s.id === id);
   const { error } = await getClient().from(TABLE).update({
-    data_conclusao: hojeISO(), ok_assistente: true, status: 'Concluído'
+    data_conclusao: hojeISO(), ok_assistente: true, status: 'Aguardando Revisão'
   }).eq('id', id);
   if(error){ alert('Erro ao atualizar: ' + error.message); return; }
 
@@ -695,23 +814,44 @@ async function concluir(id){
 
   if(registro){
     const emailAdvogado = emailPorNome(registro.advogado_solicitante);
-    const assunto = `Cálculo lançado no sistema — ${registro.cliente} — ${registro.processo}`;
+    const assunto = `Cálculo lançado — aguardando sua revisão — ${registro.cliente} — ${registro.processo}`;
     const corpo = `Olá, ${registro.advogado_solicitante}.\n\n`
-      + `O cálculo solicitado já foi lançado no sistema pelo(a) assistente ${registro.assistente_responsavel}.\n\n`
+      + `O cálculo solicitado já foi lançado no sistema pelo(a) assistente ${registro.assistente_responsavel} e está aguardando sua revisão.\n\n`
       + `Cliente: ${registro.cliente}\nProcesso: ${registro.processo}\nReclamante: ${registro.reclamante}\nReclamada: ${registro.reclamada}\n`
-      + `Tipo de Cálculo: ${registro.tipo_calculo}\nData de conclusão: ${formatarData(hojeISO())}\n\n`
+      + `Tipo de Cálculo: ${registro.tipo_calculo}\nData de lançamento: ${formatarData(hojeISO())}\n\n`
+      + `Acesse o painel para revisar: https://peixotoecury.github.io/controleinsercaovalores/\n\n`
       + `Controle de Inserção de Valores — LAWgico`;
     abrirEmail(emailAdvogado, assunto, corpo);
   }
 }
 
-async function reabrir(id){
-  if(!confirm('Reabrir esta solicitação como pendente?')) return;
+async function confirmarRevisao(id){
+  if(!confirm('Confirmar que você (advogado) revisou este cálculo?')) return;
   const { error } = await getClient().from(TABLE).update({
-    data_conclusao: null, ok_assistente: false, status: 'Pendente'
+    data_revisao: hojeISO(), revisado_advogado: true, status: 'Revisado'
   }).eq('id', id);
   if(error) alert('Erro ao atualizar: ' + error.message);
   else carregar();
+}
+
+async function reabrir(id){
+  const registro = SOLICITACOES.find(s => s.id === id);
+  if(!registro) return;
+  if(registro.status === 'Revisado'){
+    if(!confirm('Reabrir esta solicitação como "Aguardando Revisão"?')) return;
+    const { error } = await getClient().from(TABLE).update({
+      data_revisao: null, revisado_advogado: false, status: 'Aguardando Revisão'
+    }).eq('id', id);
+    if(error) alert('Erro ao atualizar: ' + error.message);
+    else carregar();
+  } else {
+    if(!confirm('Reabrir esta solicitação como "Pendente"?')) return;
+    const { error } = await getClient().from(TABLE).update({
+      data_conclusao: null, ok_assistente: false, status: 'Pendente'
+    }).eq('id', id);
+    if(error) alert('Erro ao atualizar: ' + error.message);
+    else carregar();
+  }
 }
 
 document.querySelector('#form-solicitacao').addEventListener('submit', async function(ev){
