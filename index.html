@@ -296,6 +296,31 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
             </select>
           </div>
 
+          <div class="mc-form-group" id="wrap-motivo-insalubridade" style="display:none;">
+            <label>Motivo da Insalubridade</label>
+            <input type="text" id="f-motivo-insalubridade">
+          </div>
+
+          <div class="mc-form-group" id="wrap-motivo-periculosidade" style="display:none;">
+            <label>Motivo da Periculosidade</label>
+            <input type="text" id="f-motivo-periculosidade">
+          </div>
+
+          <div id="wrap-medico-ergonomico" style="display:none;">
+            <div class="mc-form-group">
+              <label>Doença Detectada</label>
+              <input type="text" id="f-doenca-detectada">
+            </div>
+            <div class="mc-form-group">
+              <label>Área do Corpo</label>
+              <input type="text" id="f-area-corpo">
+            </div>
+            <div class="mc-form-group">
+              <label>Motivos</label>
+              <textarea id="f-motivos-laudo" rows="2"></textarea>
+            </div>
+          </div>
+
           <div class="check-row">
             <input type="checkbox" id="f-calculo-solicitado">
             <label for="f-calculo-solicitado">Cálculo foi solicitado</label>
@@ -405,6 +430,11 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
               <th>Data Decisão</th>
               <th>Tipo de Decisão</th>
               <th>Tipo de Laudo</th>
+              <th>Motivo Insalubridade</th>
+              <th>Motivo Periculosidade</th>
+              <th>Doença Detectada</th>
+              <th>Área do Corpo</th>
+              <th>Motivos do Laudo</th>
               <th>Cálculo Solicitado</th>
               <th>Alteração de Prognóstico</th>
               <th>Alteração de Fase</th>
@@ -671,7 +701,28 @@ document.querySelector('#f-tipo-decisao').addEventListener('change', function(){
   const wrap = document.querySelector('#wrap-tipo-laudo');
   const sel = document.querySelector('#f-tipo-laudo');
   if(this.value === 'Laudo Desfavorável'){ wrap.style.display = ''; }
-  else { wrap.style.display = 'none'; sel.value = ''; }
+  else {
+    wrap.style.display = 'none'; sel.value = '';
+    sel.dispatchEvent(new Event('change'));
+  }
+});
+
+document.querySelector('#f-tipo-laudo').addEventListener('change', function(){
+  const wrapInsalubridade = document.querySelector('#wrap-motivo-insalubridade');
+  const wrapPericulosidade = document.querySelector('#wrap-motivo-periculosidade');
+  const wrapMedico = document.querySelector('#wrap-medico-ergonomico');
+
+  wrapInsalubridade.style.display = this.value === 'Insalubridade' ? '' : 'none';
+  wrapPericulosidade.style.display = this.value === 'Periculosidade' ? '' : 'none';
+  wrapMedico.style.display = (this.value === 'Médico' || this.value === 'Ergonômico') ? '' : 'none';
+
+  if(this.value !== 'Insalubridade') document.querySelector('#f-motivo-insalubridade').value = '';
+  if(this.value !== 'Periculosidade') document.querySelector('#f-motivo-periculosidade').value = '';
+  if(this.value !== 'Médico' && this.value !== 'Ergonômico'){
+    document.querySelector('#f-doenca-detectada').value = '';
+    document.querySelector('#f-area-corpo').value = '';
+    document.querySelector('#f-motivos-laudo').value = '';
+  }
 });
 
 document.querySelector('#cf-cliente').addEventListener('change', function(){
@@ -787,6 +838,11 @@ function render(){
       <td>${formatarData(s.data_decisao)}</td>
       <td>${e(s.tipo_decisao)}</td>
       <td>${e(s.tipo_laudo)}</td>
+      <td>${e(s.motivo_insalubridade)}</td>
+      <td>${e(s.motivo_periculosidade)}</td>
+      <td>${e(s.doenca_detectada)}</td>
+      <td>${e(s.area_corpo)}</td>
+      <td>${e(s.motivos_laudo)}</td>
       <td>${s.calculo_solicitado ? '<span class="badge badge-orange">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
       <td>${s.alteracao_prognostico ? '<span class="badge badge-orange">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
       <td>${s.alteracao_fase ? '<span class="badge badge-orange">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
@@ -965,6 +1021,11 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
     data_decisao: document.querySelector('#f-data-decisao').value,
     tipo_decisao: document.querySelector('#f-tipo-decisao').value,
     tipo_laudo: document.querySelector('#f-tipo-laudo').value,
+    motivo_insalubridade: document.querySelector('#f-motivo-insalubridade').value.trim(),
+    motivo_periculosidade: document.querySelector('#f-motivo-periculosidade').value.trim(),
+    doenca_detectada: document.querySelector('#f-doenca-detectada').value.trim(),
+    area_corpo: document.querySelector('#f-area-corpo').value.trim(),
+    motivos_laudo: document.querySelector('#f-motivos-laudo').value.trim(),
     calculo_solicitado: document.querySelector('#f-calculo-solicitado').checked,
     alteracao_prognostico: document.querySelector('#f-alteracao-prognostico').checked,
     alteracao_fase: document.querySelector('#f-alteracao-fase').checked,
@@ -993,6 +1054,9 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
   ev.target.reset();
   document.querySelector('#wrap-cliente-outro').style.display = 'none';
   document.querySelector('#wrap-tipo-laudo').style.display = 'none';
+  document.querySelector('#wrap-motivo-insalubridade').style.display = 'none';
+  document.querySelector('#wrap-motivo-periculosidade').style.display = 'none';
+  document.querySelector('#wrap-medico-ergonomico').style.display = 'none';
   await carregar();
 
   const emailAssistente = emailPorNome(payload.assistente_responsavel);
@@ -1074,6 +1138,11 @@ function gerarExcel(lista, nomeArquivo){
     'Data da Decisão': formatarData(s.data_decisao),
     'Tipo de Decisão': s.tipo_decisao,
     'Tipo de Laudo Desfavorável': s.tipo_laudo,
+    'Motivo da Insalubridade': s.motivo_insalubridade,
+    'Motivo da Periculosidade': s.motivo_periculosidade,
+    'Doença Detectada': s.doenca_detectada,
+    'Área do Corpo': s.area_corpo,
+    'Motivos do Laudo': s.motivos_laudo,
     'Cálculo Solicitado': s.calculo_solicitado ? 'Sim' : 'Não',
     'Houve Alteração de Prognóstico': s.alteracao_prognostico ? 'Sim' : 'Não',
     'Houve Alteração de Fase': s.alteracao_fase ? 'Sim' : 'Não',
@@ -1090,7 +1159,7 @@ function gerarExcel(lista, nomeArquivo){
     'Observações Adicionais': s.observacoes
   }));
   const ws = XLSX.utils.json_to_sheet(dados);
-  ws['!cols'] = [{wch:24},{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:20},{wch:16},{wch:16},{wch:16},{wch:24},{wch:20},{wch:20},{wch:20},{wch:26},{wch:26},{wch:16},{wch:12},{wch:16},{wch:14},{wch:36}];
+  ws['!cols'] = [{wch:24},{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:26},{wch:26},{wch:22},{wch:18},{wch:30},{wch:16},{wch:16},{wch:16},{wch:24},{wch:20},{wch:20},{wch:20},{wch:26},{wch:26},{wch:16},{wch:12},{wch:16},{wch:14},{wch:36}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Solicitações');
   XLSX.writeFile(wb, `${nomeArquivo}.xlsx`);
