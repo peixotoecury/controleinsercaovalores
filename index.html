@@ -213,6 +213,11 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
           </div>
 
           <div class="mc-form-group">
+            <label>Data da Decisão <span class="req">*</span></label>
+            <input type="date" id="f-data-decisao" required>
+          </div>
+
+          <div class="mc-form-group">
             <label>Tipo de Decisão <span class="req">*</span></label>
             <select id="f-tipo-decisao" required>
               <option value="" disabled selected>Selecione…</option>
@@ -274,6 +279,7 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
               <th>Reclamante</th>
               <th>Reclamada</th>
               <th>Tipo de Cálculo</th>
+              <th>Data Decisão</th>
               <th>Tipo de Decisão</th>
               <th>Acima 400k</th>
               <th>Advogado</th>
@@ -475,6 +481,7 @@ function render(){
       <td>${e(s.reclamante)}</td>
       <td>${e(s.reclamada)}</td>
       <td>${e(s.tipo_calculo)}</td>
+      <td>${formatarData(s.data_decisao)}</td>
       <td>${e(s.tipo_decisao)}</td>
       <td>${s.acima_400k ? '<span class="badge badge-red">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
       <td>${e(s.advogado_solicitante)}</td>
@@ -520,6 +527,7 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
     reclamante: document.querySelector('#f-reclamante').value.trim(),
     reclamada: document.querySelector('#f-reclamada').value.trim(),
     tipo_calculo: document.querySelector('#f-tipo-calculo').value,
+    data_decisao: document.querySelector('#f-data-decisao').value,
     tipo_decisao: document.querySelector('#f-tipo-decisao').value,
     acima_400k: document.querySelector('#f-400k').checked,
     advogado_solicitante: document.querySelector('#f-advogado').value,
@@ -555,6 +563,7 @@ document.querySelector('#btn-exportar').addEventListener('click', function(){
     'Reclamante': s.reclamante,
     'Reclamada': s.reclamada,
     'Tipo de Cálculo': s.tipo_calculo,
+    'Data da Decisão': formatarData(s.data_decisao),
     'Tipo de Decisão': s.tipo_decisao,
     'Acima de R$ 400.000,00': s.acima_400k ? 'Sim' : 'Não',
     'Advogado Solicitante': s.advogado_solicitante,
@@ -565,7 +574,7 @@ document.querySelector('#btn-exportar').addEventListener('click', function(){
     'OK do Assistente': s.ok_assistente ? 'Sim' : 'Não'
   }));
   const ws = XLSX.utils.json_to_sheet(dados);
-  ws['!cols'] = [{wch:14},{wch:26},{wch:24},{wch:24},{wch:28},{wch:28},{wch:20},{wch:26},{wch:26},{wch:16},{wch:12},{wch:16},{wch:14}];
+  ws['!cols'] = [{wch:14},{wch:26},{wch:24},{wch:24},{wch:28},{wch:14},{wch:28},{wch:20},{wch:26},{wch:26},{wch:16},{wch:12},{wch:16},{wch:14}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Solicitações');
   const hoje = hojeISO();
