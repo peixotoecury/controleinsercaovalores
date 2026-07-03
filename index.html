@@ -239,15 +239,15 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
           </div>
 
           <div class="mc-form-group">
-            <label>Nome do Perito do Juízo</label>
-            <input type="text" id="f-perito">
-          </div>
-
-          <div class="mc-form-group">
             <label>Tipo de Cálculo <span class="req">*</span></label>
             <select id="f-tipo-calculo" required>
               <option value="" disabled selected>Selecione…</option>
             </select>
+          </div>
+
+          <div class="mc-form-group">
+            <label>Nome do Perito do Juízo</label>
+            <input type="text" id="f-perito">
           </div>
 
           <div class="mc-form-group">
@@ -338,8 +338,8 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
               <th>Vara</th>
               <th>Comarca</th>
               <th>UF</th>
-              <th>Perito do Juízo</th>
               <th>Tipo de Cálculo</th>
+              <th>Perito do Juízo</th>
               <th>Data Decisão</th>
               <th>Tipo de Decisão</th>
               <th>Alteração de Fase</th>
@@ -548,8 +548,8 @@ function render(){
       <td>${e(s.vara)}</td>
       <td>${e(s.comarca)}</td>
       <td>${e(s.uf)}</td>
-      <td>${e(s.perito_juizo)}</td>
       <td>${e(s.tipo_calculo)}</td>
+      <td>${e(s.perito_juizo)}</td>
       <td>${formatarData(s.data_decisao)}</td>
       <td>${e(s.tipo_decisao)}</td>
       <td>${s.alteracao_fase ? '<span class="badge badge-orange">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
@@ -646,8 +646,8 @@ document.querySelector('#btn-exportar').addEventListener('click', function(){
     'Vara': s.vara,
     'Comarca': s.comarca,
     'UF': s.uf,
-    'Nome do Perito do Juízo': s.perito_juizo,
     'Tipo de Cálculo': s.tipo_calculo,
+    'Nome do Perito do Juízo': s.perito_juizo,
     'Data da Decisão': formatarData(s.data_decisao),
     'Tipo de Decisão': s.tipo_decisao,
     'Houve Alteração de Fase': s.alteracao_fase ? 'Sim' : 'Não',
