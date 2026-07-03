@@ -380,6 +380,14 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
           </div>
 
           <div class="mc-form-group">
+            <label>Responsável pela Informação <span class="req">*</span></label>
+            <select id="f-responsavel-informacao" required>
+              <option value="" disabled selected>Selecione…</option>
+            </select>
+            <div class="hint">Quem está preenchendo esta solicitação.</div>
+          </div>
+
+          <div class="mc-form-group">
             <label>Observações Adicionais</label>
             <textarea id="f-observacoes" rows="3"></textarea>
           </div>
@@ -444,6 +452,7 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
               <th>Novo Valor</th>
               <th>Advogado</th>
               <th>Assistente</th>
+              <th>Responsável pela Informação</th>
               <th>Status</th>
               <th>Conclusão</th>
               <th>Observações</th>
@@ -660,7 +669,7 @@ function e(v){ return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&
 
 function popularSelectProfissionais(select, cargo){
   const grupos = {};
-  PROFISSIONAIS.filter(p => p.cargo === cargo).forEach(p => { (grupos[p.g] = grupos[p.g] || []).push(p.n); });
+  PROFISSIONAIS.filter(p => !cargo || p.cargo === cargo).forEach(p => { (grupos[p.g] = grupos[p.g] || []).push(p.n); });
   Object.keys(grupos).sort().forEach(g => {
     const og = document.createElement('optgroup');
     og.label = g;
@@ -686,6 +695,7 @@ popularSelectProfissionais(document.querySelector('#f-assistente'), 'Assistente'
 popularSelectOpcoes(document.querySelector('#f-tipo-calculo'), TIPOS_CALCULO);
 popularSelectOpcoes(document.querySelector('#f-tipo-decisao'), TIPOS_DECISAO);
 popularSelectProfissionais(document.querySelector('#flt-assistente'), 'Assistente');
+popularSelectProfissionais(document.querySelector('#f-responsavel-informacao'));
 popularSelectProfissionais(document.querySelector('#cf-advogado'), 'Advogado');
 popularSelectProfissionais(document.querySelector('#cf-identificado-por'), 'Assistente');
 popularSelectOpcoes(document.querySelector('#cf-tipo-decisao'), TIPOS_DECISAO);
@@ -867,6 +877,7 @@ function render(){
       <td>${e(s.novo_valor)}</td>
       <td>${e(s.advogado_solicitante)}</td>
       <td>${e(s.assistente_responsavel)}</td>
+      <td>${e(s.responsavel_informacao)}</td>
       <td>${statusBadge(s.status)}</td>
       <td>${formatarData(s.data_conclusao)}</td>
       <td>${e(s.observacoes)}</td>
@@ -1050,6 +1061,7 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
     novo_valor: document.querySelector('#f-novo-valor').value.trim(),
     advogado_solicitante: document.querySelector('#f-advogado').value,
     assistente_responsavel: document.querySelector('#f-assistente').value,
+    responsavel_informacao: document.querySelector('#f-responsavel-informacao').value,
     observacoes: document.querySelector('#f-observacoes').value.trim(),
     data_solicitacao: hojeISO(),
     status: 'Pendente',
@@ -1167,6 +1179,7 @@ function gerarExcel(lista, nomeArquivo){
     'Novo Valor': s.novo_valor,
     'Advogado Solicitante': s.advogado_solicitante,
     'Assistente Responsável': s.assistente_responsavel,
+    'Responsável pela Informação': s.responsavel_informacao,
     'Data da Solicitação': formatarData(s.data_solicitacao),
     'Status': s.status,
     'Data de Conclusão': formatarData(s.data_conclusao),
@@ -1176,7 +1189,7 @@ function gerarExcel(lista, nomeArquivo){
     'Observações Adicionais': s.observacoes
   }));
   const ws = XLSX.utils.json_to_sheet(dados);
-  ws['!cols'] = [{wch:24},{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:26},{wch:26},{wch:22},{wch:18},{wch:30},{wch:16},{wch:16},{wch:16},{wch:24},{wch:20},{wch:20},{wch:20},{wch:26},{wch:26},{wch:16},{wch:12},{wch:16},{wch:16},{wch:16},{wch:36}];
+  ws['!cols'] = [{wch:24},{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:26},{wch:26},{wch:24},{wch:18},{wch:16},{wch:30},{wch:16},{wch:16},{wch:16},{wch:24},{wch:20},{wch:20},{wch:20},{wch:26},{wch:26},{wch:24},{wch:16},{wch:12},{wch:16},{wch:14},{wch:16},{wch:16},{wch:36}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Solicitações');
   XLSX.writeFile(wb, `${nomeArquivo}.xlsx`);
