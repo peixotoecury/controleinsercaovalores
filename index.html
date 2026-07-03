@@ -113,6 +113,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13
 .action-btn:hover{background:rgba(0,169,224,.2);}
 .action-btn.reabrir{background:transparent;border-color:var(--border2);color:var(--muted);}
 .action-btn.reabrir:hover{border-color:var(--azul-pc);color:var(--escuro-pc);background:#F0FAFE;}
+.action-btn.excluir{background:transparent;border-color:rgba(192,57,43,.3);color:var(--red);padding:5px 9px;}
+.action-btn.excluir:hover{background:var(--red-lt);}
 
 /* ── FILTERS ── */
 .filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:14px 20px;border-bottom:1px solid var(--border2);background:var(--surface2);}
@@ -893,14 +895,24 @@ function statusBadge(status){
 }
 
 function acoesStatus(s){
+  const excluir = `<button class="action-btn excluir" onclick="excluirSolicitacao('${s.id}')" title="Excluir">🗑</button>`;
   if(s.status === 'Pendente'){
-    return `<button class="action-btn" onclick="concluir('${s.id}')">✓ Concluir</button>`;
+    return `<button class="action-btn" onclick="concluir('${s.id}')">✓ Concluir</button>${excluir}`;
   }
   if(s.status === 'Aguardando Revisão'){
     return `<button class="action-btn" onclick="confirmarRevisao('${s.id}')">✓ Confirmar Revisão</button>
-      <button class="action-btn reabrir" onclick="reabrir('${s.id}')">↺ Reabrir</button>`;
+      <button class="action-btn reabrir" onclick="reabrir('${s.id}')">↺ Reabrir</button>${excluir}`;
   }
-  return `<button class="action-btn reabrir" onclick="reabrir('${s.id}')">↺ Reabrir</button>`;
+  return `<button class="action-btn reabrir" onclick="reabrir('${s.id}')">↺ Reabrir</button>${excluir}`;
+}
+
+async function excluirSolicitacao(id){
+  const s = SOLICITACOES.find(x => x.id === id);
+  const rotulo = s ? `${s.cliente} — ${s.processo}` : 'esta solicitação';
+  if(!confirm(`Excluir definitivamente ${rotulo}? Essa ação não pode ser desfeita.`)) return;
+  const { error } = await getClient().from(TABLE).delete().eq('id', id);
+  if(error) alert('Erro ao excluir: ' + error.message);
+  else carregar();
 }
 
 function mudarAba(aba){
