@@ -1156,10 +1156,12 @@ function gerarExcel(lista, nomeArquivo){
     'Status': s.status,
     'Data de Conclusão': formatarData(s.data_conclusao),
     'OK do Assistente': s.ok_assistente ? 'Sim' : 'Não',
+    'Revisado pelo Advogado': s.revisado_advogado ? 'Sim' : 'Não',
+    'Data da Revisão': formatarData(s.data_revisao),
     'Observações Adicionais': s.observacoes
   }));
   const ws = XLSX.utils.json_to_sheet(dados);
-  ws['!cols'] = [{wch:24},{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:26},{wch:26},{wch:22},{wch:18},{wch:30},{wch:16},{wch:16},{wch:16},{wch:24},{wch:20},{wch:20},{wch:20},{wch:26},{wch:26},{wch:16},{wch:12},{wch:16},{wch:14},{wch:36}];
+  ws['!cols'] = [{wch:24},{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:26},{wch:26},{wch:22},{wch:18},{wch:30},{wch:16},{wch:16},{wch:16},{wch:24},{wch:20},{wch:20},{wch:20},{wch:26},{wch:26},{wch:16},{wch:12},{wch:16},{wch:16},{wch:16},{wch:36}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Solicitações');
   XLSX.writeFile(wb, `${nomeArquivo}.xlsx`);
