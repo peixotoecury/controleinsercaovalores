@@ -206,6 +206,44 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
           </div>
 
           <div class="mc-form-group">
+            <label>Juiz</label>
+            <input type="text" id="f-juiz">
+          </div>
+
+          <div class="mc-form-group">
+            <label>Advogado da Parte Contrária</label>
+            <input type="text" id="f-advogado-contraria">
+          </div>
+
+          <div class="mc-form-group">
+            <label>Vara</label>
+            <input type="text" id="f-vara">
+          </div>
+
+          <div class="mc-form-group">
+            <label>Comarca</label>
+            <input type="text" id="f-comarca">
+          </div>
+
+          <div class="mc-form-group">
+            <label>UF</label>
+            <select id="f-uf">
+              <option value="" selected>Selecione…</option>
+              <option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option>
+              <option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option>
+              <option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option>
+              <option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+              <option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option>
+              <option>SE</option><option>TO</option>
+            </select>
+          </div>
+
+          <div class="mc-form-group">
+            <label>Nome do Perito do Juízo</label>
+            <input type="text" id="f-perito">
+          </div>
+
+          <div class="mc-form-group">
             <label>Tipo de Cálculo <span class="req">*</span></label>
             <select id="f-tipo-calculo" required>
               <option value="" disabled selected>Selecione…</option>
@@ -278,6 +316,12 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
               <th>Processo</th>
               <th>Reclamante</th>
               <th>Reclamada</th>
+              <th>Juiz</th>
+              <th>Adv. Parte Contrária</th>
+              <th>Vara</th>
+              <th>Comarca</th>
+              <th>UF</th>
+              <th>Perito do Juízo</th>
               <th>Tipo de Cálculo</th>
               <th>Data Decisão</th>
               <th>Tipo de Decisão</th>
@@ -480,6 +524,12 @@ function render(){
       <td class="mono">${e(s.processo)}</td>
       <td>${e(s.reclamante)}</td>
       <td>${e(s.reclamada)}</td>
+      <td>${e(s.juiz)}</td>
+      <td>${e(s.advogado_contraria)}</td>
+      <td>${e(s.vara)}</td>
+      <td>${e(s.comarca)}</td>
+      <td>${e(s.uf)}</td>
+      <td>${e(s.perito_juizo)}</td>
       <td>${e(s.tipo_calculo)}</td>
       <td>${formatarData(s.data_decisao)}</td>
       <td>${e(s.tipo_decisao)}</td>
@@ -526,6 +576,12 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
     processo: document.querySelector('#f-processo').value.trim(),
     reclamante: document.querySelector('#f-reclamante').value.trim(),
     reclamada: document.querySelector('#f-reclamada').value.trim(),
+    juiz: document.querySelector('#f-juiz').value.trim(),
+    advogado_contraria: document.querySelector('#f-advogado-contraria').value.trim(),
+    vara: document.querySelector('#f-vara').value.trim(),
+    comarca: document.querySelector('#f-comarca').value.trim(),
+    uf: document.querySelector('#f-uf').value,
+    perito_juizo: document.querySelector('#f-perito').value.trim(),
     tipo_calculo: document.querySelector('#f-tipo-calculo').value,
     data_decisao: document.querySelector('#f-data-decisao').value,
     tipo_decisao: document.querySelector('#f-tipo-decisao').value,
@@ -562,6 +618,12 @@ document.querySelector('#btn-exportar').addEventListener('click', function(){
     'Processo': s.processo,
     'Reclamante': s.reclamante,
     'Reclamada': s.reclamada,
+    'Juiz': s.juiz,
+    'Advogado da Parte Contrária': s.advogado_contraria,
+    'Vara': s.vara,
+    'Comarca': s.comarca,
+    'UF': s.uf,
+    'Nome do Perito do Juízo': s.perito_juizo,
     'Tipo de Cálculo': s.tipo_calculo,
     'Data da Decisão': formatarData(s.data_decisao),
     'Tipo de Decisão': s.tipo_decisao,
@@ -574,7 +636,7 @@ document.querySelector('#btn-exportar').addEventListener('click', function(){
     'OK do Assistente': s.ok_assistente ? 'Sim' : 'Não'
   }));
   const ws = XLSX.utils.json_to_sheet(dados);
-  ws['!cols'] = [{wch:14},{wch:26},{wch:24},{wch:24},{wch:28},{wch:14},{wch:28},{wch:20},{wch:26},{wch:26},{wch:16},{wch:12},{wch:16},{wch:14}];
+  ws['!cols'] = [{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:20},{wch:26},{wch:26},{wch:16},{wch:12},{wch:16},{wch:14}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Solicitações');
   const hoje = hojeISO();
