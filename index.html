@@ -373,47 +373,58 @@ const TIPOS_CALCULO = ['Inicial','Sentença','Embargos','Acórdão TRT','Acórd�
 const TIPOS_DECISAO = ['Improcedente','Procedente em Parte','Extinção com Resolução do Mérito','Extinção Sem Resolução do Mérito','Acordo','Procedência Total','Lado Desfavorável','Laudo Desfavorável','Reintegração'];
 
 const PROFISSIONAIS = [
-  {n:'Aline Amorim Oliveira', g:'Grupo A3'}, {n:'Aline Cunha de Oliveira Borges', g:'Grupo B1'},
-  {n:'Aline Ferreira Miron', g:'Grupo E1'}, {n:'Alícia Marcondes Hamati', g:'Grupo A3'},
-  {n:'Amanda Mesquita de Lima Araujo', g:'Grupo E2'}, {n:'Anna Carolina Balbino Gatti Baani', g:'Grupo B2'},
-  {n:'Arthur Rodrigues Rios Toledo de Castro', g:'Grupo E2'}, {n:'Ana Julia Thomaz Carmona', g:'Grupo A1'},
-  {n:'Bianca Bolanhi Camacho', g:'Grupo D1'}, {n:'Bruna Cembranelli Fazenda', g:'Grupo B2'},
-  {n:'Brenna Braga Freitas Malta', g:'Grupo B3'}, {n:'Beatriz Santiago de Souza', g:'Grupo B1'},
-  {n:'Brenda da Silva dos Santos', g:'Grupo E2'}, {n:'Camila Alves Magalhães de Paula', g:'Grupo E2'},
-  {n:'Chris Carvalho', g:'Grupo A3'}, {n:'Cícera Gabriela Ferreira Vicente', g:'Grupo B1'},
-  {n:'Diana de Jesus Santos', g:'Grupo E1'}, {n:'Daniela Prandi Pedro Ricca', g:'Grupo E1'},
-  {n:'Erik Mota Coppi', g:'Grupo C'}, {n:'Ellen Mary Maciel Silva', g:'Grupo E1'},
-  {n:'Evandro Vecchio Vessoni', g:'Grupo B1'}, {n:'Erick Yuji Nakama', g:'Grupo A2'},
-  {n:'Fabiano Fritz Ferreira Filho', g:'Grupo E2'}, {n:'Fabrício Lima da Silva', g:'Grupo E1'},
-  {n:'Gabriel Fretas de Oliveira', g:'Grupo E1'}, {n:'Giovanna Teixeira Franco', g:'Grupo E2'},
-  {n:'Giovanni Comunale Oliveira', g:'Grupo A1'}, {n:'Giovanna Malheiros Gatto', g:'Grupo B1'},
-  {n:'Gisela da Silva Freire', g:'Sócios'}, {n:'Geovanna Rodrigues Silva', g:'Grupo B2'},
-  {n:'Guilherme Silva Morimoto', g:'Grupo B1'}, {n:'Gabriela de Souza Pedroso', g:'Grupo E2'},
-  {n:'Giulia Vendramini Milani', g:'Grupo E1'}, {n:'Hanyelle Alves da Silva', g:'Grupo A1'},
-  {n:'Henrique Remorini Pantuzo', g:'Grupo A1'}, {n:'Isadora Silva Gagliardi', g:'Grupo B2'},
-  {n:'Jaqueline Jahel Moraes', g:'Grupo A1'}, {n:'Jenifer de Jesus Silva', g:'Grupo B1'},
-  {n:'Juan Leonardo Ikier Moraes', g:'Grupo E2'}, {n:'Juliana Perucci', g:'Grupo B1'},
-  {n:'Júlia Priego Lopes da Silva', g:'Grupo E1'}, {n:'Jessica Cerqueira Silva', g:'Grupo D1'},
-  {n:'Joice Ramos Miranda', g:'Grupo E1'}, {n:'Jackeline Romeu Torres', g:'Grupo E2'},
-  {n:'Keyla Maria Barbosa Silva Moraes', g:'Grupo E1'}, {n:'Karoline de Castro Torres', g:'Grupo E2'},
-  {n:'Lorena Rodrigues Costa Gonçalves', g:'Grupo B1'}, {n:'Larissa Lekich Lobenwein', g:'Grupo E1'},
-  {n:'Letícia Meneghini Fontes', g:'Grupo B3'}, {n:'Leonardo Pereira de Jesus', g:'Grupo E1'},
-  {n:'Mariana Borges de Menezes Fávaro', g:'Grupo E2'}, {n:'Maria Carolina Silva Santos Dias', g:'Grupo B2'},
-  {n:'Matheus de Jesus Trindade', g:'Grupo E1'}, {n:'Marina de Novaes Brechiani', g:'Grupo A1'},
-  {n:'Marcel Tadeu Matos Alves da Silva', g:'Sócios'}, {n:'Natalia Bezerra Baliero', g:'Grupo E2'},
-  {n:'Natália Biondi Gaggini Robles', g:'Grupo A2'}, {n:'Nathalie Louise dos Santos Rodrigues Dias', g:'Grupo E1'},
-  {n:'Nicolau Rafael Guimarães Coelho', g:'Grupo B1, B2 e B3'}, {n:'Poliana Banqueri da Silva Guimarães', g:'Sócios'},
-  {n:'Paloma da Silva Santos', g:'Grupo E1'}, {n:'Rafael Camargo Felisbino', g:'Grupo E2'},
-  {n:'Rafael Rocha Ferreira', g:'Grupo B1'}, {n:'Raica Fernandes Kwok', g:'Grupo B3'},
-  {n:'Richard Ruan Leo da Silva', g:'Grupo E2'}, {n:'Rodrigo Souichi Nishijima', g:'Grupo B1'},
-  {n:'Rafaella Wittmann Domenicis', g:'Grupo B2'}, {n:'Rafael Yepez do Lago', g:'Grupo E2'},
-  {n:'Sofia Freire', g:'Grupo A3'}, {n:'Thais Catharine Cardozo Esteves', g:'Grupo A1'},
-  {n:'Tamires Lins Costa', g:'Grupo E1'}, {n:'Thiago Frid Figueiredo Rossi', g:'Grupo C'},
-  {n:'Tabata Neves Caramelli', g:'Grupo A2'}, {n:'Vitoria Araujo Carvalho', g:'Grupo B1'},
-  {n:'Vanessa de Cassia Castrequini Rosa', g:'Grupo B2'}, {n:'Vinicius Ferreira Garcia', g:'Grupo A1'},
-  {n:'Vinícius Ronchi Arruda', g:'Grupo E1'}, {n:'Vinicius da Silva Cerqueira', g:'Grupo C'},
-  {n:'Washington Soares Silva Filho', g:'Grupo E2'}
+  {n:'Aline Amorim Oliveira', g:'Grupo A3', email:'aline.oliveira@peixotoecury.com.br'}, {n:'Aline Cunha de Oliveira Borges', g:'Grupo B1', email:'aline.borges@peixotoecury.com.br'},
+  {n:'Aline Ferreira Miron', g:'Grupo E1', email:'aline.miron@peixotoecury.com.br'}, {n:'Alícia Marcondes Hamati', g:'Grupo A3', email:'alicia.hamati@peixotoecury.com.br'},
+  {n:'Amanda Mesquita de Lima Araujo', g:'Grupo E2', email:'amanda.araujo@peixotoecury.com.br'}, {n:'Anna Carolina Balbino Gatti Baani', g:'Grupo B2', email:'annacarolina.baani@peixotoecury.com.br'},
+  {n:'Arthur Rodrigues Rios Toledo de Castro', g:'Grupo E2', email:'arthur.castro@peixotoecury.com.br'}, {n:'Ana Julia Thomaz Carmona', g:'Grupo A1', email:'anajulia.carmona@peixotoecury.com.br'},
+  {n:'Bianca Bolanhi Camacho', g:'Grupo D1', email:'bianca.camacho@peixotoecury.com.br'}, {n:'Bruna Cembranelli Fazenda', g:'Grupo B2', email:'bruna.fazenda@peixotoecury.com.br'},
+  {n:'Brenna Braga Freitas Malta', g:'Grupo B3', email:'brenna.malta@peixotoecury.com.br'}, {n:'Beatriz Santiago de Souza', g:'Grupo B1', email:'beatriz.souza@peixotoecury.com.br'},
+  {n:'Brenda da Silva dos Santos', g:'Grupo E2', email:'brenda.santos@peixotoecury.com.br'}, {n:'Camila Alves Magalhães de Paula', g:'Grupo E2', email:'camila.paula@peixotoecury.com.br'},
+  {n:'Chris Carvalho', g:'Grupo A3', email:'chris.carvalho@peixotoecury.com.br'}, {n:'Cícera Gabriela Ferreira Vicente', g:'Grupo B1', email:'cicera.vicente@peixotoecury.com.br'},
+  {n:'Diana de Jesus Santos', g:'Grupo E1', email:'diana.santos@peixotoecury.com.br'}, {n:'Daniela Prandi Pedro Ricca', g:'Grupo E1', email:'daniela.ricca@peixotoecury.com.br'},
+  {n:'Erik Mota Coppi', g:'Grupo C', email:'erik.coppi@peixotoecury.com.br'}, {n:'Ellen Mary Maciel Silva', g:'Grupo E1', email:'ellenmary.silva@peixotoecury.com.br'},
+  {n:'Evandro Vecchio Vessoni', g:'Grupo B1', email:'evandro.vessoni@peixotoecury.com.br'}, {n:'Erick Yuji Nakama', g:'Grupo A2', email:'erick.nakama@peixotoecury.com.br'},
+  {n:'Fabiano Fritz Ferreira Filho', g:'Grupo E2', email:'fabiano.filho@peixotoecury.com.br'}, {n:'Fabrício Lima da Silva', g:'Grupo E1', email:'fabricio.silva@peixotoecury.com.br'},
+  {n:'Gabriel Fretas de Oliveira', g:'Grupo E1', email:'gabriel.oliveira@peixotoecury.com.br'}, {n:'Giovanna Teixeira Franco', g:'Grupo E2', email:'giovanna.teixeira@peixotoecury.com.br'},
+  {n:'Giovanni Comunale Oliveira', g:'Grupo A1', email:'giovanni.oliveira@peixotoecury.com.br'}, {n:'Giovanna Malheiros Gatto', g:'Grupo B1', email:'giovanna.gatto@peixotoecury.com.br'},
+  {n:'Gisela da Silva Freire', g:'Sócios', email:'gisela.freire@peixotoecury.com.br'}, {n:'Geovanna Rodrigues Silva', g:'Grupo B2', email:'geovanna.rodrigues@peixotoecury.com.br'},
+  {n:'Guilherme Silva Morimoto', g:'Grupo B1', email:'guilherme.morimoto@peixotoecury.com.br'}, {n:'Gabriela de Souza Pedroso', g:'Grupo E2', email:'gabriela.pedroso@peixotoecury.com.br'},
+  {n:'Giulia Vendramini Milani', g:'Grupo E1', email:'giulia.milani@peixotoecury.com.br'}, {n:'Hanyelle Alves da Silva', g:'Grupo A1', email:'hanyelle.silva@peixotoecury.com.br'},
+  {n:'Henrique Remorini Pantuzo', g:'Grupo A1', email:'henrique.pantuzo@peixotoecury.com.br'}, {n:'Isadora Silva Gagliardi', g:'Grupo B2', email:'isadora.gagliardi@peixotoecury.com.br'},
+  {n:'Jaqueline Jahel Moraes', g:'Grupo A1', email:'jaqueline.moraes@peixotoecury.com.br'}, {n:'Jenifer de Jesus Silva', g:'Grupo B1', email:'jenifer.silva@peixotoecury.com.br'},
+  {n:'Juan Leonardo Ikier Moraes', g:'Grupo E2', email:'juanleonardo.moraes@peixotoecury.com.br'}, {n:'Juliana Perucci', g:'Grupo B1', email:'juliana.perucci@peixotoecury.com.br'},
+  {n:'Júlia Priego Lopes da Silva', g:'Grupo E1', email:'julia.priego@peixotoecury.com.br'}, {n:'Jessica Cerqueira Silva', g:'Grupo D1', email:'jessica.cerqueira@peixotoecury.com.br'},
+  {n:'Joice Ramos Miranda', g:'Grupo E1', email:'joice.miranda@peixotoecury.com.br'}, {n:'Jackeline Romeu Torres', g:'Grupo E2', email:'jackeline.torres@peixotoecury.com.br'},
+  {n:'Keyla Maria Barbosa Silva Moraes', g:'Grupo E1', email:'keyla.moraes@peixotoecury.com.br'}, {n:'Karoline de Castro Torres', g:'Grupo E2', email:'karoline.torres@peixotoecury.com.br'},
+  {n:'Lorena Rodrigues Costa Gonçalves', g:'Grupo B1', email:'lorena.goncalves@peixotoecury.com.br'}, {n:'Larissa Lekich Lobenwein', g:'Grupo E1', email:'larissa.lekich@peixotoecury.com.br'},
+  {n:'Letícia Meneghini Fontes', g:'Grupo B3', email:'leticia.fontes@peixotoecury.com.br'}, {n:'Leonardo Pereira de Jesus', g:'Grupo E1', email:'leonardo.jesus@peixotoecury.com.br'},
+  {n:'Mariana Borges de Menezes Fávaro', g:'Grupo E2', email:'mariana.favaro@peixotoecury.com.br'}, {n:'Maria Carolina Silva Santos Dias', g:'Grupo B2', email:'mariacarolina.dias@peixotoecury.com.br'},
+  {n:'Matheus de Jesus Trindade', g:'Grupo E1', email:'matheus.trindade@peixotoecury.com.br'}, {n:'Marina de Novaes Brechiani', g:'Grupo A1', email:'marina.brechiani@peixotoecury.com.br'},
+  {n:'Marcel Tadeu Matos Alves da Silva', g:'Sócios', email:'marcel.alves@peixotoecury.com.br'}, {n:'Natalia Bezerra Baliero', g:'Grupo E2', email:'natalia.baliero@peixotoecury.com.br'},
+  {n:'Natália Biondi Gaggini Robles', g:'Grupo A2', email:'natalia.gaggini@peixotoecury.com.br'}, {n:'Nathalie Louise dos Santos Rodrigues Dias', g:'Grupo E1', email:'nathalie.louise@peixotoecury.com.br'},
+  {n:'Nicolau Rafael Guimarães Coelho', g:'Grupo B1, B2 e B3', email:'nicolau.coelho@peixotoecury.com.br'}, {n:'Poliana Banqueri da Silva Guimarães', g:'Sócios', email:'poliana.banqueri@peixotoecury.com.br'},
+  {n:'Paloma da Silva Santos', g:'Grupo E1', email:'paloma.santos@peixotoecury.com.br'}, {n:'Rafael Camargo Felisbino', g:'Grupo E2', email:'rafael.camargo@peixotoecury.com.br'},
+  {n:'Rafael Rocha Ferreira', g:'Grupo B1', email:'rafael.ferreira@peixotoecury.com.br'}, {n:'Raica Fernandes Kwok', g:'Grupo B3', email:'raica.kwok@peixotoecury.com.br'},
+  {n:'Richard Ruan Leo da Silva', g:'Grupo E2', email:'richard.silva@peixotoecury.com.br'}, {n:'Rodrigo Souichi Nishijima', g:'Grupo B1', email:'rodrigo.nishijima@peixotoecury.com.br'},
+  {n:'Rafaella Wittmann Domenicis', g:'Grupo B2', email:'rafaella.domenicis@peixotoecury.com.br'}, {n:'Rafael Yepez do Lago', g:'Grupo E2', email:'rafael.lago@peixotoecury.com.br'},
+  {n:'Sofia Freire', g:'Grupo A3', email:'sofia.freire@peixotoecury.com.br'}, {n:'Thais Catharine Cardozo Esteves', g:'Grupo A1', email:'thais.esteves@peixotoecury.com.br'},
+  {n:'Tamires Lins Costa', g:'Grupo E1', email:'tamireslins.costa@peixotoecury.com.br'}, {n:'Thiago Frid Figueiredo Rossi', g:'Grupo C', email:'thiago.rossi@peixotoecury.com.br'},
+  {n:'Tabata Neves Caramelli', g:'Grupo A2', email:'tabata.caramelli@peixotoecury.com.br'}, {n:'Vitoria Araujo Carvalho', g:'Grupo B1', email:'vitoria.carvalho@peixotoecury.com.br'},
+  {n:'Vanessa de Cassia Castrequini Rosa', g:'Grupo B2', email:'vanessa.rosa@peixotoecury.com.br'}, {n:'Vinicius Ferreira Garcia', g:'Grupo A1', email:'vinicius.garcia@peixotoecury.com.br'},
+  {n:'Vinícius Ronchi Arruda', g:'Grupo E1', email:'vinicius.ronchi@peixotoecury.com.br'}, {n:'Vinicius da Silva Cerqueira', g:'Grupo C', email:'vinicius.dasilva@peixotoecury.com.br'},
+  {n:'Washington Soares Silva Filho', g:'Grupo E2', email:'washington.soares@peixotoecury.com.br'}
 ];
+
+function emailPorNome(nome){
+  const p = PROFISSIONAIS.find(x => x.n === nome);
+  return p ? p.email : '';
+}
+
+function abrirEmail(destinatario, assunto, corpo){
+  if(!destinatario) return;
+  const link = `mailto:${destinatario}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
+  window.location.href = link;
+}
 
 function e(v){ return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
@@ -461,6 +472,7 @@ function getClient(){
 let SOLICITACOES = [];
 
 function hojeISO(){ return new Date().toISOString().slice(0,10); }
+function agoraHHmm(){ const d = new Date(); return String(d.getHours()).padStart(2,'0') + String(d.getMinutes()).padStart(2,'0'); }
 function formatarData(iso){
   if(!iso) return '—';
   const [y,m,d] = iso.split('-');
@@ -570,11 +582,25 @@ function render(){
 
 async function concluir(id){
   if(!confirm('Confirmar que o cálculo foi lançado no sistema?')) return;
+  const registro = SOLICITACOES.find(s => s.id === id);
   const { error } = await getClient().from(TABLE).update({
     data_conclusao: hojeISO(), ok_assistente: true, status: 'Concluído'
   }).eq('id', id);
-  if(error) alert('Erro ao atualizar: ' + error.message);
-  else carregar();
+  if(error){ alert('Erro ao atualizar: ' + error.message); return; }
+
+  await carregar();
+  gerarExcel(SOLICITACOES, `Backup_Controle_Insercao_Valores_${hojeISO()}_${agoraHHmm()}`);
+
+  if(registro){
+    const emailAdvogado = emailPorNome(registro.advogado_solicitante);
+    const assunto = `Cálculo lançado no sistema — ${registro.cliente} — ${registro.processo}`;
+    const corpo = `Olá, ${registro.advogado_solicitante}.\n\n`
+      + `O cálculo solicitado já foi lançado no sistema pelo(a) assistente ${registro.assistente_responsavel}.\n\n`
+      + `Cliente: ${registro.cliente}\nProcesso: ${registro.processo}\nReclamante: ${registro.reclamante}\nReclamada: ${registro.reclamada}\n`
+      + `Tipo de Cálculo: ${registro.tipo_calculo}\nData de conclusão: ${formatarData(hojeISO())}\n\n`
+      + `Controle de Inserção de Valores — LAWgico`;
+    abrirEmail(emailAdvogado, assunto, corpo);
+  }
 }
 
 async function reabrir(id){
@@ -627,15 +653,24 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
 
   ev.target.reset();
   document.querySelector('#wrap-cliente-outro').style.display = 'none';
-  carregar();
+  await carregar();
+
+  const emailAssistente = emailPorNome(payload.assistente_responsavel);
+  const assunto = `Nova solicitação de cálculo — ${payload.cliente} — ${payload.processo}`;
+  const corpo = `Olá, ${payload.assistente_responsavel}.\n\n`
+    + `Uma nova solicitação de cálculo foi registrada pelo(a) advogado(a) ${payload.advogado_solicitante}.\n\n`
+    + `Cliente: ${payload.cliente}\nProcesso: ${payload.processo}\nReclamante: ${payload.reclamante}\nReclamada: ${payload.reclamada}\n`
+    + `Tipo de Cálculo: ${payload.tipo_calculo}\nAcima de R$ 400.000,00: ${payload.acima_400k ? 'Sim' : 'Não'}\n\n`
+    + `Acesse o painel para mais detalhes: https://peixotoecury.github.io/controleinsercaovalores/\n\n`
+    + `Controle de Inserção de Valores — LAWgico`;
+  abrirEmail(emailAssistente, assunto, corpo);
 });
 
 ['#flt-cliente','#flt-status','#flt-assistente'].forEach(sel => document.querySelector(sel).addEventListener('change', render));
 document.querySelector('#flt-busca').addEventListener('input', render);
 
-document.querySelector('#btn-exportar').addEventListener('click', function(){
-  const lista = filtrar();
-  if(!lista.length){ alert('Não há solicitações para exportar.'); return; }
+function gerarExcel(lista, nomeArquivo){
+  if(!lista.length){ return; }
   const dados = lista.map(s => ({
     'Cliente': s.cliente,
     'Processo': s.processo,
@@ -664,8 +699,13 @@ document.querySelector('#btn-exportar').addEventListener('click', function(){
   ws['!cols'] = [{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:16},{wch:24},{wch:20},{wch:26},{wch:26},{wch:16},{wch:12},{wch:16},{wch:14}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Solicitações');
-  const hoje = hojeISO();
-  XLSX.writeFile(wb, `Controle_Insercao_Valores_${hoje}.xlsx`);
+  XLSX.writeFile(wb, `${nomeArquivo}.xlsx`);
+}
+
+document.querySelector('#btn-exportar').addEventListener('click', function(){
+  const lista = filtrar();
+  if(!lista.length){ alert('Não há solicitações para exportar.'); return; }
+  gerarExcel(lista, `Controle_Insercao_Valores_${hojeISO()}`);
 });
 
 function iniciarRealtime(){
