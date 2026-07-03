@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Controle de Decisões - Inclusão de Valores — LAWgico</title>
+<title>Controle de Decisões e Inclusão de Valores — LAWgico</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -164,7 +164,7 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
       <div class="tb-tagline">lawyers at work</div>
     </div>
     <div class="topbar-divider"></div>
-    <div class="topbar-title">Controle de Decisões - Inclusão de Valores — Jurídica</div>
+    <div class="topbar-title">Controle de Decisões e Inclusão de Valores</div>
   </div>
   <div class="topbar-right">
     <a class="logout-btn" href="../LAWgico_Hub.html">← Hub</a>
@@ -1047,16 +1047,16 @@ function cobrarSolicitacao(id, tipo){
   let assunto, corpo;
   if(tipo === 'calculo'){
     assunto = `Cobrança — solicitação de cálculo pendente de lançamento — ${s.cliente} — ${s.processo}`;
-    corpo = `Olá, ${s.advogado_solicitante}.\n\nA solicitação de cálculo abaixo ainda está pendente de lançamento. Se houver alguma informação faltando para o(a) assistente ${s.assistente_responsavel} dar andamento, por favor nos avise.\n\n${base}Controle de Decisões - Inclusão de Valores — LAWgico`;
+    corpo = `Olá, ${s.advogado_solicitante}.\n\nA solicitação de cálculo abaixo ainda está pendente de lançamento. Se houver alguma informação faltando para o(a) assistente ${s.assistente_responsavel} dar andamento, por favor nos avise.\n\n${base}Controle de Decisões e Inclusão de Valores — LAWgico`;
   } else if(tipo === 'revisao'){
     assunto = `Cobrança — cálculo aguardando sua revisão — ${s.cliente} — ${s.processo}`;
-    corpo = `Olá, ${s.advogado_solicitante}.\n\nO cálculo abaixo já foi lançado pelo(a) assistente ${s.assistente_responsavel} e segue aguardando a sua revisão.\n\n${base}Acesse o painel para revisar: https://peixotoecury.github.io/controleinsercaovalores/\n\nControle de Decisões - Inclusão de Valores — LAWgico`;
+    corpo = `Olá, ${s.advogado_solicitante}.\n\nO cálculo abaixo já foi lançado pelo(a) assistente ${s.assistente_responsavel} e segue aguardando a sua revisão.\n\n${base}Acesse o painel para revisar: https://peixotoecury.github.io/controleinsercaovalores/\n\nControle de Decisões e Inclusão de Valores — LAWgico`;
   } else if(tipo === 'decisao'){
     assunto = `Cobrança — decisão do processo ainda não informada — ${s.cliente} — ${s.processo}`;
-    corpo = `Olá, ${s.advogado_solicitante}.\n\nAinda não recebemos a informação do Tipo de Decisão para o processo abaixo. Por favor, nos informe assim que possível.\n\n${base}Controle de Decisões - Inclusão de Valores — LAWgico`;
+    corpo = `Olá, ${s.advogado_solicitante}.\n\nAinda não recebemos a informação do Tipo de Decisão para o processo abaixo. Por favor, nos informe assim que possível.\n\n${base}Controle de Decisões e Inclusão de Valores — LAWgico`;
   } else {
     assunto = `Cobrança — decisão identificada sem solicitação de cálculo — ${s.cliente} — ${s.processo}`;
-    corpo = `Olá, ${s.advogado_solicitante}.\n\nO(a) assistente ${s.assistente_responsavel} identificou que saiu a decisão abaixo (${s.tipo_decisao}, em ${formatarData(s.data_decisao)}), mas ainda não recebemos a solicitação de cálculo pra esse processo.\n\n${base}Por favor, envie a solicitação assim que possível: https://peixotoecury.github.io/controleinsercaovalores/\n\nControle de Decisões - Inclusão de Valores — LAWgico`;
+    corpo = `Olá, ${s.advogado_solicitante}.\n\nO(a) assistente ${s.assistente_responsavel} identificou que saiu a decisão abaixo (${s.tipo_decisao}, em ${formatarData(s.data_decisao)}), mas ainda não recebemos a solicitação de cálculo pra esse processo.\n\n${base}Por favor, envie a solicitação assim que possível: https://peixotoecury.github.io/controleinsercaovalores/\n\nControle de Decisões e Inclusão de Valores — LAWgico`;
   }
   abrirEmail(email, assunto, corpo);
 }
@@ -1080,7 +1080,7 @@ async function concluir(id){
       + `Cliente: ${registro.cliente}\nProcesso: ${registro.processo}\nReclamante: ${registro.reclamante}\nReclamada: ${registro.reclamada}\n`
       + `Tipo de Cálculo: ${registro.tipo_calculo}\nData de lançamento: ${formatarData(hojeISO())}\n\n`
       + `Acesse o painel para revisar: https://peixotoecury.github.io/controleinsercaovalores/\n\n`
-      + `Controle de Decisões - Inclusão de Valores — LAWgico`;
+      + `Controle de Decisões e Inclusão de Valores — LAWgico`;
     abrirEmail(emailAdvogado, assunto, corpo);
   }
 }
@@ -1186,7 +1186,7 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
     + `Cliente: ${payload.cliente}\nProcesso: ${payload.processo}\nReclamante: ${payload.reclamante}\nReclamada: ${payload.reclamada}\n`
     + `Tipo de Cálculo: ${payload.tipo_calculo}\nAcima de R$ 400.000,00: ${payload.acima_400k ? 'Sim' : 'Não'}\n\n`
     + `Acesse o painel para mais detalhes: https://peixotoecury.github.io/controleinsercaovalores/\n\n`
-    + `Controle de Decisões - Inclusão de Valores — LAWgico`;
+    + `Controle de Decisões e Inclusão de Valores — LAWgico`;
   abrirEmail(emailAssistente, assunto, corpo);
 });
 
@@ -1233,7 +1233,7 @@ document.querySelector('#form-identificado').addEventListener('submit', async fu
     + `Cliente: ${payload.cliente}\nProcesso: ${payload.processo}\nReclamante: ${payload.reclamante}\nReclamada: ${payload.reclamada}\n`
     + `Tipo de Decisão: ${payload.tipo_decisao}\nData da Decisão: ${formatarData(payload.data_decisao)}\n\n`
     + `Por favor, envie a solicitação de cálculo assim que possível: https://peixotoecury.github.io/controleinsercaovalores/\n\n`
-    + `Controle de Decisões - Inclusão de Valores — LAWgico`;
+    + `Controle de Decisões e Inclusão de Valores — LAWgico`;
   abrirEmail(emailAdvogado, assunto, corpo);
 });
 
