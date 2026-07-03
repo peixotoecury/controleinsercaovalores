@@ -88,11 +88,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13
 .mc-form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
 .mc-form-group label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
 .mc-form-group label .req{color:var(--red);}
-.mc-form-group input,.mc-form-group select{
-  background:#fff;border:1px solid #BFD6E4;border-radius:var(--radius);padding:9px 12px;color:var(--preto-pc);font-size:13px;font-family:var(--font);outline:none;transition:border .2s;width:100%;
+.mc-form-group input,.mc-form-group select,.mc-form-group textarea{
+  background:#fff;border:1px solid #BFD6E4;border-radius:var(--radius);padding:9px 12px;color:var(--preto-pc);font-size:13px;font-family:var(--font);outline:none;transition:border .2s;width:100%;resize:vertical;
 }
-.mc-form-group input:focus,.mc-form-group select:focus{border-color:var(--azul-pc);box-shadow:0 0 0 3px rgba(0,169,224,.14);}
-.mc-form-group input::placeholder{color:var(--muted2);}
+.mc-form-group input:focus,.mc-form-group select:focus,.mc-form-group textarea:focus{border-color:var(--azul-pc);box-shadow:0 0 0 3px rgba(0,169,224,.14);}
+.mc-form-group input::placeholder,.mc-form-group textarea::placeholder{color:var(--muted2);}
 .hint{font-size:10.5px;color:var(--muted2);margin-top:2px;}
 
 .check-row{display:flex;align-items:center;gap:9px;background:var(--orange-lt);border:1px solid rgba(230,126,34,.3);border-radius:var(--radius);padding:10px 12px;margin-bottom:16px;}
@@ -262,6 +262,17 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
             </select>
           </div>
 
+          <div class="mc-form-group" id="wrap-tipo-laudo" style="display:none;">
+            <label>Tipo de Laudo Desfavorável</label>
+            <select id="f-tipo-laudo">
+              <option value="" selected>Selecione…</option>
+              <option>Insalubridade</option>
+              <option>Periculosidade</option>
+              <option>Médico</option>
+              <option>Ergonômico</option>
+            </select>
+          </div>
+
           <div class="check-row">
             <input type="checkbox" id="f-calculo-solicitado">
             <label for="f-calculo-solicitado">Cálculo foi solicitado</label>
@@ -314,6 +325,11 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
             <div class="hint">Quem vai lançar o cálculo no sistema.</div>
           </div>
 
+          <div class="mc-form-group">
+            <label>Observações Adicionais</label>
+            <textarea id="f-observacoes" rows="3"></textarea>
+          </div>
+
           <button type="submit" class="btn-cyan">Enviar Solicitação</button>
         </form>
       </div>
@@ -357,6 +373,7 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
               <th>Perito do Juízo</th>
               <th>Data Decisão</th>
               <th>Tipo de Decisão</th>
+              <th>Tipo de Laudo</th>
               <th>Cálculo Solicitado</th>
               <th>Alteração de Prognóstico</th>
               <th>Alteração de Fase</th>
@@ -367,6 +384,7 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
               <th>Assistente</th>
               <th>Status</th>
               <th>Conclusão</th>
+              <th>Observações</th>
               <th></th>
             </tr>
           </thead>
@@ -527,6 +545,13 @@ document.querySelector('#f-cliente').addEventListener('change', function(){
   else { wrap.style.display = 'none'; outro.required = false; outro.value = ''; }
 });
 
+document.querySelector('#f-tipo-decisao').addEventListener('change', function(){
+  const wrap = document.querySelector('#wrap-tipo-laudo');
+  const sel = document.querySelector('#f-tipo-laudo');
+  if(this.value === 'Laudo Desfavorável'){ wrap.style.display = ''; }
+  else { wrap.style.display = 'none'; sel.value = ''; }
+});
+
 let sbClient = null;
 function getClient(){
   if(!sbClient) sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -628,6 +653,7 @@ function render(){
       <td>${e(s.perito_juizo)}</td>
       <td>${formatarData(s.data_decisao)}</td>
       <td>${e(s.tipo_decisao)}</td>
+      <td>${e(s.tipo_laudo)}</td>
       <td>${s.calculo_solicitado ? '<span class="badge badge-orange">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
       <td>${s.alteracao_prognostico ? '<span class="badge badge-orange">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
       <td>${s.alteracao_fase ? '<span class="badge badge-orange">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
@@ -638,6 +664,7 @@ function render(){
       <td>${e(s.assistente_responsavel)}</td>
       <td>${s.status === 'Concluído' ? '<span class="badge badge-green">Concluído</span>' : '<span class="badge badge-orange">Pendente</span>'}</td>
       <td>${formatarData(s.data_conclusao)}</td>
+      <td>${e(s.observacoes)}</td>
       <td>
         ${s.status === 'Pendente'
           ? `<button class="action-btn" onclick="concluir('${s.id}')">✓ Concluir</button>`
@@ -699,6 +726,7 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
     tipo_calculo: document.querySelector('#f-tipo-calculo').value,
     data_decisao: document.querySelector('#f-data-decisao').value,
     tipo_decisao: document.querySelector('#f-tipo-decisao').value,
+    tipo_laudo: document.querySelector('#f-tipo-laudo').value,
     calculo_solicitado: document.querySelector('#f-calculo-solicitado').checked,
     alteracao_prognostico: document.querySelector('#f-alteracao-prognostico').checked,
     alteracao_fase: document.querySelector('#f-alteracao-fase').checked,
@@ -707,6 +735,7 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
     provisao_atual: document.querySelector('#f-provisao-atual').value.trim(),
     advogado_solicitante: document.querySelector('#f-advogado').value,
     assistente_responsavel: document.querySelector('#f-assistente').value,
+    observacoes: document.querySelector('#f-observacoes').value.trim(),
     data_solicitacao: hojeISO(),
     status: 'Pendente',
     ok_assistente: false
@@ -723,6 +752,7 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
 
   ev.target.reset();
   document.querySelector('#wrap-cliente-outro').style.display = 'none';
+  document.querySelector('#wrap-tipo-laudo').style.display = 'none';
   await carregar();
 
   const emailAssistente = emailPorNome(payload.assistente_responsavel);
@@ -755,6 +785,7 @@ function gerarExcel(lista, nomeArquivo){
     'Nome do Perito do Juízo': s.perito_juizo,
     'Data da Decisão': formatarData(s.data_decisao),
     'Tipo de Decisão': s.tipo_decisao,
+    'Tipo de Laudo Desfavorável': s.tipo_laudo,
     'Cálculo Solicitado': s.calculo_solicitado ? 'Sim' : 'Não',
     'Houve Alteração de Prognóstico': s.alteracao_prognostico ? 'Sim' : 'Não',
     'Houve Alteração de Fase': s.alteracao_fase ? 'Sim' : 'Não',
@@ -766,10 +797,11 @@ function gerarExcel(lista, nomeArquivo){
     'Data da Solicitação': formatarData(s.data_solicitacao),
     'Status': s.status,
     'Data de Conclusão': formatarData(s.data_conclusao),
-    'OK do Assistente': s.ok_assistente ? 'Sim' : 'Não'
+    'OK do Assistente': s.ok_assistente ? 'Sim' : 'Não',
+    'Observações Adicionais': s.observacoes
   }));
   const ws = XLSX.utils.json_to_sheet(dados);
-  ws['!cols'] = [{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:16},{wch:16},{wch:16},{wch:24},{wch:20},{wch:20},{wch:26},{wch:26},{wch:16},{wch:12},{wch:16},{wch:14}];
+  ws['!cols'] = [{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:20},{wch:16},{wch:16},{wch:16},{wch:24},{wch:20},{wch:20},{wch:26},{wch:26},{wch:16},{wch:12},{wch:16},{wch:14},{wch:36}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Solicitações');
   XLSX.writeFile(wb, `${nomeArquivo}.xlsx`);
