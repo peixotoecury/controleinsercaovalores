@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controle de Inserção de Valores — LAWgico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Padrão P&C Claro — mesma paleta do dashboard executivo (Pauta de Audiências) */
+:root {
+  --azul-pc:  #00A9E0;
+  --cyan:     #00A9E0;
+  --cyan-lt:  rgba(0,169,224,.12);
+  --cyan-glow:rgba(0,169,224,.22);
+  --escuro-pc:#003B5C;
+  --navy:     #003B5C;
+  --blue:     #006080;
+  --preto-pc: #2D2926;
+  --bg:       #F4F9FC;
+  --bg2:      #FFFFFF;
+  --surface:  #FFFFFF;
+  --surface2: #F7FCFF;
+  --border:   rgba(0,169,224,.20);
+  --border2:  #D8E7F0;
+  --text:     #2D2926;
+  --white:    #fff;
+  --muted:    #5F7E92;
+  --muted2:   #7E98AA;
+  --red:      #C0392B;
+  --red-lt:   rgba(192,57,43,.10);
+  --orange:   #B85C00;
+  --orange-lt:rgba(230,126,34,.10);
+  --green:    #117A65;
+  --green-lt: rgba(17,122,101,.10);
+  --shadow-pc:0 8px 22px rgba(0,59,92,.08);
+  --font:     'Sora', sans-serif;
+  --mono:     'IBM Plex Mono', monospace;
+  --radius:   8px;
+  --radius-lg:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow-x:hidden;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(0,169,224,.25);border-radius:4px;}
+::-webkit-scrollbar-thumb:hover{background:rgba(0,169,224,.45);}
+
+/* ── TOPBAR (navy, marca LAWgico) ── */
+.topbar{background:linear-gradient(90deg,var(--escuro-pc),#00557B 72%,var(--azul-pc));border-bottom:4px solid var(--azul-pc);box-shadow:var(--shadow-pc);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:100;}
+.topbar-left{display:flex;align-items:center;gap:16px;}
+.tb-lawgico{display:inline-block;line-height:1;position:relative;}
+.tb-law{font-size:18px;font-weight:800;color:#fff;font-family:'Sora',sans-serif;letter-spacing:-.5px;}
+.tb-gico{font-size:18px;font-weight:300;color:#fff;font-family:'Sora',sans-serif;letter-spacing:-.5px;}
+.tb-modulo{font-size:9px;font-weight:300;color:rgba(255,255,255,.75);font-family:'Sora',sans-serif;position:absolute;top:-5px;right:0;white-space:nowrap;}
+.tb-tagline{font-size:7.5px;font-weight:300;letter-spacing:3px;color:rgba(255,255,255,.65);font-family:'Sora',sans-serif;margin-top:1px;}
+.topbar-divider{width:1px;height:28px;background:rgba(255,255,255,.25);}
+.topbar-title{font-size:13px;font-weight:600;color:rgba(255,255,255,.85);}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.logout-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.38);color:#fff;border-radius:var(--radius);padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;font-family:var(--font);text-decoration:none;display:inline-flex;align-items:center;gap:6px;}
+.logout-btn:hover{background:rgba(255,255,255,.22);}
+
+/* ── LAYOUT ── */
+.main{max-width:1440px;margin:0 auto;padding:22px 24px 60px;}
+
+.kpi-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;}
+.kpi-card{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border2);box-shadow:var(--shadow-pc);border-radius:var(--radius-lg);padding:16px 20px;flex:1;min-width:170px;position:relative;overflow:hidden;transition:transform .2s;}
+.kpi-card:hover{transform:translateY(-2px);}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;}
+.kpi-total::before{background:linear-gradient(90deg,var(--azul-pc),#006080);}
+.kpi-orange::before{background:linear-gradient(90deg,#E67E22,#B85C00);}
+.kpi-green::before{background:linear-gradient(90deg,var(--green),#0c5c4c);}
+.kpi-red::before{background:linear-gradient(90deg,var(--red),#8B1D1D);}
+.kpi-icon{font-size:22px;flex-shrink:0;}
+.kpi-val{font-size:28px;font-weight:700;color:var(--escuro-pc);line-height:1;font-variant-numeric:tabular-nums;font-family:var(--mono);}
+.kpi-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:3px;font-weight:600;}
+
+.grid-main{display:grid;grid-template-columns:380px 1fr;gap:18px;align-items:start;}
+@media (max-width: 1000px){ .grid-main{grid-template-columns:1fr;} }
+
+.dash-card{background:var(--surface);border:1px solid var(--border2);box-shadow:var(--shadow-pc);border-radius:var(--radius-lg);overflow:hidden;}
+.dash-card-head{padding:16px 20px;border-bottom:1px solid var(--border2);background:var(--surface2);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--escuro-pc);display:flex;align-items:center;gap:8px;}
+.dash-card-body{padding:20px;}
+
+/* ── FORM ── */
+.mc-form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.mc-form-group label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+.mc-form-group label .req{color:var(--red);}
+.mc-form-group input,.mc-form-group select{
+  background:#fff;border:1px solid #BFD6E4;border-radius:var(--radius);padding:9px 12px;color:var(--preto-pc);font-size:13px;font-family:var(--font);outline:none;transition:border .2s;width:100%;
+}
+.mc-form-group input:focus,.mc-form-group select:focus{border-color:var(--azul-pc);box-shadow:0 0 0 3px rgba(0,169,224,.14);}
+.mc-form-group input::placeholder{color:var(--muted2);}
+.hint{font-size:10.5px;color:var(--muted2);margin-top:2px;}
+
+.check-row{display:flex;align-items:center;gap:9px;background:var(--orange-lt);border:1px solid rgba(230,126,34,.3);border-radius:var(--radius);padding:10px 12px;margin-bottom:16px;}
+.check-row input{width:16px;height:16px;accent-color:var(--orange);flex-shrink:0;}
+.check-row label{font-size:12px;font-weight:600;color:var(--orange);}
+
+.btn-cyan{background:var(--escuro-pc);color:#fff;border:none;border-radius:var(--radius);padding:11px 18px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:var(--font);width:100%;letter-spacing:.2px;}
+.btn-cyan:hover{background:#00557B;transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,59,92,.25);}
+.btn-cyan:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+
+.export-btn{background:var(--green);color:#fff;border:none;border-radius:var(--radius);padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;font-family:var(--font);display:flex;align-items:center;gap:6px;white-space:nowrap;}
+.export-btn:hover{background:#0c5c4c;transform:translateY(-1px);box-shadow:0 4px 14px rgba(17,122,101,.3);}
+
+.action-btn{background:rgba(0,169,224,.10);border:1px solid rgba(0,169,224,.3);color:var(--escuro-pc);border-radius:var(--radius);padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;font-family:var(--font);white-space:nowrap;}
+.action-btn:hover{background:rgba(0,169,224,.2);}
+.action-btn.reabrir{background:transparent;border-color:var(--border2);color:var(--muted);}
+.action-btn.reabrir:hover{border-color:var(--azul-pc);color:var(--escuro-pc);background:#F0FAFE;}
+
+/* ── FILTERS ── */
+.filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:14px 20px;border-bottom:1px solid var(--border2);background:var(--surface2);}
+.filter-select,.filter-input{background:#fff;border:1px solid #BFD6E4;border-radius:var(--radius);padding:8px 12px;color:var(--preto-pc);font-size:12px;font-family:var(--font);outline:none;transition:border .2s;}
+.filter-select:focus,.filter-input:focus{border-color:var(--azul-pc);box-shadow:0 0 0 3px rgba(0,169,224,.14);}
+.filter-input{flex:1;min-width:200px;}
+.filter-input::placeholder{color:var(--muted2);}
+
+/* ── TABLE ── */
+.table-wrap{overflow-x:auto;}
+table.sol-table{width:100%;border-collapse:collapse;min-width:1150px;background:#fff;}
+table.sol-table thead th{position:sticky;top:0;background:var(--escuro-pc);color:#fff;padding:10px 12px;text-transform:uppercase;font-size:10px;letter-spacing:.6px;text-align:left;white-space:nowrap;}
+table.sol-table tbody td{padding:10px 12px;border-bottom:1px solid #E5EEF4;color:var(--preto-pc);font-size:12px;vertical-align:middle;}
+table.sol-table tbody tr:hover td{background:#F8FCFF;}
+td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:nowrap;}
+
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;border:1px solid transparent;}
+.badge-nao{background:#F1F5F8;color:var(--muted);border-color:var(--border2);}
+.badge-red{background:var(--red-lt);color:var(--red);border-color:rgba(192,57,43,.25);}
+.badge-orange{background:var(--orange-lt);color:var(--orange);border-color:rgba(230,126,34,.25);}
+.badge-green{background:var(--green-lt);color:var(--green);border-color:rgba(17,122,101,.25);}
+
+.empty-state{padding:48px 16px;text-align:center;color:var(--muted);font-size:13px;}
+.error-banner{background:var(--red-lt);border:1px solid rgba(192,57,43,.3);color:var(--red);border-radius:var(--radius);padding:14px 18px;margin-bottom:18px;font-size:12px;line-height:1.6;}
+.error-banner strong{color:var(--preto-pc);}
+.error-banner code{background:rgba(0,0,0,.06);padding:1px 6px;border-radius:4px;font-family:var(--mono);color:var(--preto-pc);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">
+      <div class="tb-lawgico"><span class="tb-law">LAW</span><span class="tb-gico">gico</span><span class="tb-modulo">valores</span></div>
+      <div class="tb-tagline">lawyers at work</div>
+    </div>
+    <div class="topbar-divider"></div>
+    <div class="topbar-title">Controle de Inserção de Valores — Controladoria Jurídica</div>
+  </div>
+  <div class="topbar-right">
+    <a class="logout-btn" href="../LAWgico_Hub.html">← Hub</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <div id="erro-conexao"></div>
+
+  <div class="kpi-row">
+    <div class="kpi-card kpi-total"><div class="kpi-icon">📋</div><div><div class="kpi-val" id="st-total">0</div><div class="kpi-label">Total de solicitações</div></div></div>
+    <div class="kpi-card kpi-orange"><div class="kpi-icon">⏳</div><div><div class="kpi-val" id="st-pendentes">0</div><div class="kpi-label">Pendentes</div></div></div>
+    <div class="kpi-card kpi-green"><div class="kpi-icon">✅</div><div><div class="kpi-val" id="st-concluidas">0</div><div class="kpi-label">Concluídas</div></div></div>
+    <div class="kpi-card kpi-red"><div class="kpi-icon">💰</div><div><div class="kpi-val" id="st-400k">0</div><div class="kpi-label">Acima de R$ 400.000,00</div></div></div>
+  </div>
+
+  <div class="grid-main">
+
+    <div class="dash-card">
+      <div class="dash-card-head">📝 Nova Solicitação de Valores</div>
+      <div class="dash-card-body">
+        <form id="form-solicitacao">
+
+          <div class="mc-form-group">
+            <label>Cliente <span class="req">*</span></label>
+            <select id="f-cliente" required>
+              <option value="" disabled selected>Selecione…</option>
+              <option>Bridgestone</option>
+              <option>CBC</option>
+              <option>Embraer</option>
+              <option>T4F</option>
+              <option>Ferrero</option>
+              <option value="Outro">Outro…</option>
+            </select>
+          </div>
+
+          <div class="mc-form-group" id="wrap-cliente-outro" style="display:none;">
+            <label>Nome do Cliente <span class="req">*</span></label>
+            <input type="text" id="f-cliente-outro" placeholder="Digite o nome do cliente">
+          </div>
+
+          <div class="mc-form-group">
+            <label>Processo (CNJ) <span class="req">*</span></label>
+            <input type="text" id="f-processo" required placeholder="0000000-00.0000.0.00.0000">
+          </div>
+
+          <div class="mc-form-group">
+            <label>Reclamante <span class="req">*</span></label>
+            <input type="text" id="f-reclamante" required>
+          </div>
+
+          <div class="mc-form-group">
+            <label>Reclamada <span class="req">*</span></label>
+            <input type="text" id="f-reclamada" required>
+          </div>
+
+          <div class="mc-form-group">
+            <label>Tipo de Cálculo <span class="req">*</span></label>
+            <select id="f-tipo-calculo" required>
+              <option value="" disabled selected>Selecione…</option>
+            </select>
+          </div>
+
+          <div class="check-row">
+            <input type="checkbox" id="f-400k">
+            <label for="f-400k">Valor acima de R$ 400.000,00</label>
+          </div>
+
+          <div class="mc-form-group">
+            <label>Advogado que Solicitou <span class="req">*</span></label>
+            <select id="f-advogado" required>
+              <option value="" disabled selected>Selecione…</option>
+            </select>
+          </div>
+
+          <div class="mc-form-group">
+            <label>Assistente Responsável pelo Lançamento <span class="req">*</span></label>
+            <select id="f-assistente" required>
+              <option value="" disabled selected>Selecione…</option>
+            </select>
+            <div class="hint">Quem vai lançar o cálculo no sistema.</div>
+          </div>
+
+          <button type="submit" class="btn-cyan">Enviar Solicitação</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-card-head">🎯 Solicitações</div>
+      <div class="filters">
+        <select class="filter-select" id="flt-cliente">
+          <option value="">Todos os clientes</option>
+          <option>Bridgestone</option>
+          <option>CBC</option>
+          <option>Embraer</option>
+          <option>T4F</option>
+          <option>Ferrero</option>
+        </select>
+        <select class="filter-select" id="flt-status">
+          <option value="">Todos os status</option>
+          <option value="Pendente">Pendente</option>
+          <option value="Concluído">Concluído</option>
+        </select>
+        <select class="filter-select" id="flt-assistente"><option value="">Todos os assistentes</option></select>
+        <input class="filter-input" type="search" id="flt-busca" placeholder="Buscar por processo, reclamante ou reclamada…">
+        <button class="export-btn" id="btn-exportar">⬇ Exportar Excel</button>
+      </div>
+      <div class="table-wrap">
+        <table class="sol-table">
+          <thead>
+            <tr>
+              <th>Data Sol.</th>
+              <th>Cliente</th>
+              <th>Processo</th>
+              <th>Reclamante</th>
+              <th>Reclamada</th>
+              <th>Tipo de Cálculo</th>
+              <th>Acima 400k</th>
+              <th>Advogado</th>
+              <th>Assistente</th>
+              <th>Status</th>
+              <th>Conclusão</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tbody-solicitacoes"></tbody>
+        </table>
+        <div class="empty-state" id="empty-state" style="display:none;">Nenhuma solicitação encontrada.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const SUPABASE_URL = 'https://sydamnqagkdmczmgkvso.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_kA_IDYtEdATSygg7EajrdQ_cEi4d57N';
+const TABLE = 'solicitacoes_calculo';
+
+const TIPOS_CALCULO = ['Inicial','Sentença','Embargos','Acórdão TRT','Acórdão TST','Acordo','Cálculos Reclamante','Cálculos Reclamada','Cálculos do Perito Judicial','Cálculos Homologados em Execução','Carta de Sentença','Laudo Pericial Médico','Laudo Pericial Ergonômico','Laudo Pericial Técnico'];
+
+const PROFISSIONAIS = [
+  {n:'Aline Amorim Oliveira', g:'Grupo A3'}, {n:'Aline Cunha de Oliveira Borges', g:'Grupo B1'},
+  {n:'Aline Ferreira Miron', g:'Grupo E1'}, {n:'Alícia Marcondes Hamati', g:'Grupo A3'},
+  {n:'Amanda Mesquita de Lima Araujo', g:'Grupo E2'}, {n:'Anna Carolina Balbino Gatti Baani', g:'Grupo B2'},
+  {n:'Arthur Rodrigues Rios Toledo de Castro', g:'Grupo E2'}, {n:'Ana Julia Thomaz Carmona', g:'Grupo A1'},
+  {n:'Bianca Bolanhi Camacho', g:'Grupo D1'}, {n:'Bruna Cembranelli Fazenda', g:'Grupo B2'},
+  {n:'Brenna Braga Freitas Malta', g:'Grupo B3'}, {n:'Beatriz Santiago de Souza', g:'Grupo B1'},
+  {n:'Brenda da Silva dos Santos', g:'Grupo E2'}, {n:'Camila Alves Magalhães de Paula', g:'Grupo E2'},
+  {n:'Chris Carvalho', g:'Grupo A3'}, {n:'Cícera Gabriela Ferreira Vicente', g:'Grupo B1'},
+  {n:'Diana de Jesus Santos', g:'Grupo E1'}, {n:'Daniela Prandi Pedro Ricca', g:'Grupo E1'},
+  {n:'Erik Mota Coppi', g:'Grupo C'}, {n:'Ellen Mary Maciel Silva', g:'Grupo E1'},
+  {n:'Evandro Vecchio Vessoni', g:'Grupo B1'}, {n:'Erick Yuji Nakama', g:'Grupo A2'},
+  {n:'Fabiano Fritz Ferreira Filho', g:'Grupo E2'}, {n:'Fabrício Lima da Silva', g:'Grupo E1'},
+  {n:'Gabriel Fretas de Oliveira', g:'Grupo E1'}, {n:'Giovanna Teixeira Franco', g:'Grupo E2'},
+  {n:'Giovanni Comunale Oliveira', g:'Grupo A1'}, {n:'Giovanna Malheiros Gatto', g:'Grupo B1'},
+  {n:'Gisela da Silva Freire', g:'Sócios'}, {n:'Geovanna Rodrigues Silva', g:'Grupo B2'},
+  {n:'Guilherme Silva Morimoto', g:'Grupo B1'}, {n:'Gabriela de Souza Pedroso', g:'Grupo E2'},
+  {n:'Giulia Vendramini Milani', g:'Grupo E1'}, {n:'Hanyelle Alves da Silva', g:'Grupo A1'},
+  {n:'Henrique Remorini Pantuzo', g:'Grupo A1'}, {n:'Isadora Silva Gagliardi', g:'Grupo B2'},
+  {n:'Jaqueline Jahel Moraes', g:'Grupo A1'}, {n:'Jenifer de Jesus Silva', g:'Grupo B1'},
+  {n:'Juan Leonardo Ikier Moraes', g:'Grupo E2'}, {n:'Juliana Perucci', g:'Grupo B1'},
+  {n:'Júlia Priego Lopes da Silva', g:'Grupo E1'}, {n:'Jessica Cerqueira Silva', g:'Grupo D1'},
+  {n:'Joice Ramos Miranda', g:'Grupo E1'}, {n:'Jackeline Romeu Torres', g:'Grupo E2'},
+  {n:'Keyla Maria Barbosa Silva Moraes', g:'Grupo E1'}, {n:'Karoline de Castro Torres', g:'Grupo E2'},
+  {n:'Lorena Rodrigues Costa Gonçalves', g:'Grupo B1'}, {n:'Larissa Lekich Lobenwein', g:'Grupo E1'},
+  {n:'Letícia Meneghini Fontes', g:'Grupo B3'}, {n:'Leonardo Pereira de Jesus', g:'Grupo E1'},
+  {n:'Mariana Borges de Menezes Fávaro', g:'Grupo E2'}, {n:'Maria Carolina Silva Santos Dias', g:'Grupo B2'},
+  {n:'Matheus de Jesus Trindade', g:'Grupo E1'}, {n:'Marina de Novaes Brechiani', g:'Grupo A1'},
+  {n:'Marcel Tadeu Matos Alves da Silva', g:'Sócios'}, {n:'Natalia Bezerra Baliero', g:'Grupo E2'},
+  {n:'Natália Biondi Gaggini Robles', g:'Grupo A2'}, {n:'Nathalie Louise dos Santos Rodrigues Dias', g:'Grupo E1'},
+  {n:'Nicolau Rafael Guimarães Coelho', g:'Grupo B1, B2 e B3'}, {n:'Poliana Banqueri da Silva Guimarães', g:'Sócios'},
+  {n:'Paloma da Silva Santos', g:'Grupo E1'}, {n:'Rafael Camargo Felisbino', g:'Grupo E2'},
+  {n:'Rafael Rocha Ferreira', g:'Grupo B1'}, {n:'Raica Fernandes Kwok', g:'Grupo B3'},
+  {n:'Richard Ruan Leo da Silva', g:'Grupo E2'}, {n:'Rodrigo Souichi Nishijima', g:'Grupo B1'},
+  {n:'Rafaella Wittmann Domenicis', g:'Grupo B2'}, {n:'Rafael Yepez do Lago', g:'Grupo E2'},
+  {n:'Sofia Freire', g:'Grupo A3'}, {n:'Thais Catharine Cardozo Esteves', g:'Grupo A1'},
+  {n:'Tamires Lins Costa', g:'Grupo E1'}, {n:'Thiago Frid Figueiredo Rossi', g:'Grupo C'},
+  {n:'Tabata Neves Caramelli', g:'Grupo A2'}, {n:'Vitoria Araujo Carvalho', g:'Grupo B1'},
+  {n:'Vanessa de Cassia Castrequini Rosa', g:'Grupo B2'}, {n:'Vinicius Ferreira Garcia', g:'Grupo A1'},
+  {n:'Vinícius Ronchi Arruda', g:'Grupo E1'}, {n:'Vinicius da Silva Cerqueira', g:'Grupo C'},
+  {n:'Washington Soares Silva Filho', g:'Grupo E2'}
+];
+
+function e(v){ return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function popularSelectProfissionais(select){
+  const grupos = {};
+  PROFISSIONAIS.forEach(p => { (grupos[p.g] = grupos[p.g] || []).push(p.n); });
+  Object.keys(grupos).sort().forEach(g => {
+    const og = document.createElement('optgroup');
+    og.label = g;
+    grupos[g].sort((a,b)=>a.localeCompare(b,'pt-BR')).forEach(nome => {
+      const opt = document.createElement('option');
+      opt.value = nome; opt.textContent = nome;
+      og.appendChild(opt);
+    });
+    select.appendChild(og);
+  });
+}
+
+function popularSelectTipos(select){
+  TIPOS_CALCULO.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t; opt.textContent = t;
+    select.appendChild(opt);
+  });
+}
+
+['#f-advogado','#f-assistente'].forEach(sel => popularSelectProfissionais(document.querySelector(sel)));
+popularSelectTipos(document.querySelector('#f-tipo-calculo'));
+popularSelectProfissionais(document.querySelector('#flt-assistente'));
+
+document.querySelector('#f-cliente').addEventListener('change', function(){
+  const wrap = document.querySelector('#wrap-cliente-outro');
+  const outro = document.querySelector('#f-cliente-outro');
+  if(this.value === 'Outro'){ wrap.style.display = ''; outro.required = true; }
+  else { wrap.style.display = 'none'; outro.required = false; outro.value = ''; }
+});
+
+let sbClient = null;
+function getClient(){
+  if(!sbClient) sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  return sbClient;
+}
+
+let SOLICITACOES = [];
+
+function hojeISO(){ return new Date().toISOString().slice(0,10); }
+function formatarData(iso){
+  if(!iso) return '—';
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+async function carregar(){
+  try{
+    const { data, error } = await getClient().from(TABLE).select('*').order('created_at', { ascending: false });
+    if(error) throw error;
+    SOLICITACOES = data || [];
+    document.querySelector('#erro-conexao').innerHTML = '';
+    popularFiltroClientes();
+    render();
+  }catch(err){
+    mostrarErroConexao(err);
+  }
+}
+
+function mostrarErroConexao(err){
+  document.querySelector('#erro-conexao').innerHTML = `
+    <div class="error-banner">
+      <strong>Não foi possível carregar as solicitações.</strong><br>
+      A tabela <code>${TABLE}</code> provavelmente ainda não existe no Supabase. Rode o script SQL de criação da tabela (fornecido junto com este módulo) no SQL Editor do projeto e recarregue a página.<br>
+      <span style="opacity:.75;">Detalhe técnico: ${e(err.message || err)}</span>
+    </div>`;
+}
+
+function popularFiltroClientes(){
+  const sel = document.querySelector('#flt-cliente');
+  const atuais = new Set(Array.from(sel.options).map(o=>o.value).filter(Boolean));
+  const clientes = new Set(SOLICITACOES.map(s=>s.cliente).filter(Boolean));
+  clientes.forEach(c => {
+    if(!atuais.has(c)){
+      const opt = document.createElement('option');
+      opt.value = c; opt.textContent = c;
+      sel.appendChild(opt);
+    }
+  });
+}
+
+function filtrar(){
+  const cliente = document.querySelector('#flt-cliente').value;
+  const status = document.querySelector('#flt-status').value;
+  const assistente = document.querySelector('#flt-assistente').value;
+  const busca = document.querySelector('#flt-busca').value.trim().toLowerCase();
+  return SOLICITACOES.filter(s => {
+    if(cliente && s.cliente !== cliente) return false;
+    if(status && s.status !== status) return false;
+    if(assistente && s.assistente_responsavel !== assistente) return false;
+    if(busca){
+      const alvo = [s.processo, s.reclamante, s.reclamada].join(' ').toLowerCase();
+      if(!alvo.includes(busca)) return false;
+    }
+    return true;
+  });
+}
+
+function render(){
+  const lista = filtrar();
+  const tbody = document.querySelector('#tbody-solicitacoes');
+  const empty = document.querySelector('#empty-state');
+
+  document.querySelector('#st-total').textContent = SOLICITACOES.length;
+  document.querySelector('#st-pendentes').textContent = SOLICITACOES.filter(s=>s.status==='Pendente').length;
+  document.querySelector('#st-concluidas').textContent = SOLICITACOES.filter(s=>s.status==='Concluído').length;
+  document.querySelector('#st-400k').textContent = SOLICITACOES.filter(s=>s.acima_400k).length;
+
+  if(!lista.length){
+    tbody.innerHTML = '';
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = lista.map(s => `
+    <tr>
+      <td>${formatarData(s.data_solicitacao)}</td>
+      <td>${e(s.cliente)}</td>
+      <td class="mono">${e(s.processo)}</td>
+      <td>${e(s.reclamante)}</td>
+      <td>${e(s.reclamada)}</td>
+      <td>${e(s.tipo_calculo)}</td>
+      <td>${s.acima_400k ? '<span class="badge badge-red">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
+      <td>${e(s.advogado_solicitante)}</td>
+      <td>${e(s.assistente_responsavel)}</td>
+      <td>${s.status === 'Concluído' ? '<span class="badge badge-green">Concluído</span>' : '<span class="badge badge-orange">Pendente</span>'}</td>
+      <td>${formatarData(s.data_conclusao)}</td>
+      <td>
+        ${s.status === 'Pendente'
+          ? `<button class="action-btn" onclick="concluir('${s.id}')">✓ Concluir</button>`
+          : `<button class="action-btn reabrir" onclick="reabrir('${s.id}')">↺ Reabrir</button>`}
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function concluir(id){
+  if(!confirm('Confirmar que o cálculo foi lançado no sistema?')) return;
+  const { error } = await getClient().from(TABLE).update({
+    data_conclusao: hojeISO(), ok_assistente: true, status: 'Concluído'
+  }).eq('id', id);
+  if(error) alert('Erro ao atualizar: ' + error.message);
+  else carregar();
+}
+
+async function reabrir(id){
+  if(!confirm('Reabrir esta solicitação como pendente?')) return;
+  const { error } = await getClient().from(TABLE).update({
+    data_conclusao: null, ok_assistente: false, status: 'Pendente'
+  }).eq('id', id);
+  if(error) alert('Erro ao atualizar: ' + error.message);
+  else carregar();
+}
+
+document.querySelector('#form-solicitacao').addEventListener('submit', async function(ev){
+  ev.preventDefault();
+  const clienteSel = document.querySelector('#f-cliente').value;
+  const cliente = clienteSel === 'Outro' ? document.querySelector('#f-cliente-outro').value.trim() : clienteSel;
+  if(!cliente){ alert('Informe o cliente.'); return; }
+
+  const payload = {
+    cliente,
+    processo: document.querySelector('#f-processo').value.trim(),
+    reclamante: document.querySelector('#f-reclamante').value.trim(),
+    reclamada: document.querySelector('#f-reclamada').value.trim(),
+    tipo_calculo: document.querySelector('#f-tipo-calculo').value,
+    acima_400k: document.querySelector('#f-400k').checked,
+    advogado_solicitante: document.querySelector('#f-advogado').value,
+    assistente_responsavel: document.querySelector('#f-assistente').value,
+    data_solicitacao: hojeISO(),
+    status: 'Pendente',
+    ok_assistente: false
+  };
+
+  const btn = ev.target.querySelector('button[type="submit"]');
+  btn.disabled = true; btn.textContent = 'Enviando…';
+
+  const { error } = await getClient().from(TABLE).insert(payload);
+
+  btn.disabled = false; btn.textContent = 'Enviar Solicitação';
+
+  if(error){ alert('Erro ao enviar solicitação: ' + error.message); return; }
+
+  ev.target.reset();
+  document.querySelector('#wrap-cliente-outro').style.display = 'none';
+  carregar();
+});
+
+['#flt-cliente','#flt-status','#flt-assistente'].forEach(sel => document.querySelector(sel).addEventListener('change', render));
+document.querySelector('#flt-busca').addEventListener('input', render);
+
+document.querySelector('#btn-exportar').addEventListener('click', function(){
+  const lista = filtrar();
+  if(!lista.length){ alert('Não há solicitações para exportar.'); return; }
+  const dados = lista.map(s => ({
+    'Cliente': s.cliente,
+    'Processo': s.processo,
+    'Reclamante': s.reclamante,
+    'Reclamada': s.reclamada,
+    'Tipo de Cálculo': s.tipo_calculo,
+    'Acima de R$ 400.000,00': s.acima_400k ? 'Sim' : 'Não',
+    'Advogado Solicitante': s.advogado_solicitante,
+    'Assistente Responsável': s.assistente_responsavel,
+    'Data da Solicitação': formatarData(s.data_solicitacao),
+    'Status': s.status,
+    'Data de Conclusão': formatarData(s.data_conclusao),
+    'OK do Assistente': s.ok_assistente ? 'Sim' : 'Não'
+  }));
+  const ws = XLSX.utils.json_to_sheet(dados);
+  ws['!cols'] = [{wch:14},{wch:26},{wch:24},{wch:24},{wch:28},{wch:20},{wch:26},{wch:26},{wch:16},{wch:12},{wch:16},{wch:14}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Solicitações');
+  const hoje = hojeISO();
+  XLSX.writeFile(wb, `Controle_Insercao_Valores_${hoje}.xlsx`);
+});
+
+function iniciarRealtime(){
+  getClient().channel('solicitacoes_calculo_changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: TABLE }, () => carregar())
+    .subscribe();
+}
+
+carregar();
+iniciarRealtime();
+</script>
+</body>
+</html>
