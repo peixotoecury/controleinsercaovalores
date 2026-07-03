@@ -287,13 +287,13 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
 
           <div class="mc-form-group" id="wrap-tipo-laudo" style="display:none;">
             <label>Tipo de Laudo Desfavorável</label>
-            <select id="f-tipo-laudo">
-              <option value="" selected>Selecione…</option>
-              <option>Insalubridade</option>
-              <option>Periculosidade</option>
-              <option>Médico</option>
-              <option>Ergonômico</option>
-            </select>
+            <div class="hint" style="margin-bottom:6px;">Pode marcar mais de um — às vezes o mesmo laudo cobre insalubridade e periculosidade juntas.</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px 18px;padding:9px 12px;background:#fff;border:1px solid #BFD6E4;border-radius:var(--radius);">
+              <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:400;text-transform:none;color:var(--preto-pc);"><input type="checkbox" id="f-laudo-insalubridade"> Insalubridade</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:400;text-transform:none;color:var(--preto-pc);"><input type="checkbox" id="f-laudo-periculosidade"> Periculosidade</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:400;text-transform:none;color:var(--preto-pc);"><input type="checkbox" id="f-laudo-medico"> Médico</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:400;text-transform:none;color:var(--preto-pc);"><input type="checkbox" id="f-laudo-ergonomico"> Ergonômico</label>
+            </div>
           </div>
 
           <div class="mc-form-group" id="wrap-motivo-insalubridade" style="display:none;">
@@ -697,32 +697,47 @@ document.querySelector('#f-cliente').addEventListener('change', function(){
   else { wrap.style.display = 'none'; outro.required = false; outro.value = ''; }
 });
 
-document.querySelector('#f-tipo-decisao').addEventListener('change', function(){
-  const wrap = document.querySelector('#wrap-tipo-laudo');
-  const sel = document.querySelector('#f-tipo-laudo');
-  if(this.value === 'Laudo Desfavorável'){ wrap.style.display = ''; }
-  else {
-    wrap.style.display = 'none'; sel.value = '';
-    sel.dispatchEvent(new Event('change'));
-  }
-});
+function limparLaudoCheckboxes(){
+  ['#f-laudo-insalubridade','#f-laudo-periculosidade','#f-laudo-medico','#f-laudo-ergonomico'].forEach(sel => document.querySelector(sel).checked = false);
+  atualizarWrapsLaudo();
+}
 
-document.querySelector('#f-tipo-laudo').addEventListener('change', function(){
-  const wrapInsalubridade = document.querySelector('#wrap-motivo-insalubridade');
-  const wrapPericulosidade = document.querySelector('#wrap-motivo-periculosidade');
-  const wrapMedico = document.querySelector('#wrap-medico-ergonomico');
+function atualizarWrapsLaudo(){
+  const insalubridade = document.querySelector('#f-laudo-insalubridade').checked;
+  const periculosidade = document.querySelector('#f-laudo-periculosidade').checked;
+  const medico = document.querySelector('#f-laudo-medico').checked;
+  const ergonomico = document.querySelector('#f-laudo-ergonomico').checked;
 
-  wrapInsalubridade.style.display = this.value === 'Insalubridade' ? '' : 'none';
-  wrapPericulosidade.style.display = this.value === 'Periculosidade' ? '' : 'none';
-  wrapMedico.style.display = (this.value === 'Médico' || this.value === 'Ergonômico') ? '' : 'none';
+  document.querySelector('#wrap-motivo-insalubridade').style.display = insalubridade ? '' : 'none';
+  document.querySelector('#wrap-motivo-periculosidade').style.display = periculosidade ? '' : 'none';
+  document.querySelector('#wrap-medico-ergonomico').style.display = (medico || ergonomico) ? '' : 'none';
 
-  if(this.value !== 'Insalubridade') document.querySelector('#f-motivo-insalubridade').value = '';
-  if(this.value !== 'Periculosidade') document.querySelector('#f-motivo-periculosidade').value = '';
-  if(this.value !== 'Médico' && this.value !== 'Ergonômico'){
+  if(!insalubridade) document.querySelector('#f-motivo-insalubridade').value = '';
+  if(!periculosidade) document.querySelector('#f-motivo-periculosidade').value = '';
+  if(!medico && !ergonomico){
     document.querySelector('#f-doenca-detectada').value = '';
     document.querySelector('#f-area-corpo').value = '';
     document.querySelector('#f-motivos-laudo').value = '';
   }
+}
+
+function tipoLaudoSelecionado(){
+  const marcados = [];
+  if(document.querySelector('#f-laudo-insalubridade').checked) marcados.push('Insalubridade');
+  if(document.querySelector('#f-laudo-periculosidade').checked) marcados.push('Periculosidade');
+  if(document.querySelector('#f-laudo-medico').checked) marcados.push('Médico');
+  if(document.querySelector('#f-laudo-ergonomico').checked) marcados.push('Ergonômico');
+  return marcados.join(', ');
+}
+
+document.querySelector('#f-tipo-decisao').addEventListener('change', function(){
+  const wrap = document.querySelector('#wrap-tipo-laudo');
+  if(this.value === 'Laudo Desfavorável'){ wrap.style.display = ''; }
+  else { wrap.style.display = 'none'; limparLaudoCheckboxes(); }
+});
+
+['#f-laudo-insalubridade','#f-laudo-periculosidade','#f-laudo-medico','#f-laudo-ergonomico'].forEach(sel => {
+  document.querySelector(sel).addEventListener('change', atualizarWrapsLaudo);
 });
 
 document.querySelector('#cf-cliente').addEventListener('change', function(){
@@ -1020,7 +1035,7 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
     tipo_calculo: document.querySelector('#f-tipo-calculo').value,
     data_decisao: document.querySelector('#f-data-decisao').value,
     tipo_decisao: document.querySelector('#f-tipo-decisao').value,
-    tipo_laudo: document.querySelector('#f-tipo-laudo').value,
+    tipo_laudo: tipoLaudoSelecionado(),
     motivo_insalubridade: document.querySelector('#f-motivo-insalubridade').value.trim(),
     motivo_periculosidade: document.querySelector('#f-motivo-periculosidade').value.trim(),
     doenca_detectada: document.querySelector('#f-doenca-detectada').value.trim(),
