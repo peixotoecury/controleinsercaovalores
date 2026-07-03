@@ -193,7 +193,7 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
   <div class="grid-main">
 
     <div class="dash-card">
-      <div class="dash-card-head">📝 Nova Solicitação de Valores</div>
+      <div class="dash-card-head">📝 Nova Solicitação</div>
       <div class="dash-card-body">
         <form id="form-solicitacao">
 
@@ -667,7 +667,7 @@ function abrirEmail(destinatario, assunto, corpo){
   window.location.href = link;
 }
 
-function e(v){ return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function e(v){ return String(v==null||v===''?'N/A':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 function popularSelectProfissionais(select, cargo){
   const grupos = {};
@@ -769,8 +769,10 @@ let SOLICITACOES = [];
 
 function hojeISO(){ return new Date().toISOString().slice(0,10); }
 function agoraHHmm(){ const d = new Date(); return String(d.getHours()).padStart(2,'0') + String(d.getMinutes()).padStart(2,'0'); }
+function naSeVazio(v){ return (v === null || v === undefined || v === '') ? 'N/A' : v; }
+
 function formatarData(iso){
-  if(!iso) return '—';
+  if(!iso) return 'N/A';
   const [y,m,d] = iso.split('-');
   return `${d}/${m}/${y}`;
 }
@@ -1163,42 +1165,42 @@ function gerarExcel(lista, nomeArquivo){
   if(!lista.length){ return; }
   const dados = lista.map(s => ({
     'Origem': s.origem === 'Identificado pelo Assistente' ? 'Identificado pelo Assistente' : 'Advogado',
-    'Cliente': s.cliente,
-    'Processo': s.processo,
-    'Reclamante': s.reclamante,
-    'Reclamada': s.reclamada,
-    'Juiz': s.juiz,
-    'Advogado da Parte Contrária': s.advogado_contraria,
-    'Vara': s.vara,
-    'Comarca': s.comarca,
-    'UF': s.uf,
-    'Tipo de Cálculo': s.tipo_calculo,
-    'Nome do Perito do Juízo': s.perito_juizo,
+    'Cliente': naSeVazio(s.cliente),
+    'Processo': naSeVazio(s.processo),
+    'Reclamante': naSeVazio(s.reclamante),
+    'Reclamada': naSeVazio(s.reclamada),
+    'Juiz': naSeVazio(s.juiz),
+    'Advogado da Parte Contrária': naSeVazio(s.advogado_contraria),
+    'Vara': naSeVazio(s.vara),
+    'Comarca': naSeVazio(s.comarca),
+    'UF': naSeVazio(s.uf),
+    'Tipo de Cálculo': naSeVazio(s.tipo_calculo),
+    'Nome do Perito do Juízo': naSeVazio(s.perito_juizo),
     'Data da Decisão': formatarData(s.data_decisao),
-    'Tipo de Decisão': s.tipo_decisao,
-    'Tipo de Laudo Desfavorável': s.tipo_laudo,
-    'Motivo da Insalubridade': s.motivo_insalubridade,
-    'Motivo da Periculosidade': s.motivo_periculosidade,
-    'Doença Detectada': s.doenca_detectada,
-    'Área do Corpo': s.area_corpo,
-    'Motivos do Laudo': s.motivos_laudo,
+    'Tipo de Decisão': naSeVazio(s.tipo_decisao),
+    'Tipo de Laudo Desfavorável': naSeVazio(s.tipo_laudo),
+    'Motivo da Insalubridade': naSeVazio(s.motivo_insalubridade),
+    'Motivo da Periculosidade': naSeVazio(s.motivo_periculosidade),
+    'Doença Detectada': naSeVazio(s.doenca_detectada),
+    'Área do Corpo': naSeVazio(s.area_corpo),
+    'Motivos do Laudo': naSeVazio(s.motivos_laudo),
     'Cálculo Solicitado': s.calculo_solicitado ? 'Sim' : 'Não',
     'Houve Alteração de Prognóstico': s.alteracao_prognostico ? 'Sim' : 'Não',
     'Houve Alteração de Fase': s.alteracao_fase ? 'Sim' : 'Não',
-    'Fase Atual': s.fase_atual,
+    'Fase Atual': naSeVazio(s.fase_atual),
     'Acima de R$ 400.000,00': s.acima_400k ? 'Sim' : 'Não',
-    'Provisão/Accrual Atual': s.provisao_atual,
-    'Novo Valor': s.novo_valor,
-    'Advogado Solicitante': s.advogado_solicitante,
-    'Assistente Responsável': s.assistente_responsavel,
-    'Responsável pela Informação': s.responsavel_informacao,
+    'Provisão/Accrual Atual': naSeVazio(s.provisao_atual),
+    'Novo Valor': naSeVazio(s.novo_valor),
+    'Advogado Solicitante': naSeVazio(s.advogado_solicitante),
+    'Assistente Responsável': naSeVazio(s.assistente_responsavel),
+    'Responsável pela Informação': naSeVazio(s.responsavel_informacao),
     'Data da Solicitação': formatarData(s.data_solicitacao),
-    'Status': s.status,
+    'Status': naSeVazio(s.status),
     'Data de Conclusão': formatarData(s.data_conclusao),
     'OK do Assistente': s.ok_assistente ? 'Sim' : 'Não',
     'Revisado pelo Advogado': s.revisado_advogado ? 'Sim' : 'Não',
     'Data da Revisão': formatarData(s.data_revisao),
-    'Observações Adicionais': s.observacoes
+    'Observações Adicionais': naSeVazio(s.observacoes)
   }));
   const ws = XLSX.utils.json_to_sheet(dados);
   ws['!cols'] = [{wch:24},{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:26},{wch:26},{wch:24},{wch:18},{wch:16},{wch:30},{wch:16},{wch:16},{wch:16},{wch:24},{wch:20},{wch:20},{wch:20},{wch:26},{wch:26},{wch:24},{wch:16},{wch:12},{wch:16},{wch:14},{wch:16},{wch:16},{wch:36}];
