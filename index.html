@@ -501,6 +501,7 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
               <th>Acima 400k</th>
               <th>Provisão/Accrual Atual</th>
               <th>Novo Valor</th>
+              <th>Link do Cálculo</th>
               <th>Advogado</th>
               <th>Assistente</th>
               <th>Responsável pela Informação</th>
@@ -646,6 +647,10 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
             <label>Novo Valor</label>
             <input type="text" id="iv-novo-valor" placeholder="R$ 0,00" disabled>
           </div>
+          <div class="mc-form-group">
+            <label>Link do Cálculo (PDF)</label>
+            <input type="url" id="iv-link-calculo" placeholder="https://…" disabled>
+          </div>
           <div class="check-row">
             <input type="checkbox" id="iv-400k" disabled>
             <label for="iv-400k">Valor acima de R$ 400.000,00</label>
@@ -681,6 +686,7 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
                 <th>Revisado</th>
                 <th>Provisão/Accrual Atual</th>
                 <th>Novo Valor</th>
+                <th>Link do Cálculo</th>
                 <th>Acima 400k</th>
                 <th></th>
               </tr>
@@ -781,6 +787,10 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
             <div class="mc-form-group">
               <label>Novo Valor</label>
               <input type="text" id="cn-novo-valor" placeholder="R$ 0,00">
+            </div>
+            <div class="mc-form-group">
+              <label>Link do Cálculo (PDF)</label>
+              <input type="url" id="cn-link-calculo" placeholder="https://…">
             </div>
           </div>
           <div class="check-row">
@@ -1250,6 +1260,7 @@ function render(){
       <td>${s.acima_400k ? '<span class="badge badge-red">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
       <td>${e(s.provisao_atual)}</td>
       <td>${e(s.novo_valor)}</td>
+      <td>${s.link_calculo_pdf ? `<a href="${e(s.link_calculo_pdf)}" target="_blank" rel="noopener">📄 Abrir</a>` : 'N/A'}</td>
       <td>${e(s.advogado_solicitante)}</td>
       <td>${e(s.assistente_responsavel)}</td>
       <td>${e(s.responsavel_informacao)}</td>
@@ -1362,6 +1373,7 @@ function renderInsercaoValores(){
       <td>${s.revisado_advogado ? '<span class="badge badge-green">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
       <td>${e(s.provisao_atual)}</td>
       <td>${e(s.novo_valor)}</td>
+      <td>${s.link_calculo_pdf ? `<a href="${e(s.link_calculo_pdf)}" target="_blank" rel="noopener">📄 Abrir</a>` : 'N/A'}</td>
       <td>${s.acima_400k ? '<span class="badge badge-red">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
       <td><button class="action-btn" onclick="selecionarProcessoValores('${s.id}')">🔗 Selecionar</button></td>
     </tr>
@@ -1380,6 +1392,7 @@ function atualizarPainelValores(){
   const info = document.querySelector('#iv-info');
   const provisao = document.querySelector('#iv-provisao-atual');
   const novoValor = document.querySelector('#iv-novo-valor');
+  const linkCalculo = document.querySelector('#iv-link-calculo');
   const acima400k = document.querySelector('#iv-400k');
   const btn = document.querySelector('#btn-salvar-valores');
 
@@ -1387,6 +1400,7 @@ function atualizarPainelValores(){
     info.textContent = '';
     provisao.value = ''; provisao.disabled = true;
     novoValor.value = ''; novoValor.disabled = true;
+    linkCalculo.value = ''; linkCalculo.disabled = true;
     acima400k.checked = false; acima400k.disabled = true;
     btn.disabled = true;
     return;
@@ -1394,6 +1408,7 @@ function atualizarPainelValores(){
   info.innerHTML = `<b>${e(s.reclamante)}</b> x <b>${e(s.reclamada)}</b> — Advogado: ${e(s.advogado_solicitante)} · Assistente: ${e(s.assistente_responsavel)}`;
   provisao.value = s.provisao_atual || ''; provisao.disabled = false;
   novoValor.value = s.novo_valor || ''; novoValor.disabled = false;
+  linkCalculo.value = s.link_calculo_pdf || ''; linkCalculo.disabled = false;
   acima400k.checked = !!s.acima_400k; acima400k.disabled = false;
   btn.disabled = false;
 }
@@ -1406,9 +1421,10 @@ document.querySelector('#btn-salvar-valores').addEventListener('click', async fu
   if(!id) return;
   const provisao = document.querySelector('#iv-provisao-atual').value.trim();
   const novoValor = document.querySelector('#iv-novo-valor').value.trim();
+  const linkCalculo = document.querySelector('#iv-link-calculo').value.trim();
   const acima400k = document.querySelector('#iv-400k').checked;
   this.disabled = true; this.textContent = 'Salvando…';
-  const { error } = await getClient().from(TABLE).update({ provisao_atual: provisao, novo_valor: novoValor, acima_400k: acima400k }).eq('id', id);
+  const { error } = await getClient().from(TABLE).update({ provisao_atual: provisao, novo_valor: novoValor, link_calculo_pdf: linkCalculo, acima_400k: acima400k }).eq('id', id);
   this.disabled = false; this.textContent = 'Salvar Valores';
   if(error){ alert('Erro ao salvar: ' + error.message); return; }
   await carregar();
@@ -1697,6 +1713,7 @@ document.querySelector('#form-caso-novo').addEventListener('submit', async funct
     tipo_calculo: document.querySelector('#cn-tipo-insercao').value,
     provisao_atual: document.querySelector('#cn-provisao-atual').value.trim(),
     novo_valor: document.querySelector('#cn-novo-valor').value.trim(),
+    link_calculo_pdf: document.querySelector('#cn-link-calculo').value.trim(),
     acima_400k: document.querySelector('#cn-400k').checked,
     inserido_lm: document.querySelector('#cn-inserido-lm').value === 'Sim',
     data_insercao_lm: document.querySelector('#cn-data-lm').value || null,
@@ -1768,6 +1785,7 @@ function gerarExcel(lista, nomeArquivo){
     'Acima de R$ 400.000,00': s.acima_400k ? 'Sim' : 'Não',
     'Provisão/Accrual Atual': naSeVazio(s.provisao_atual),
     'Novo Valor': naSeVazio(s.novo_valor),
+    'Link do Cálculo (PDF)': naSeVazio(s.link_calculo_pdf),
     'Advogado Solicitante': naSeVazio(s.advogado_solicitante),
     'Assistente Responsável': naSeVazio(s.assistente_responsavel),
     'Responsável pela Informação': naSeVazio(s.responsavel_informacao),
@@ -1785,7 +1803,7 @@ function gerarExcel(lista, nomeArquivo){
     'Observações Adicionais': naSeVazio(s.observacoes)
   }));
   const ws = XLSX.utils.json_to_sheet(dados);
-  ws['!cols'] = [{wch:24},{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:26},{wch:26},{wch:24},{wch:18},{wch:16},{wch:30},{wch:16},{wch:16},{wch:24},{wch:20},{wch:16},{wch:16},{wch:16},{wch:24},{wch:16},{wch:20},{wch:20},{wch:20},{wch:26},{wch:26},{wch:24},{wch:16},{wch:12},{wch:16},{wch:14},{wch:16},{wch:16},{wch:14},{wch:16},{wch:14},{wch:16},{wch:28},{wch:36}];
+  ws['!cols'] = [{wch:24},{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:26},{wch:26},{wch:24},{wch:18},{wch:16},{wch:30},{wch:16},{wch:16},{wch:24},{wch:20},{wch:16},{wch:16},{wch:16},{wch:24},{wch:16},{wch:20},{wch:20},{wch:20},{wch:30},{wch:26},{wch:26},{wch:24},{wch:16},{wch:12},{wch:16},{wch:14},{wch:16},{wch:16},{wch:14},{wch:16},{wch:14},{wch:16},{wch:28},{wch:36}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Solicitações');
   XLSX.writeFile(wb, `${nomeArquivo}.xlsx`);
@@ -1815,10 +1833,11 @@ document.querySelector('#btn-exportar-valores').addEventListener('click', functi
     'Revisado': s.revisado_advogado ? 'Sim' : 'Não',
     'Provisão/Accrual Atual': naSeVazio(s.provisao_atual),
     'Novo Valor': naSeVazio(s.novo_valor),
+    'Link do Cálculo (PDF)': naSeVazio(s.link_calculo_pdf),
     'Acima de R$ 400.000,00': s.acima_400k ? 'Sim' : 'Não'
   }));
   const ws = XLSX.utils.json_to_sheet(dados);
-  ws['!cols'] = [{wch:24},{wch:26},{wch:24},{wch:24},{wch:16},{wch:12},{wch:20},{wch:20},{wch:20}];
+  ws['!cols'] = [{wch:24},{wch:26},{wch:24},{wch:24},{wch:16},{wch:12},{wch:20},{wch:20},{wch:30},{wch:20}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Valores');
   XLSX.writeFile(wb, `Insercao_Valores_${hojeISO()}.xlsx`);
