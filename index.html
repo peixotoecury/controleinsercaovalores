@@ -365,6 +365,8 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
                 <option>Inicial</option>
                 <option>Instrução</option>
                 <option>Recursal</option>
+                <option>Recursal TRT</option>
+                <option>Recursal TST</option>
                 <option>Recursal com Execução Provisória</option>
                 <option>Execução</option>
               </select>
@@ -376,6 +378,8 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
                 <option>Inicial</option>
                 <option>Instrução</option>
                 <option>Recursal</option>
+                <option>Recursal TRT</option>
+                <option>Recursal TST</option>
                 <option>Recursal com Execução Provisória</option>
                 <option>Execução</option>
               </select>
@@ -633,9 +637,9 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
         <div class="dash-card-head">💰 Inserir/Atualizar Valores</div>
         <div class="dash-card-body">
           <div class="mc-form-group">
-            <label>Processo <span class="req">*</span></label>
+            <label>Cliente / Processo <span class="req">*</span></label>
             <select id="iv-processo">
-              <option value="" selected>Selecione um processo…</option>
+              <option value="" selected>Selecione um cliente/processo…</option>
             </select>
           </div>
           <div id="iv-info" class="hint" style="margin-bottom:14px;"></div>
@@ -681,9 +685,21 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
                 <th>Cliente</th>
                 <th>Processo</th>
                 <th>Reclamante</th>
+                <th>Reclamada</th>
+                <th>Vara/Turma/Câmara</th>
+                <th>Comarca</th>
+                <th>UF</th>
+                <th>Advogado Solicitante</th>
+                <th>Assistente Responsável</th>
+                <th>Tipo de Decisão</th>
                 <th>Tipo de Cálculo</th>
                 <th>Data do Cálculo</th>
                 <th>Revisado</th>
+                <th>Justificativa Revisão</th>
+                <th>Inserido no LM</th>
+                <th>Data Inserção LM</th>
+                <th>Inserido no Sistema</th>
+                <th>Data Inserção Sistema</th>
                 <th>Provisão/Accrual Atual</th>
                 <th>Novo Valor</th>
                 <th>Link do Cálculo</th>
@@ -724,6 +740,7 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
             <div class="mc-form-group">
               <label>Processo (CNJ) <span class="req">*</span></label>
               <input type="text" id="cn-processo" required placeholder="0000000-00.0000.0.00.0000">
+              <div class="hint" id="cn-processo-aviso" style="display:none;color:var(--red);font-weight:600;"></div>
             </div>
             <div class="mc-form-group">
               <label>Reclamante <span class="req">*</span></label>
@@ -1134,6 +1151,18 @@ document.querySelector('#cn-teve-revisao').addEventListener('change', function()
   else { wrap.style.display = 'none'; justificativa.required = false; justificativa.value = ''; }
 });
 
+document.querySelector('#cn-processo').addEventListener('input', function(){
+  const aviso = document.querySelector('#cn-processo-aviso');
+  const valor = this.value.trim().toLowerCase();
+  const existe = valor && SOLICITACOES.some(s => (s.processo || '').trim().toLowerCase() === valor);
+  if(existe){
+    aviso.style.display = '';
+    aviso.textContent = '⚠ Esse processo já existe na aba Solicitações — use o painel "Inserir/Atualizar Valores" acima em vez de cadastrar de novo, pra não duplicar.';
+  } else {
+    aviso.style.display = 'none';
+  }
+});
+
 let sbClient = null;
 function getClient(){
   if(!sbClient) sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -1353,7 +1382,7 @@ function renderInsercaoValores(){
   const sel = document.querySelector('#iv-processo');
   const selecaoAtual = sel.value;
 
-  sel.innerHTML = '<option value="" selected>Selecione um processo…</option>'
+  sel.innerHTML = '<option value="" selected>Selecione um cliente/processo…</option>'
     + SOLICITACOES.map(s => `<option value="${s.id}">${e(s.cliente)} — ${e(s.processo)} — ${e(s.reclamante)}</option>`).join('');
 
   if(selecaoAtual && SOLICITACOES.some(s => s.id === selecaoAtual)) sel.value = selecaoAtual;
@@ -1368,9 +1397,21 @@ function renderInsercaoValores(){
       <td>${e(s.cliente)}</td>
       <td class="mono">${e(s.processo)}</td>
       <td>${e(s.reclamante)}</td>
+      <td>${e(s.reclamada)}</td>
+      <td>${e(s.vara)}</td>
+      <td>${e(s.comarca)}</td>
+      <td>${e(s.uf)}</td>
+      <td>${e(s.advogado_solicitante)}</td>
+      <td>${e(s.assistente_responsavel)}</td>
+      <td>${e(s.tipo_decisao)}</td>
       <td>${e(s.tipo_calculo)}</td>
       <td>${formatarData(s.data_conclusao)}</td>
       <td>${s.revisado_advogado ? '<span class="badge badge-green">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
+      <td>${e(s.justificativa_revisao)}</td>
+      <td>${s.inserido_lm ? '<span class="badge badge-green">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
+      <td>${formatarData(s.data_insercao_lm)}</td>
+      <td>${s.inserido_sistema ? '<span class="badge badge-green">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
+      <td>${formatarData(s.data_insercao_sistema)}</td>
       <td>${e(s.provisao_atual)}</td>
       <td>${e(s.novo_valor)}</td>
       <td>${s.link_calculo_pdf ? `<a href="${e(s.link_calculo_pdf)}" target="_blank" rel="noopener">📄 Abrir</a>` : 'N/A'}</td>
@@ -1828,16 +1869,28 @@ document.querySelector('#btn-exportar-valores').addEventListener('click', functi
     'Cliente': naSeVazio(s.cliente),
     'Processo': naSeVazio(s.processo),
     'Reclamante': naSeVazio(s.reclamante),
+    'Reclamada': naSeVazio(s.reclamada),
+    'Vara/Turma/Câmara': naSeVazio(s.vara),
+    'Comarca': naSeVazio(s.comarca),
+    'UF': naSeVazio(s.uf),
+    'Advogado Solicitante': naSeVazio(s.advogado_solicitante),
+    'Assistente Responsável': naSeVazio(s.assistente_responsavel),
+    'Tipo de Decisão': naSeVazio(s.tipo_decisao),
     'Tipo de Cálculo': naSeVazio(s.tipo_calculo),
     'Data do Cálculo': formatarData(s.data_conclusao),
     'Revisado': s.revisado_advogado ? 'Sim' : 'Não',
+    'Justificativa Revisão': naSeVazio(s.justificativa_revisao),
+    'Inserido no LM': s.inserido_lm ? 'Sim' : 'Não',
+    'Data Inserção LM': formatarData(s.data_insercao_lm),
+    'Inserido no Sistema': s.inserido_sistema ? 'Sim' : 'Não',
+    'Data Inserção Sistema': formatarData(s.data_insercao_sistema),
     'Provisão/Accrual Atual': naSeVazio(s.provisao_atual),
     'Novo Valor': naSeVazio(s.novo_valor),
     'Link do Cálculo (PDF)': naSeVazio(s.link_calculo_pdf),
     'Acima de R$ 400.000,00': s.acima_400k ? 'Sim' : 'Não'
   }));
   const ws = XLSX.utils.json_to_sheet(dados);
-  ws['!cols'] = [{wch:24},{wch:26},{wch:24},{wch:24},{wch:16},{wch:12},{wch:20},{wch:20},{wch:30},{wch:20}];
+  ws['!cols'] = [{wch:24},{wch:26},{wch:24},{wch:24},{wch:20},{wch:16},{wch:6},{wch:26},{wch:26},{wch:28},{wch:24},{wch:16},{wch:12},{wch:28},{wch:14},{wch:16},{wch:16},{wch:16},{wch:20},{wch:20},{wch:30},{wch:20}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Valores');
   XLSX.writeFile(wb, `Insercao_Valores_${hojeISO()}.xlsx`);
