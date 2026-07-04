@@ -506,6 +506,11 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
               <th>Responsável pela Informação</th>
               <th>Status</th>
               <th>Conclusão</th>
+              <th>Inserido no LM</th>
+              <th>Data Inserção LM</th>
+              <th>Inserido no Sistema</th>
+              <th>Data Inserção Sistema</th>
+              <th>Justificativa Revisão</th>
               <th>Observações</th>
               <th></th>
             </tr>
@@ -686,6 +691,148 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
       </div>
 
     </div>
+
+    <div class="dash-card" style="margin-top:18px;">
+      <div class="dash-card-head">➕ Cadastrar Caso Novo (não veio da aba Solicitações)</div>
+      <div class="dash-card-body">
+        <div class="hint" style="margin-bottom:14px;">Use isso pra lançar valores de um caso antigo que nunca passou pela aba Solicitações — ele entra no sistema com os dados abaixo.</div>
+        <form id="form-caso-novo">
+          <div class="mc-form-grid">
+            <div class="mc-form-group">
+              <label>Cliente <span class="req">*</span></label>
+              <select id="cn-cliente" required>
+                <option value="" disabled selected>Selecione…</option>
+                <option>Bridgestone</option>
+                <option>CBC</option>
+                <option>Embraer</option>
+                <option>T4F</option>
+                <option>Ferrero</option>
+                <option>Telefônica</option>
+                <option value="Outro">Outro…</option>
+              </select>
+            </div>
+            <div class="mc-form-group" id="wrap-cn-cliente-outro" style="display:none;">
+              <label>Nome do Cliente <span class="req">*</span></label>
+              <input type="text" id="cn-cliente-outro">
+            </div>
+            <div class="mc-form-group">
+              <label>Processo (CNJ) <span class="req">*</span></label>
+              <input type="text" id="cn-processo" required placeholder="0000000-00.0000.0.00.0000">
+            </div>
+            <div class="mc-form-group">
+              <label>Reclamante <span class="req">*</span></label>
+              <input type="text" id="cn-reclamante" required>
+            </div>
+            <div class="mc-form-group">
+              <label>Reclamada <span class="req">*</span></label>
+              <input type="text" id="cn-reclamada" required>
+            </div>
+            <div class="mc-form-group">
+              <label>Vara/Turma/Câmara <span class="req">*</span></label>
+              <input type="text" id="cn-vara" required>
+            </div>
+            <div class="mc-form-group">
+              <label>Comarca <span class="req">*</span></label>
+              <input type="text" id="cn-comarca" required>
+            </div>
+            <div class="mc-form-group">
+              <label>UF <span class="req">*</span></label>
+              <select id="cn-uf" required>
+                <option value="" disabled selected>Selecione…</option>
+                <option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option>
+                <option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option>
+                <option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option>
+                <option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+                <option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option>
+                <option>SE</option><option>TO</option>
+              </select>
+            </div>
+            <div class="mc-form-group">
+              <label>Advogado Solicitante <span class="req">*</span></label>
+              <select id="cn-advogado" required>
+                <option value="" disabled selected>Selecione…</option>
+              </select>
+            </div>
+            <div class="mc-form-group">
+              <label>Assistente Responsável <span class="req">*</span></label>
+              <select id="cn-assistente" required>
+                <option value="" disabled selected>Selecione…</option>
+              </select>
+            </div>
+            <div class="mc-form-group">
+              <label>Tipo da Decisão <span class="req">*</span></label>
+              <select id="cn-tipo-decisao" required>
+                <option value="" disabled selected>Selecione…</option>
+              </select>
+            </div>
+            <div class="mc-form-group">
+              <label>Tipo da Inserção <span class="req">*</span></label>
+              <select id="cn-tipo-insercao" required>
+                <option value="" disabled selected>Selecione…</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mc-form-grid">
+            <div class="mc-form-group">
+              <label>Provisão/Accrual Atual</label>
+              <input type="text" id="cn-provisao-atual" placeholder="R$ 0,00">
+            </div>
+            <div class="mc-form-group">
+              <label>Novo Valor</label>
+              <input type="text" id="cn-novo-valor" placeholder="R$ 0,00">
+            </div>
+          </div>
+          <div class="check-row">
+            <input type="checkbox" id="cn-400k">
+            <label for="cn-400k">Valor acima de R$ 400.000,00</label>
+          </div>
+
+          <div class="mc-form-grid">
+            <div class="mc-form-group">
+              <label>Inserir no LM? <span class="req">*</span></label>
+              <select id="cn-inserido-lm" required>
+                <option value="" disabled selected>Selecione…</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+            </div>
+            <div class="mc-form-group" id="wrap-cn-data-lm" style="display:none;">
+              <label>Data de Inserção no LM <span class="req">*</span></label>
+              <input type="date" id="cn-data-lm">
+            </div>
+            <div class="mc-form-group">
+              <label>Inserir no Sistema? <span class="req">*</span></label>
+              <select id="cn-inserido-sistema" required>
+                <option value="" disabled selected>Selecione…</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+            </div>
+            <div class="mc-form-group" id="wrap-cn-data-sistema" style="display:none;">
+              <label>Data de Inserção no Sistema <span class="req">*</span></label>
+              <input type="date" id="cn-data-sistema">
+            </div>
+          </div>
+
+          <div class="mc-form-group">
+            <label>Teve Revisão? <span class="req">*</span></label>
+            <select id="cn-teve-revisao" required>
+              <option value="" disabled selected>Selecione…</option>
+              <option value="Sim">Sim</option>
+              <option value="Não">Não</option>
+            </select>
+          </div>
+          <div class="mc-form-group" id="wrap-cn-justificativa-revisao" style="display:none;">
+            <label>Justificativa <span class="req">*</span></label>
+            <textarea id="cn-justificativa-revisao" rows="2"></textarea>
+          </div>
+
+          <button type="submit" class="btn-cyan" style="width:auto;padding-left:24px;padding-right:24px;">Cadastrar Caso e Valores</button>
+        </form>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -833,6 +980,10 @@ popularSelectProfissionais(document.querySelector('#f-responsavel-informacao'));
 popularSelectProfissionais(document.querySelector('#cf-advogado'), 'Advogado');
 popularSelectProfissionais(document.querySelector('#cf-identificado-por'), 'Assistente');
 popularSelectOpcoes(document.querySelector('#cf-tipo-decisao'), TIPOS_DECISAO);
+popularSelectProfissionais(document.querySelector('#cn-advogado'), 'Advogado');
+popularSelectProfissionais(document.querySelector('#cn-assistente'), 'Assistente');
+popularSelectOpcoes(document.querySelector('#cn-tipo-decisao'), TIPOS_DECISAO);
+popularSelectOpcoes(document.querySelector('#cn-tipo-insercao'), TIPOS_CALCULO);
 
 document.querySelector('#f-cliente').addEventListener('change', function(){
   const wrap = document.querySelector('#wrap-cliente-outro');
@@ -945,6 +1096,34 @@ document.querySelector('#cf-cliente').addEventListener('change', function(){
   else { wrap.style.display = 'none'; outro.required = false; outro.value = ''; }
 });
 
+document.querySelector('#cn-cliente').addEventListener('change', function(){
+  const wrap = document.querySelector('#wrap-cn-cliente-outro');
+  const outro = document.querySelector('#cn-cliente-outro');
+  if(this.value === 'Outro'){ wrap.style.display = ''; outro.required = true; }
+  else { wrap.style.display = 'none'; outro.required = false; outro.value = ''; }
+});
+
+document.querySelector('#cn-inserido-lm').addEventListener('change', function(){
+  const wrap = document.querySelector('#wrap-cn-data-lm');
+  const data = document.querySelector('#cn-data-lm');
+  if(this.value === 'Sim'){ wrap.style.display = ''; data.required = true; }
+  else { wrap.style.display = 'none'; data.required = false; data.value = ''; }
+});
+
+document.querySelector('#cn-inserido-sistema').addEventListener('change', function(){
+  const wrap = document.querySelector('#wrap-cn-data-sistema');
+  const data = document.querySelector('#cn-data-sistema');
+  if(this.value === 'Sim'){ wrap.style.display = ''; data.required = true; }
+  else { wrap.style.display = 'none'; data.required = false; data.value = ''; }
+});
+
+document.querySelector('#cn-teve-revisao').addEventListener('change', function(){
+  const wrap = document.querySelector('#wrap-cn-justificativa-revisao');
+  const justificativa = document.querySelector('#cn-justificativa-revisao');
+  if(this.value === 'Não'){ wrap.style.display = ''; justificativa.required = true; }
+  else { wrap.style.display = 'none'; justificativa.required = false; justificativa.value = ''; }
+});
+
 let sbClient = null;
 function getClient(){
   if(!sbClient) sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -1039,7 +1218,7 @@ function render(){
   tbody.innerHTML = lista.map(s => `
     <tr>
       <td>${formatarData(s.data_solicitacao)}</td>
-      <td>${s.origem === 'Identificado pelo Assistente' ? '<span class="badge badge-blue">🔍 Identificado</span>' : '<span class="badge badge-nao">Advogado</span>'}</td>
+      <td>${origemBadge(s.origem)}</td>
       <td>${e(s.cliente)}</td>
       <td class="mono">${e(s.processo)}</td>
       <td>${e(s.reclamante)}</td>
@@ -1076,6 +1255,11 @@ function render(){
       <td>${e(s.responsavel_informacao)}</td>
       <td>${statusBadge(s.status)}</td>
       <td>${formatarData(s.data_conclusao)}</td>
+      <td>${s.inserido_lm ? '<span class="badge badge-green">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
+      <td>${formatarData(s.data_insercao_lm)}</td>
+      <td>${s.inserido_sistema ? '<span class="badge badge-green">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
+      <td>${formatarData(s.data_insercao_sistema)}</td>
+      <td>${e(s.justificativa_revisao)}</td>
       <td>${e(s.observacoes)}</td>
       <td>${acoesStatus(s)}</td>
     </tr>
@@ -1098,6 +1282,18 @@ function calcSolicitadoTexto(v){
   if(v === true) return 'Sim';
   if(v === false) return 'Não';
   return 'N/A';
+}
+
+function origemBadge(origem){
+  if(origem === 'Identificado pelo Assistente') return '<span class="badge badge-blue">🔍 Identificado</span>';
+  if(origem === 'Cadastro Manual (Valores)') return '<span class="badge badge-orange">➕ Cadastro Manual</span>';
+  return '<span class="badge badge-nao">Advogado</span>';
+}
+
+function origemTexto(origem){
+  if(origem === 'Identificado pelo Assistente') return 'Identificado pelo Assistente';
+  if(origem === 'Cadastro Manual (Valores)') return 'Cadastro Manual (Valores)';
+  return 'Advogado';
 }
 
 function acoesStatus(s){
@@ -1478,13 +1674,69 @@ document.querySelector('#form-identificado').addEventListener('submit', async fu
   abrirEmail(emailAdvogado, assunto, corpo);
 });
 
+document.querySelector('#form-caso-novo').addEventListener('submit', async function(ev){
+  ev.preventDefault();
+  const clienteSel = document.querySelector('#cn-cliente').value;
+  const cliente = clienteSel === 'Outro' ? document.querySelector('#cn-cliente-outro').value.trim() : clienteSel;
+  if(!cliente){ alert('Informe o cliente.'); return; }
+
+  const tevRevisaoVal = document.querySelector('#cn-teve-revisao').value;
+  const tevRevisaoBool = tevRevisaoVal === 'Sim';
+
+  const payload = {
+    cliente,
+    processo: document.querySelector('#cn-processo').value.trim(),
+    reclamante: document.querySelector('#cn-reclamante').value.trim(),
+    reclamada: document.querySelector('#cn-reclamada').value.trim(),
+    vara: document.querySelector('#cn-vara').value.trim(),
+    comarca: document.querySelector('#cn-comarca').value.trim(),
+    uf: document.querySelector('#cn-uf').value,
+    advogado_solicitante: document.querySelector('#cn-advogado').value,
+    assistente_responsavel: document.querySelector('#cn-assistente').value,
+    tipo_decisao: document.querySelector('#cn-tipo-decisao').value,
+    tipo_calculo: document.querySelector('#cn-tipo-insercao').value,
+    provisao_atual: document.querySelector('#cn-provisao-atual').value.trim(),
+    novo_valor: document.querySelector('#cn-novo-valor').value.trim(),
+    acima_400k: document.querySelector('#cn-400k').checked,
+    inserido_lm: document.querySelector('#cn-inserido-lm').value === 'Sim',
+    data_insercao_lm: document.querySelector('#cn-data-lm').value || null,
+    inserido_sistema: document.querySelector('#cn-inserido-sistema').value === 'Sim',
+    data_insercao_sistema: document.querySelector('#cn-data-sistema').value || null,
+    revisado_advogado: tevRevisaoBool,
+    justificativa_revisao: document.querySelector('#cn-justificativa-revisao').value.trim(),
+    calculo_solicitado: true,
+    data_solicitacao: hojeISO(),
+    data_conclusao: hojeISO(),
+    ok_assistente: true,
+    status: tevRevisaoBool ? 'Revisado' : 'Aguardando Revisão',
+    origem: 'Cadastro Manual (Valores)'
+  };
+
+  const btn = ev.target.querySelector('button[type="submit"]');
+  btn.disabled = true; btn.textContent = 'Cadastrando…';
+
+  const { error } = await getClient().from(TABLE).insert(payload);
+
+  btn.disabled = false; btn.textContent = 'Cadastrar Caso e Valores';
+
+  if(error){ alert('Erro ao cadastrar: ' + error.message); return; }
+
+  ev.target.reset();
+  document.querySelector('#wrap-cn-cliente-outro').style.display = 'none';
+  document.querySelector('#wrap-cn-data-lm').style.display = 'none';
+  document.querySelector('#wrap-cn-data-sistema').style.display = 'none';
+  document.querySelector('#wrap-cn-justificativa-revisao').style.display = 'none';
+  await carregar();
+  alert('Caso cadastrado com sucesso.');
+});
+
 ['#flt-cliente','#flt-status','#flt-assistente'].forEach(sel => document.querySelector(sel).addEventListener('change', render));
 document.querySelector('#flt-busca').addEventListener('input', render);
 
 function gerarExcel(lista, nomeArquivo){
   if(!lista.length){ return; }
   const dados = lista.map(s => ({
-    'Origem': s.origem === 'Identificado pelo Assistente' ? 'Identificado pelo Assistente' : 'Advogado',
+    'Origem': origemTexto(s.origem),
     'Cliente': naSeVazio(s.cliente),
     'Processo': naSeVazio(s.processo),
     'Reclamante': naSeVazio(s.reclamante),
@@ -1525,10 +1777,15 @@ function gerarExcel(lista, nomeArquivo){
     'OK do Assistente': s.ok_assistente ? 'Sim' : 'Não',
     'Revisado pelo Advogado': s.revisado_advogado ? 'Sim' : 'Não',
     'Data da Revisão': formatarData(s.data_revisao),
+    'Inserido no LM': s.inserido_lm ? 'Sim' : 'Não',
+    'Data Inserção LM': formatarData(s.data_insercao_lm),
+    'Inserido no Sistema': s.inserido_sistema ? 'Sim' : 'Não',
+    'Data Inserção Sistema': formatarData(s.data_insercao_sistema),
+    'Justificativa Revisão': naSeVazio(s.justificativa_revisao),
     'Observações Adicionais': naSeVazio(s.observacoes)
   }));
   const ws = XLSX.utils.json_to_sheet(dados);
-  ws['!cols'] = [{wch:24},{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:26},{wch:26},{wch:24},{wch:18},{wch:16},{wch:30},{wch:16},{wch:16},{wch:24},{wch:20},{wch:16},{wch:16},{wch:16},{wch:24},{wch:16},{wch:20},{wch:20},{wch:20},{wch:26},{wch:26},{wch:24},{wch:16},{wch:12},{wch:16},{wch:14},{wch:16},{wch:16},{wch:36}];
+  ws['!cols'] = [{wch:24},{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:26},{wch:26},{wch:24},{wch:18},{wch:16},{wch:30},{wch:16},{wch:16},{wch:24},{wch:20},{wch:16},{wch:16},{wch:16},{wch:24},{wch:16},{wch:20},{wch:20},{wch:20},{wch:26},{wch:26},{wch:24},{wch:16},{wch:12},{wch:16},{wch:14},{wch:16},{wch:16},{wch:14},{wch:16},{wch:14},{wch:16},{wch:28},{wch:36}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Solicitações');
   XLSX.writeFile(wb, `${nomeArquivo}.xlsx`);
