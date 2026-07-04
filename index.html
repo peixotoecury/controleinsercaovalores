@@ -382,11 +382,6 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
             </div>
           </div>
 
-          <div class="check-row">
-            <input type="checkbox" id="f-400k">
-            <label for="f-400k">Valor acima de R$ 400.000,00</label>
-          </div>
-
           <div class="mc-form-group">
             <label>Advogado que Solicitou <span class="req">*</span></label>
             <select id="f-advogado" required>
@@ -646,6 +641,10 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
             <label>Novo Valor</label>
             <input type="text" id="iv-novo-valor" placeholder="R$ 0,00" disabled>
           </div>
+          <div class="check-row">
+            <input type="checkbox" id="iv-400k" disabled>
+            <label for="iv-400k">Valor acima de R$ 400.000,00</label>
+          </div>
           <button type="button" class="btn-cyan" id="btn-salvar-valores" disabled>Salvar Valores</button>
         </div>
       </div>
@@ -677,6 +676,7 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
                 <th>Revisado</th>
                 <th>Provisão/Accrual Atual</th>
                 <th>Novo Valor</th>
+                <th>Acima 400k</th>
                 <th></th>
               </tr>
             </thead>
@@ -1166,6 +1166,7 @@ function renderInsercaoValores(){
       <td>${s.revisado_advogado ? '<span class="badge badge-green">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
       <td>${e(s.provisao_atual)}</td>
       <td>${e(s.novo_valor)}</td>
+      <td>${s.acima_400k ? '<span class="badge badge-red">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
       <td><button class="action-btn" onclick="selecionarProcessoValores('${s.id}')">🔗 Selecionar</button></td>
     </tr>
   `).join('');
@@ -1183,18 +1184,21 @@ function atualizarPainelValores(){
   const info = document.querySelector('#iv-info');
   const provisao = document.querySelector('#iv-provisao-atual');
   const novoValor = document.querySelector('#iv-novo-valor');
+  const acima400k = document.querySelector('#iv-400k');
   const btn = document.querySelector('#btn-salvar-valores');
 
   if(!s){
     info.textContent = '';
     provisao.value = ''; provisao.disabled = true;
     novoValor.value = ''; novoValor.disabled = true;
+    acima400k.checked = false; acima400k.disabled = true;
     btn.disabled = true;
     return;
   }
   info.innerHTML = `<b>${e(s.reclamante)}</b> x <b>${e(s.reclamada)}</b> — Advogado: ${e(s.advogado_solicitante)} · Assistente: ${e(s.assistente_responsavel)}`;
   provisao.value = s.provisao_atual || ''; provisao.disabled = false;
   novoValor.value = s.novo_valor || ''; novoValor.disabled = false;
+  acima400k.checked = !!s.acima_400k; acima400k.disabled = false;
   btn.disabled = false;
 }
 
@@ -1206,8 +1210,9 @@ document.querySelector('#btn-salvar-valores').addEventListener('click', async fu
   if(!id) return;
   const provisao = document.querySelector('#iv-provisao-atual').value.trim();
   const novoValor = document.querySelector('#iv-novo-valor').value.trim();
+  const acima400k = document.querySelector('#iv-400k').checked;
   this.disabled = true; this.textContent = 'Salvando…';
-  const { error } = await getClient().from(TABLE).update({ provisao_atual: provisao, novo_valor: novoValor }).eq('id', id);
+  const { error } = await getClient().from(TABLE).update({ provisao_atual: provisao, novo_valor: novoValor, acima_400k: acima400k }).eq('id', id);
   this.disabled = false; this.textContent = 'Salvar Valores';
   if(error){ alert('Erro ao salvar: ' + error.message); return; }
   await carregar();
@@ -1379,7 +1384,7 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
     alteracao_fase: document.querySelector('#f-alteracao-fase').value === 'Sim',
     fase_atual: document.querySelector('#f-fase-atual').value,
     nova_fase: document.querySelector('#f-nova-fase').value,
-    acima_400k: document.querySelector('#f-400k').checked,
+    acima_400k: false,
     advogado_solicitante: document.querySelector('#f-advogado').value,
     assistente_responsavel: document.querySelector('#f-assistente').value,
     responsavel_informacao: document.querySelector('#f-responsavel-informacao').value,
@@ -1552,10 +1557,11 @@ document.querySelector('#btn-exportar-valores').addEventListener('click', functi
     'Data do Cálculo': formatarData(s.data_conclusao),
     'Revisado': s.revisado_advogado ? 'Sim' : 'Não',
     'Provisão/Accrual Atual': naSeVazio(s.provisao_atual),
-    'Novo Valor': naSeVazio(s.novo_valor)
+    'Novo Valor': naSeVazio(s.novo_valor),
+    'Acima de R$ 400.000,00': s.acima_400k ? 'Sim' : 'Não'
   }));
   const ws = XLSX.utils.json_to_sheet(dados);
-  ws['!cols'] = [{wch:24},{wch:26},{wch:24},{wch:24},{wch:16},{wch:12},{wch:20},{wch:20}];
+  ws['!cols'] = [{wch:24},{wch:26},{wch:24},{wch:24},{wch:16},{wch:12},{wch:20},{wch:20},{wch:20}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Valores');
   XLSX.writeFile(wb, `Insercao_Valores_${hojeISO()}.xlsx`);
