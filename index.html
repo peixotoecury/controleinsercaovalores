@@ -233,29 +233,29 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
           </div>
 
           <div class="mc-form-group">
-            <label>Juiz/Desembargador/Ministro</label>
-            <input type="text" id="f-juiz">
+            <label>Juiz/Desembargador/Ministro <span class="req">*</span></label>
+            <input type="text" id="f-juiz" required>
           </div>
 
           <div class="mc-form-group">
-            <label>Advogado da Parte Contrária</label>
-            <input type="text" id="f-advogado-contraria">
+            <label>Advogado da Parte Contrária <span class="req">*</span></label>
+            <input type="text" id="f-advogado-contraria" required>
           </div>
 
           <div class="mc-form-group">
-            <label>Vara/Turma/Câmara</label>
-            <input type="text" id="f-vara">
+            <label>Vara/Turma/Câmara <span class="req">*</span></label>
+            <input type="text" id="f-vara" required>
           </div>
 
           <div class="mc-form-group">
-            <label>Comarca</label>
-            <input type="text" id="f-comarca">
+            <label>Comarca <span class="req">*</span></label>
+            <input type="text" id="f-comarca" required>
           </div>
 
           <div class="mc-form-group">
-            <label>UF</label>
-            <select id="f-uf">
-              <option value="" selected>Selecione…</option>
+            <label>UF <span class="req">*</span></label>
+            <select id="f-uf" required>
+              <option value="" disabled selected>Selecione…</option>
               <option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option>
               <option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option>
               <option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option>
@@ -266,8 +266,8 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
           </div>
 
           <div class="mc-form-group">
-            <label>Nome do Perito do Juízo</label>
-            <input type="text" id="f-perito">
+            <label>Nome do Perito do Juízo <span class="req">*</span></label>
+            <input type="text" id="f-perito" required>
           </div>
 
           <div class="mc-form-group">
@@ -294,26 +294,26 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
           </div>
 
           <div class="mc-form-group" id="wrap-motivo-insalubridade" style="display:none;">
-            <label>Motivo da Insalubridade</label>
+            <label>Motivo da Insalubridade <span class="req">*</span></label>
             <input type="text" id="f-motivo-insalubridade">
           </div>
 
           <div class="mc-form-group" id="wrap-motivo-periculosidade" style="display:none;">
-            <label>Motivo da Periculosidade</label>
+            <label>Motivo da Periculosidade <span class="req">*</span></label>
             <input type="text" id="f-motivo-periculosidade">
           </div>
 
           <div id="wrap-medico-ergonomico" style="display:none;">
             <div class="mc-form-group">
-              <label>Doença Detectada</label>
+              <label>Doença Detectada <span class="req">*</span></label>
               <input type="text" id="f-doenca-detectada">
             </div>
             <div class="mc-form-group">
-              <label>Área do Corpo</label>
+              <label>Área do Corpo <span class="req">*</span></label>
               <input type="text" id="f-area-corpo">
             </div>
             <div class="mc-form-group">
-              <label>Motivos</label>
+              <label>Motivos <span class="req">*</span></label>
               <textarea id="f-motivos-laudo" rows="2"></textarea>
             </div>
           </div>
@@ -329,18 +329,18 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
 
           <div id="wrap-prognosticos" style="display:none;">
             <div class="mc-form-group">
-              <label>Prognóstico Atual</label>
+              <label>Prognóstico Atual <span class="req">*</span></label>
               <select id="f-prognostico-atual">
-                <option value="" selected>Selecione…</option>
+                <option value="" disabled selected>Selecione…</option>
                 <option>Possível</option>
                 <option>Provável</option>
                 <option>Remoto</option>
               </select>
             </div>
             <div class="mc-form-group">
-              <label>Novo Prognóstico</label>
+              <label>Novo Prognóstico <span class="req">*</span></label>
               <select id="f-novo-prognostico">
-                <option value="" selected>Selecione…</option>
+                <option value="" disabled selected>Selecione…</option>
                 <option>Possível</option>
                 <option>Provável</option>
                 <option>Remoto</option>
@@ -359,9 +359,9 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
 
           <div id="wrap-fases" style="display:none;">
             <div class="mc-form-group">
-              <label>Fase Atual</label>
+              <label>Fase Atual <span class="req">*</span></label>
               <select id="f-fase-atual">
-                <option value="" selected>Selecione…</option>
+                <option value="" disabled selected>Selecione…</option>
                 <option>Inicial</option>
                 <option>Instrução</option>
                 <option>Recursal</option>
@@ -370,9 +370,9 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
               </select>
             </div>
             <div class="mc-form-group">
-              <label>Nova Fase</label>
+              <label>Nova Fase <span class="req">*</span></label>
               <select id="f-nova-fase">
-                <option value="" selected>Selecione…</option>
+                <option value="" disabled selected>Selecione…</option>
                 <option>Inicial</option>
                 <option>Instrução</option>
                 <option>Recursal</option>
@@ -428,19 +428,19 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
           </div>
 
           <div class="mc-form-group" id="wrap-data-retorno" style="display:none;">
-            <label>Data do Retorno do Cálculo</label>
+            <label>Data do Retorno do Cálculo <span class="req">*</span></label>
             <input type="date" id="f-data-retorno-calculo">
             <div class="hint">Quando essa data chegar, o caso aparece automaticamente na aba Cobranças pra sermos lembrados de cobrar.</div>
           </div>
 
           <div class="mc-form-group" id="wrap-justificativa-calculo" style="display:none;">
-            <label>Justificativa</label>
+            <label>Justificativa <span class="req">*</span></label>
             <textarea id="f-justificativa-calculo" rows="2"></textarea>
           </div>
 
           <div class="mc-form-group">
-            <label>Observações Adicionais</label>
-            <textarea id="f-observacoes" rows="3"></textarea>
+            <label>Observações Adicionais <span class="req">*</span></label>
+            <textarea id="f-observacoes" rows="3" required></textarea>
           </div>
 
           <button type="submit" class="btn-cyan">Enviar Solicitação</button>
@@ -526,6 +526,10 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
 
   <div id="view-cobrancas" style="display:none;">
 
+    <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
+      <button class="export-btn" id="btn-exportar-cobrancas">⬇ Exportar Excel</button>
+    </div>
+
     <div class="dash-card" style="margin-bottom:18px;">
       <div class="dash-card-head">📝 Solicitação de Cálculo — Pendentes de Lançamento</div>
       <div id="cobranca-calculo"></div>
@@ -610,8 +614,8 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
             </div>
           </div>
           <div class="mc-form-group">
-            <label>Observações Adicionais</label>
-            <textarea id="cf-observacoes" rows="2"></textarea>
+            <label>Observações Adicionais <span class="req">*</span></label>
+            <textarea id="cf-observacoes" rows="2" required></textarea>
           </div>
           <button type="submit" class="btn-cyan" style="width:auto;padding-left:24px;padding-right:24px;">Registrar e Cobrar Advogado</button>
         </form>
@@ -647,7 +651,9 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
       </div>
 
       <div class="dash-card">
-        <div class="dash-card-head">📊 Valores Lançados</div>
+        <div class="dash-card-head">📊 Valores Lançados
+          <button class="export-btn" id="btn-exportar-valores" style="margin-left:auto;">⬇ Exportar Excel</button>
+        </div>
         <div class="table-wrap">
           <table class="sol-table">
             <thead>
@@ -829,6 +835,12 @@ function atualizarWrapsLaudo(){
   document.querySelector('#wrap-motivo-periculosidade').style.display = periculosidade ? '' : 'none';
   document.querySelector('#wrap-medico-ergonomico').style.display = (medico || ergonomico) ? '' : 'none';
 
+  document.querySelector('#f-motivo-insalubridade').required = insalubridade;
+  document.querySelector('#f-motivo-periculosidade').required = periculosidade;
+  document.querySelector('#f-doenca-detectada').required = (medico || ergonomico);
+  document.querySelector('#f-area-corpo').required = (medico || ergonomico);
+  document.querySelector('#f-motivos-laudo').required = (medico || ergonomico);
+
   if(!insalubridade) document.querySelector('#f-motivo-insalubridade').value = '';
   if(!periculosidade) document.querySelector('#f-motivo-periculosidade').value = '';
   if(!medico && !ergonomico){
@@ -866,15 +878,15 @@ document.querySelector('#f-calculo-solicitado').addEventListener('change', funct
   const justificativa = document.querySelector('#f-justificativa-calculo');
 
   wrapTipo.style.display = 'none'; tipoCalculo.required = false;
-  wrapRetorno.style.display = 'none';
-  wrapJustificativa.style.display = 'none';
+  wrapRetorno.style.display = 'none'; dataRetorno.required = false;
+  wrapJustificativa.style.display = 'none'; justificativa.required = false;
 
   if(this.value === 'Sim'){
     wrapTipo.style.display = ''; tipoCalculo.required = true;
-    wrapRetorno.style.display = '';
+    wrapRetorno.style.display = ''; dataRetorno.required = true;
     justificativa.value = '';
   } else if(this.value === 'Não'){
-    wrapJustificativa.style.display = '';
+    wrapJustificativa.style.display = ''; justificativa.required = true;
     tipoCalculo.value = ''; dataRetorno.value = '';
   } else {
     tipoCalculo.value = ''; dataRetorno.value = ''; justificativa.value = '';
@@ -883,21 +895,25 @@ document.querySelector('#f-calculo-solicitado').addEventListener('change', funct
 
 document.querySelector('#f-alteracao-prognostico').addEventListener('change', function(){
   const wrap = document.querySelector('#wrap-prognosticos');
-  if(this.value === 'Sim'){ wrap.style.display = ''; }
-  else {
-    wrap.style.display = 'none';
-    document.querySelector('#f-prognostico-atual').value = '';
-    document.querySelector('#f-novo-prognostico').value = '';
+  const prognosticoAtual = document.querySelector('#f-prognostico-atual');
+  const novoPrognostico = document.querySelector('#f-novo-prognostico');
+  if(this.value === 'Sim'){
+    wrap.style.display = ''; prognosticoAtual.required = true; novoPrognostico.required = true;
+  } else {
+    wrap.style.display = 'none'; prognosticoAtual.required = false; novoPrognostico.required = false;
+    prognosticoAtual.value = ''; novoPrognostico.value = '';
   }
 });
 
 document.querySelector('#f-alteracao-fase').addEventListener('change', function(){
   const wrap = document.querySelector('#wrap-fases');
-  if(this.value === 'Sim'){ wrap.style.display = ''; }
-  else {
-    wrap.style.display = 'none';
-    document.querySelector('#f-fase-atual').value = '';
-    document.querySelector('#f-nova-fase').value = '';
+  const faseAtual = document.querySelector('#f-fase-atual');
+  const novaFase = document.querySelector('#f-nova-fase');
+  if(this.value === 'Sim'){
+    wrap.style.display = ''; faseAtual.required = true; novaFase.required = true;
+  } else {
+    wrap.style.display = 'none'; faseAtual.required = false; novaFase.required = false;
+    faseAtual.value = ''; novaFase.value = '';
   }
 });
 
@@ -1290,6 +1306,11 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
   const cliente = clienteSel === 'Outro' ? document.querySelector('#f-cliente-outro').value.trim() : clienteSel;
   if(!cliente){ alert('Informe o cliente.'); return; }
 
+  if(document.querySelector('#wrap-tipo-laudo').style.display !== 'none' && !tipoLaudoSelecionado()){
+    alert('Marque pelo menos um Tipo de Laudo Desfavorável.');
+    return;
+  }
+
   const calcSolicitadoVal = document.querySelector('#f-calculo-solicitado').value;
   const calcSolicitadoBool = calcSolicitadoVal === 'Sim' ? true : (calcSolicitadoVal === 'Não' ? false : null);
 
@@ -1353,7 +1374,9 @@ document.querySelector('#form-solicitacao').addEventListener('submit', async fun
   document.querySelector('#wrap-tipo-calculo').style.display = 'none';
   document.querySelector('#wrap-justificativa-calculo').style.display = 'none';
   document.querySelector('#wrap-data-retorno').style.display = 'none';
-  document.querySelector('#f-tipo-calculo').required = false;
+  ['#f-tipo-calculo','#f-data-retorno-calculo','#f-justificativa-calculo','#f-prognostico-atual','#f-novo-prognostico','#f-fase-atual','#f-nova-fase','#f-motivo-insalubridade','#f-motivo-periculosidade','#f-doenca-detectada','#f-area-corpo','#f-motivos-laudo'].forEach(sel => {
+    document.querySelector(sel).required = false;
+  });
   await carregar();
 
   const emailAssistente = emailPorNome(payload.assistente_responsavel);
@@ -1474,6 +1497,27 @@ document.querySelector('#btn-exportar').addEventListener('click', function(){
   const lista = filtrar();
   if(!lista.length){ alert('Não há solicitações para exportar.'); return; }
   gerarExcel(lista, `Controle_Insercao_Valores_${hojeISO()}`);
+});
+
+document.querySelector('#btn-exportar-cobrancas').addEventListener('click', function(){
+  if(!SOLICITACOES.length){ alert('Não há solicitações para exportar.'); return; }
+  gerarExcel(SOLICITACOES, `Cobrancas_Controle_Insercao_Valores_${hojeISO()}`);
+});
+
+document.querySelector('#btn-exportar-valores').addEventListener('click', function(){
+  if(!SOLICITACOES.length){ alert('Não há valores para exportar.'); return; }
+  const dados = SOLICITACOES.map(s => ({
+    'Cliente': naSeVazio(s.cliente),
+    'Processo': naSeVazio(s.processo),
+    'Reclamante': naSeVazio(s.reclamante),
+    'Provisão/Accrual Atual': naSeVazio(s.provisao_atual),
+    'Novo Valor': naSeVazio(s.novo_valor)
+  }));
+  const ws = XLSX.utils.json_to_sheet(dados);
+  ws['!cols'] = [{wch:24},{wch:26},{wch:24},{wch:20},{wch:20}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Valores');
+  XLSX.writeFile(wb, `Insercao_Valores_${hojeISO()}.xlsx`);
 });
 
 function iniciarRealtime(){
