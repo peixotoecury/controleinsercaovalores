@@ -654,10 +654,31 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
         <div class="dash-card-head">📊 Valores Lançados
           <button class="export-btn" id="btn-exportar-valores" style="margin-left:auto;">⬇ Exportar Excel</button>
         </div>
+        <div class="filters">
+          <select class="filter-select" id="iv-flt-cliente">
+            <option value="">Todos os clientes</option>
+            <option>Bridgestone</option>
+            <option>CBC</option>
+            <option>Embraer</option>
+            <option>T4F</option>
+            <option>Ferrero</option>
+            <option>Telefônica</option>
+          </select>
+        </div>
         <div class="table-wrap">
           <table class="sol-table">
             <thead>
-              <tr><th>Cliente</th><th>Processo</th><th>Reclamante</th><th>Provisão/Accrual Atual</th><th>Novo Valor</th></tr>
+              <tr>
+                <th>Cliente</th>
+                <th>Processo</th>
+                <th>Reclamante</th>
+                <th>Tipo de Cálculo</th>
+                <th>Data do Cálculo</th>
+                <th>Revisado</th>
+                <th>Provisão/Accrual Atual</th>
+                <th>Novo Valor</th>
+                <th></th>
+              </tr>
             </thead>
             <tbody id="tbody-valores"></tbody>
           </table>
@@ -1131,16 +1152,30 @@ function renderInsercaoValores(){
   if(selecaoAtual && SOLICITACOES.some(s => s.id === selecaoAtual)) sel.value = selecaoAtual;
   else atualizarPainelValores();
 
+  const filtroCliente = document.querySelector('#iv-flt-cliente').value;
+  const lista = filtroCliente ? SOLICITACOES.filter(s => s.cliente === filtroCliente) : SOLICITACOES;
+
   const tbody = document.querySelector('#tbody-valores');
-  tbody.innerHTML = SOLICITACOES.map(s => `
+  tbody.innerHTML = lista.map(s => `
     <tr>
       <td>${e(s.cliente)}</td>
       <td class="mono">${e(s.processo)}</td>
       <td>${e(s.reclamante)}</td>
+      <td>${e(s.tipo_calculo)}</td>
+      <td>${formatarData(s.data_conclusao)}</td>
+      <td>${s.revisado_advogado ? '<span class="badge badge-green">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
       <td>${e(s.provisao_atual)}</td>
       <td>${e(s.novo_valor)}</td>
+      <td><button class="action-btn" onclick="selecionarProcessoValores('${s.id}')">🔗 Selecionar</button></td>
     </tr>
   `).join('');
+}
+
+function selecionarProcessoValores(id){
+  const sel = document.querySelector('#iv-processo');
+  sel.value = id;
+  atualizarPainelValores();
+  document.querySelector('#iv-processo').scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function atualizarPainelValores(){
@@ -1164,6 +1199,7 @@ function atualizarPainelValores(){
 }
 
 document.querySelector('#iv-processo').addEventListener('change', atualizarPainelValores);
+document.querySelector('#iv-flt-cliente').addEventListener('change', renderInsercaoValores);
 
 document.querySelector('#btn-salvar-valores').addEventListener('click', async function(){
   const id = document.querySelector('#iv-processo').value;
@@ -1505,16 +1541,21 @@ document.querySelector('#btn-exportar-cobrancas').addEventListener('click', func
 });
 
 document.querySelector('#btn-exportar-valores').addEventListener('click', function(){
-  if(!SOLICITACOES.length){ alert('Não há valores para exportar.'); return; }
-  const dados = SOLICITACOES.map(s => ({
+  const filtroCliente = document.querySelector('#iv-flt-cliente').value;
+  const lista = filtroCliente ? SOLICITACOES.filter(s => s.cliente === filtroCliente) : SOLICITACOES;
+  if(!lista.length){ alert('Não há valores para exportar.'); return; }
+  const dados = lista.map(s => ({
     'Cliente': naSeVazio(s.cliente),
     'Processo': naSeVazio(s.processo),
     'Reclamante': naSeVazio(s.reclamante),
+    'Tipo de Cálculo': naSeVazio(s.tipo_calculo),
+    'Data do Cálculo': formatarData(s.data_conclusao),
+    'Revisado': s.revisado_advogado ? 'Sim' : 'Não',
     'Provisão/Accrual Atual': naSeVazio(s.provisao_atual),
     'Novo Valor': naSeVazio(s.novo_valor)
   }));
   const ws = XLSX.utils.json_to_sheet(dados);
-  ws['!cols'] = [{wch:24},{wch:26},{wch:24},{wch:20},{wch:20}];
+  ws['!cols'] = [{wch:24},{wch:26},{wch:24},{wch:24},{wch:16},{wch:12},{wch:20},{wch:20}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Valores');
   XLSX.writeFile(wb, `Insercao_Valores_${hojeISO()}.xlsx`);
