@@ -503,6 +503,8 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
               <th>Fase Atual</th>
               <th>Nova Fase</th>
               <th>Acima 400k</th>
+              <th>Enviado ao Cliente</th>
+              <th>Justificativa Envio</th>
               <th>Provisão/Accrual Atual</th>
               <th>Novo Valor</th>
               <th>Link do Cálculo</th>
@@ -659,6 +661,18 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
             <input type="checkbox" id="iv-400k" disabled>
             <label for="iv-400k">Valor acima de R$ 400.000,00</label>
           </div>
+          <div class="mc-form-group" id="wrap-iv-enviado-cliente" style="display:none;">
+            <label>Já foi enviado para o cliente? <span class="req">*</span></label>
+            <select id="iv-enviado-cliente">
+              <option value="" disabled selected>Selecione…</option>
+              <option value="Sim">Sim</option>
+              <option value="Não">Não</option>
+            </select>
+          </div>
+          <div class="mc-form-group" id="wrap-iv-justificativa-envio" style="display:none;">
+            <label>Justificativa <span class="req">*</span></label>
+            <textarea id="iv-justificativa-envio" rows="2"></textarea>
+          </div>
           <button type="button" class="btn-cyan" id="btn-salvar-valores" disabled>Salvar Valores</button>
         </div>
       </div>
@@ -704,6 +718,8 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
                 <th>Novo Valor</th>
                 <th>Link do Cálculo</th>
                 <th>Acima 400k</th>
+                <th>Enviado ao Cliente</th>
+                <th>Justificativa Envio</th>
                 <th></th>
               </tr>
             </thead>
@@ -813,6 +829,18 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
           <div class="check-row">
             <input type="checkbox" id="cn-400k">
             <label for="cn-400k">Valor acima de R$ 400.000,00</label>
+          </div>
+          <div class="mc-form-group" id="wrap-cn-enviado-cliente" style="display:none;">
+            <label>Já foi enviado para o cliente? <span class="req">*</span></label>
+            <select id="cn-enviado-cliente">
+              <option value="" disabled selected>Selecione…</option>
+              <option value="Sim">Sim</option>
+              <option value="Não">Não</option>
+            </select>
+          </div>
+          <div class="mc-form-group" id="wrap-cn-justificativa-envio" style="display:none;">
+            <label>Justificativa <span class="req">*</span></label>
+            <textarea id="cn-justificativa-envio" rows="2"></textarea>
           </div>
 
           <div class="mc-form-grid">
@@ -1287,6 +1315,8 @@ function render(){
       <td>${e(s.fase_atual)}</td>
       <td>${e(s.nova_fase)}</td>
       <td>${s.acima_400k ? '<span class="badge badge-red">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
+      <td>${enviadoClienteBadge(s.enviado_cliente_400k)}</td>
+      <td>${e(s.justificativa_envio_400k)}</td>
       <td>${e(s.provisao_atual)}</td>
       <td>${e(s.novo_valor)}</td>
       <td>${s.link_calculo_pdf ? `<a href="${e(s.link_calculo_pdf)}" target="_blank" rel="noopener">📄 Abrir</a>` : 'N/A'}</td>
@@ -1313,6 +1343,12 @@ function statusBadge(status){
 }
 
 function calcSolicitadoBadge(v){
+  if(v === true) return '<span class="badge badge-green">Sim</span>';
+  if(v === false) return '<span class="badge badge-red">Não</span>';
+  return '<span class="badge badge-nao">N/A</span>';
+}
+
+function enviadoClienteBadge(v){
   if(v === true) return '<span class="badge badge-green">Sim</span>';
   if(v === false) return '<span class="badge badge-red">Não</span>';
   return '<span class="badge badge-nao">N/A</span>';
@@ -1416,6 +1452,8 @@ function renderInsercaoValores(){
       <td>${e(s.novo_valor)}</td>
       <td>${s.link_calculo_pdf ? `<a href="${e(s.link_calculo_pdf)}" target="_blank" rel="noopener">📄 Abrir</a>` : 'N/A'}</td>
       <td>${s.acima_400k ? '<span class="badge badge-red">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
+      <td>${enviadoClienteBadge(s.enviado_cliente_400k)}</td>
+      <td>${e(s.justificativa_envio_400k)}</td>
       <td><button class="action-btn" onclick="selecionarProcessoValores('${s.id}')">🔗 Selecionar</button></td>
     </tr>
   `).join('');
@@ -1435,6 +1473,8 @@ function atualizarPainelValores(){
   const novoValor = document.querySelector('#iv-novo-valor');
   const linkCalculo = document.querySelector('#iv-link-calculo');
   const acima400k = document.querySelector('#iv-400k');
+  const enviadoCliente = document.querySelector('#iv-enviado-cliente');
+  const justificativaEnvio = document.querySelector('#iv-justificativa-envio');
   const btn = document.querySelector('#btn-salvar-valores');
 
   if(!s){
@@ -1443,6 +1483,8 @@ function atualizarPainelValores(){
     novoValor.value = ''; novoValor.disabled = true;
     linkCalculo.value = ''; linkCalculo.disabled = true;
     acima400k.checked = false; acima400k.disabled = true;
+    enviadoCliente.value = ''; justificativaEnvio.value = '';
+    atualizarWrapEnviado400k('iv');
     btn.disabled = true;
     return;
   }
@@ -1451,8 +1493,33 @@ function atualizarPainelValores(){
   novoValor.value = s.novo_valor || ''; novoValor.disabled = false;
   linkCalculo.value = s.link_calculo_pdf || ''; linkCalculo.disabled = false;
   acima400k.checked = !!s.acima_400k; acima400k.disabled = false;
+  enviadoCliente.value = s.enviado_cliente_400k === true ? 'Sim' : (s.enviado_cliente_400k === false ? 'Não' : '');
+  justificativaEnvio.value = s.justificativa_envio_400k || '';
+  atualizarWrapEnviado400k('iv');
   btn.disabled = false;
 }
+
+function atualizarWrapEnviado400k(prefixo){
+  const checked = document.querySelector(`#${prefixo}-400k`).checked;
+  const wrapEnviado = document.querySelector(`#wrap-${prefixo}-enviado-cliente`);
+  const enviadoSelect = document.querySelector(`#${prefixo}-enviado-cliente`);
+  const wrapJustificativa = document.querySelector(`#wrap-${prefixo}-justificativa-envio`);
+  const justificativa = document.querySelector(`#${prefixo}-justificativa-envio`);
+
+  wrapEnviado.style.display = checked ? '' : 'none';
+  enviadoSelect.required = checked;
+  if(!checked) enviadoSelect.value = '';
+
+  const mostrarJustificativa = checked && enviadoSelect.value === 'Não';
+  wrapJustificativa.style.display = mostrarJustificativa ? '' : 'none';
+  justificativa.required = mostrarJustificativa;
+  if(!mostrarJustificativa) justificativa.value = '';
+}
+
+['iv','cn'].forEach(prefixo => {
+  document.querySelector(`#${prefixo}-400k`).addEventListener('change', () => atualizarWrapEnviado400k(prefixo));
+  document.querySelector(`#${prefixo}-enviado-cliente`).addEventListener('change', () => atualizarWrapEnviado400k(prefixo));
+});
 
 document.querySelector('#iv-processo').addEventListener('change', atualizarPainelValores);
 document.querySelector('#iv-flt-cliente').addEventListener('change', renderInsercaoValores);
@@ -1464,8 +1531,21 @@ document.querySelector('#btn-salvar-valores').addEventListener('click', async fu
   const novoValor = document.querySelector('#iv-novo-valor').value.trim();
   const linkCalculo = document.querySelector('#iv-link-calculo').value.trim();
   const acima400k = document.querySelector('#iv-400k').checked;
+  const enviadoClienteVal = document.querySelector('#iv-enviado-cliente').value;
+  const justificativaEnvio = document.querySelector('#iv-justificativa-envio').value.trim();
+
+  if(acima400k && !enviadoClienteVal){ alert('Informe se já foi enviado para o cliente.'); return; }
+  if(acima400k && enviadoClienteVal === 'Não' && !justificativaEnvio){ alert('Informe a justificativa.'); return; }
+
   this.disabled = true; this.textContent = 'Salvando…';
-  const { error } = await getClient().from(TABLE).update({ provisao_atual: provisao, novo_valor: novoValor, link_calculo_pdf: linkCalculo, acima_400k: acima400k }).eq('id', id);
+  const { error } = await getClient().from(TABLE).update({
+    provisao_atual: provisao,
+    novo_valor: novoValor,
+    link_calculo_pdf: linkCalculo,
+    acima_400k: acima400k,
+    enviado_cliente_400k: acima400k ? (enviadoClienteVal === 'Sim') : null,
+    justificativa_envio_400k: acima400k ? justificativaEnvio : null
+  }).eq('id', id);
   this.disabled = false; this.textContent = 'Salvar Valores';
   if(error){ alert('Erro ao salvar: ' + error.message); return; }
   await carregar();
@@ -1740,6 +1820,13 @@ document.querySelector('#form-caso-novo').addEventListener('submit', async funct
   const tevRevisaoVal = document.querySelector('#cn-teve-revisao').value;
   const tevRevisaoBool = tevRevisaoVal === 'Sim';
 
+  const acima400kVal = document.querySelector('#cn-400k').checked;
+  const enviadoClienteVal = document.querySelector('#cn-enviado-cliente').value;
+  const justificativaEnvioVal = document.querySelector('#cn-justificativa-envio').value.trim();
+
+  if(acima400kVal && !enviadoClienteVal){ alert('Informe se já foi enviado para o cliente.'); return; }
+  if(acima400kVal && enviadoClienteVal === 'Não' && !justificativaEnvioVal){ alert('Informe a justificativa.'); return; }
+
   const payload = {
     cliente,
     processo: document.querySelector('#cn-processo').value.trim(),
@@ -1755,7 +1842,9 @@ document.querySelector('#form-caso-novo').addEventListener('submit', async funct
     provisao_atual: document.querySelector('#cn-provisao-atual').value.trim(),
     novo_valor: document.querySelector('#cn-novo-valor').value.trim(),
     link_calculo_pdf: document.querySelector('#cn-link-calculo').value.trim(),
-    acima_400k: document.querySelector('#cn-400k').checked,
+    acima_400k: acima400kVal,
+    enviado_cliente_400k: acima400kVal ? (enviadoClienteVal === 'Sim') : null,
+    justificativa_envio_400k: acima400kVal ? justificativaEnvioVal : null,
     inserido_lm: document.querySelector('#cn-inserido-lm').value === 'Sim',
     data_insercao_lm: document.querySelector('#cn-data-lm').value || null,
     inserido_sistema: document.querySelector('#cn-inserido-sistema').value === 'Sim',
@@ -1784,6 +1873,8 @@ document.querySelector('#form-caso-novo').addEventListener('submit', async funct
   document.querySelector('#wrap-cn-data-lm').style.display = 'none';
   document.querySelector('#wrap-cn-data-sistema').style.display = 'none';
   document.querySelector('#wrap-cn-justificativa-revisao').style.display = 'none';
+  document.querySelector('#wrap-cn-enviado-cliente').style.display = 'none';
+  document.querySelector('#wrap-cn-justificativa-envio').style.display = 'none';
   await carregar();
   alert('Caso cadastrado com sucesso.');
 });
@@ -1824,6 +1915,8 @@ function gerarExcel(lista, nomeArquivo){
     'Fase Atual': naSeVazio(s.fase_atual),
     'Nova Fase': naSeVazio(s.nova_fase),
     'Acima de R$ 400.000,00': s.acima_400k ? 'Sim' : 'Não',
+    'Já Enviado ao Cliente': naSeVazio(s.enviado_cliente_400k === true ? 'Sim' : (s.enviado_cliente_400k === false ? 'Não' : '')),
+    'Justificativa Envio': naSeVazio(s.justificativa_envio_400k),
     'Provisão/Accrual Atual': naSeVazio(s.provisao_atual),
     'Novo Valor': naSeVazio(s.novo_valor),
     'Link do Cálculo (PDF)': naSeVazio(s.link_calculo_pdf),
@@ -1844,7 +1937,7 @@ function gerarExcel(lista, nomeArquivo){
     'Observações Adicionais': naSeVazio(s.observacoes)
   }));
   const ws = XLSX.utils.json_to_sheet(dados);
-  ws['!cols'] = [{wch:24},{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:26},{wch:26},{wch:24},{wch:18},{wch:16},{wch:30},{wch:16},{wch:16},{wch:24},{wch:20},{wch:16},{wch:16},{wch:16},{wch:24},{wch:16},{wch:20},{wch:20},{wch:20},{wch:30},{wch:26},{wch:26},{wch:24},{wch:16},{wch:12},{wch:16},{wch:14},{wch:16},{wch:16},{wch:14},{wch:16},{wch:14},{wch:16},{wch:28},{wch:36}];
+  ws['!cols'] = [{wch:24},{wch:14},{wch:26},{wch:24},{wch:24},{wch:20},{wch:26},{wch:16},{wch:16},{wch:6},{wch:24},{wch:28},{wch:14},{wch:28},{wch:26},{wch:26},{wch:24},{wch:18},{wch:16},{wch:30},{wch:16},{wch:16},{wch:24},{wch:20},{wch:16},{wch:16},{wch:16},{wch:24},{wch:16},{wch:20},{wch:20},{wch:28},{wch:20},{wch:20},{wch:30},{wch:26},{wch:26},{wch:24},{wch:16},{wch:12},{wch:16},{wch:14},{wch:16},{wch:16},{wch:14},{wch:16},{wch:14},{wch:16},{wch:28},{wch:36}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Solicitações');
   XLSX.writeFile(wb, `${nomeArquivo}.xlsx`);
@@ -1887,10 +1980,12 @@ document.querySelector('#btn-exportar-valores').addEventListener('click', functi
     'Provisão/Accrual Atual': naSeVazio(s.provisao_atual),
     'Novo Valor': naSeVazio(s.novo_valor),
     'Link do Cálculo (PDF)': naSeVazio(s.link_calculo_pdf),
-    'Acima de R$ 400.000,00': s.acima_400k ? 'Sim' : 'Não'
+    'Acima de R$ 400.000,00': s.acima_400k ? 'Sim' : 'Não',
+    'Já Enviado ao Cliente': naSeVazio(s.enviado_cliente_400k === true ? 'Sim' : (s.enviado_cliente_400k === false ? 'Não' : '')),
+    'Justificativa Envio': naSeVazio(s.justificativa_envio_400k)
   }));
   const ws = XLSX.utils.json_to_sheet(dados);
-  ws['!cols'] = [{wch:24},{wch:26},{wch:24},{wch:24},{wch:20},{wch:16},{wch:6},{wch:26},{wch:26},{wch:28},{wch:24},{wch:16},{wch:12},{wch:28},{wch:14},{wch:16},{wch:16},{wch:16},{wch:20},{wch:20},{wch:30},{wch:20}];
+  ws['!cols'] = [{wch:24},{wch:26},{wch:24},{wch:24},{wch:20},{wch:16},{wch:6},{wch:26},{wch:26},{wch:28},{wch:24},{wch:16},{wch:12},{wch:28},{wch:14},{wch:16},{wch:16},{wch:16},{wch:20},{wch:20},{wch:30},{wch:20},{wch:20},{wch:28}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Valores');
   XLSX.writeFile(wb, `Insercao_Valores_${hojeISO()}.xlsx`);
