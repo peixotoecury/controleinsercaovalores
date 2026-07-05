@@ -514,6 +514,7 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
               <th>Responsável pela Informação</th>
               <th>Status</th>
               <th>Conclusão</th>
+              <th>OK do Assistente</th>
               <th>Inserido no LM</th>
               <th>Data Inserção LM</th>
               <th>Inserido no Sistema</th>
@@ -1326,6 +1327,7 @@ function render(){
       <td>${e(s.responsavel_informacao)}</td>
       <td>${statusBadge(s.status)}</td>
       <td>${formatarData(s.data_conclusao)}</td>
+      <td>${s.ok_assistente ? '<span class="badge badge-green">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
       <td>${s.inserido_lm ? '<span class="badge badge-green">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
       <td>${formatarData(s.data_insercao_lm)}</td>
       <td>${s.inserido_sistema ? '<span class="badge badge-green">Sim</span>' : '<span class="badge badge-nao">Não</span>'}</td>
