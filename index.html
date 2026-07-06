@@ -2347,6 +2347,7 @@ document.querySelector('#btn-exportar-valores').addEventListener('click', functi
 // pra aba Inserção de Valores.
 // ══════════════════════════════════════════════════════
 let IA_VERBAS = [];
+let IA_PAGINAS_ITENS = null; // posição (x,y) de cada texto do último PDF lido, por página
 
 const IA_PADROES = [
   ['13º Salário', /13[ºo]\s*sal[aá]rio|d[eé]cimo terceiro/i],
@@ -2472,32 +2473,156 @@ function iaTripletaOuSimples(valsAll){
   return {juros: 0, total: 0, principal: 0, obs: 'Pedido identificado; sem valor individual no texto'};
 }
 
+// ══════════════════════════════════════════════════════
+// Leitura por POSIÇÃO REAL na página (x,y de cada texto do PDF), não por palavra-chave.
+// O pdf.js às vezes devolve o texto de uma tabela fora da ordem visual das colunas —
+// isso NUNCA acontece com a posição, então essa via é muito mais confiável que caçar
+// "Juros/Total/Valor Corrigido" no texto achatado. Só funciona quando o PDF tem as
+// tabelas padrão do PJe-Calc; documentos sem essa estrutura caem no método por
+// palavra-chave (IA_PADROES) como já fazia antes.
+// ══════════════════════════════════════════════════════
+
+// Agrupa itens de texto (com posição x/y) em linhas visuais, por proximidade de Y.
+function iaAgruparLinhas(itens){
+  const linhas = [];
+  const tolerancia = 3;
+  itens.forEach(it => {
+    let linha = linhas.find(l => Math.abs(l.y - it.y) <= tolerancia);
+    if(!linha){ linha = {y: it.y, itens: []}; linhas.push(linha); }
+    linha.itens.push(it);
+  });
+  linhas.forEach(l => l.itens.sort((a,b) => a.x - b.x));
+  linhas.sort((a,b) => b.y - a.y); // no pdf.js, Y maior = mais acima na página
+  return linhas;
+}
+
+// Reconstrói a tabela "Resumo do Cálculo" (Descrição | Valor Corrigido | Juros | Total)
+// pela posição de cada cabeçalho de coluna — pega o que estiver mais perto de cada
+// coluna, então funciona pra qualquer nome de verba (não depende de lista pré-definida).
+function iaReconstruirTabelaResumo(paginasItens){
+  if(!paginasItens) return null;
+  for(const itensPagina of paginasItens){
+    const linhas = iaAgruparLinhas(itensPagina);
+    const idxHeader = linhas.findIndex(l => {
+      const t = l.itens.map(i => i.str).join(' ').toLowerCase();
+      return t.includes('corrigido') && t.includes('juros') && t.includes('total');
+    });
+    if(idxHeader < 0) continue;
+    const header = linhas[idxHeader];
+    const colVC = header.itens.find(i => /corrigido/i.test(i.str));
+    const colJuros = header.itens.find(i => /juros/i.test(i.str));
+    const colTotal = header.itens.find(i => i.str.trim().toLowerCase() === 'total');
+    if(!colVC || !colJuros || !colTotal) continue;
+    const colunas = [{tipo:'valorCorrigido', x:colVC.x}, {tipo:'juros', x:colJuros.x}, {tipo:'total', x:colTotal.x}];
+    const limiteDescricao = Math.min(...colunas.map(c => c.x)) - 20;
+
+    const verbas = [];
+    for(let i = idxHeader+1; i < linhas.length; i++){
+      const linha = linhas[i];
+      const descItens = linha.itens.filter(it => it.x < limiteDescricao);
+      const numItens = linha.itens.filter(it => it.x >= limiteDescricao && /\d,\d{2}$/.test(it.str.replace(/\s/g,'')));
+      const descricao = descItens.map(it => it.str).join(' ').replace(/\s+/g,' ').trim();
+      if(!descricao) break; // linha sem descrição = acabou a tabela
+      if(descricao.toLowerCase() === 'total') break; // linha de total geral, para antes dela
+
+      const valores = {valorCorrigido:0, juros:0, total:0};
+      numItens.forEach(it => {
+        const maisProxima = colunas.reduce((a,b) => Math.abs(it.x-a.x) < Math.abs(it.x-b.x) ? a : b);
+        valores[maisProxima.tipo] = iaNum(it.str);
+      });
+      if(!valores.valorCorrigido && !valores.juros && !valores.total) continue;
+
+      verbas.push({
+        pedido: descricao, dtOrigem: '', indice: 'auto',
+        principal: valores.valorCorrigido, correcao: 0, juros: valores.juros,
+        total: valores.total || (valores.valorCorrigido + valores.juros),
+        probabilidade: 'Possível', obs: 'Lido diretamente da tabela do cálculo (posição real da página)'
+      });
+    }
+    if(verbas.length) return verbas;
+  }
+  return null;
+}
+
+// Reconstrói a tabela "Descrição de Débitos do Reclamado por Credor" (honorários etc.)
+// — fica ao lado direito da página, com colunas Descrição | Valor. Ao contrário da
+// busca por palavra-chave "honorários" (que se confunde quando o nome do credor repete
+// a palavra, tipo "HONORÁRIOS PERICIAIS"), aqui cada linha da tabela vira uma verba,
+// então pega honorários pra credores diferentes sem duplicar nem inventar.
+function iaReconstruirTabelaDebitos(paginasItens){
+  if(!paginasItens) return null;
+  for(const itensPagina of paginasItens){
+    const linhas = iaAgruparLinhas(itensPagina);
+    const idxHeader = linhas.findIndex(l => {
+      const t = l.itens.map(i => i.str).join(' ').toLowerCase();
+      return t.includes('débitos') && t.includes('credor');
+    });
+    if(idxHeader < 0) continue;
+    const header = linhas[idxHeader];
+    const itensDireita = header.itens.filter(it => it.x > 440);
+    const colValor = itensDireita.find(i => i.str.trim().toLowerCase() === 'valor');
+    if(!colValor) continue;
+    const xValor = colValor.x, xDescMin = 440;
+
+    const verbas = [];
+    for(let i = idxHeader+1; i < linhas.length; i++){
+      const linha = linhas[i];
+      const itensTabela = linha.itens.filter(it => it.x >= xDescMin - 10);
+      if(!itensTabela.length) continue;
+      const numeroItem = itensTabela.find(it => Math.abs(it.x - xValor) < 30 && /\d,\d{2}$/.test(it.str.replace(/\s/g,'')));
+      const descItens = itensTabela.filter(it => it !== numeroItem && it.x < xValor - 20);
+      const descricao = descItens.map(it => it.str).join(' ').replace(/\s+/g,' ').trim();
+      if(!descricao) continue;
+      if(/total devido pelo reclamado/i.test(descricao)) break;
+      if(/^l[íi]quido devido/i.test(descricao)) continue; // só repete o total já capturado no Resumo
+      if(!numeroItem) continue;
+      const valor = iaNum(numeroItem.str);
+      if(!valor) continue; // ignora linhas tipo IRRF = 0,00
+      verbas.push({pedido: descricao, dtOrigem:'', indice:'auto', principal:valor, correcao:0, juros:0, total:valor, probabilidade:'Possível', obs:'Lido diretamente da tabela de débitos (posição real da página)'});
+    }
+    if(verbas.length) return verbas;
+  }
+  return null;
+}
+
 function iaProcessarTexto(){
   const text = document.querySelector('#ia-texto').value || '';
   iaPreencherDadosProcesso(text);
-  const textoBusca = iaRemoverSecaoParametros(text);
-  const verbas = [];
   const valorCausa = iaExtrairValorCausa(text);
-  IA_PADROES.forEach(([nome, re]) => {
-    if(re.test(textoBusca)){
-      const valsAll = iaValoresLinha(textoBusca, re);
-      const r = iaTripletaOuSimples(valsAll);
-      verbas.push({pedido: nome, dtOrigem: '', indice: 'auto', principal: r.principal, correcao: 0, juros: r.juros, total: r.total, probabilidade: 'Possível', obs: r.obs});
-    }
-  });
+  let verbas = [];
+  let usouPosicao = false;
+
+  const verbasResumo = iaReconstruirTabelaResumo(IA_PAGINAS_ITENS);
+  if(verbasResumo){
+    usouPosicao = true;
+    verbas = verbasResumo.concat(iaReconstruirTabelaDebitos(IA_PAGINAS_ITENS) || []);
+  } else {
+    // Fallback: sem posição disponível (colou texto, XLSX, ou PDF sem essa estrutura) —
+    // caça por palavra-chave, como antes.
+    const textoBusca = iaRemoverSecaoParametros(text);
+    IA_PADROES.forEach(([nome, re]) => {
+      if(re.test(textoBusca)){
+        const valsAll = iaValoresLinha(textoBusca, re);
+        const r = iaTripletaOuSimples(valsAll);
+        verbas.push({pedido: nome, dtOrigem: '', indice: 'auto', principal: r.principal, correcao: 0, juros: r.juros, total: r.total, probabilidade: 'Possível', obs: r.obs});
+      }
+    });
+  }
+
   if(valorCausa && !verbas.some(v => v.pedido === 'Valor da Causa')){
     verbas.unshift({pedido: 'Valor da Causa', dtOrigem: '', indice: 'auto', principal: valorCausa, correcao: 0, juros: 0, total: valorCausa, probabilidade: 'Possível', obs: 'Valor da causa capturado da inicial'});
   }
   IA_VERBAS = iaMergeVerbas(iaRemoverDuplicatasPorValor(verbas));
   iaDrawVerbas();
   const info = document.querySelector('#ia-file-info');
-  const isCalculoTabular = /PJe[\s\-]?Calc|PJC|Planilha\s+de\s+Liquid|C[ÁA]LCULO\s+TRABALHISTA|Valor\s+Corrigido/i.test(text);
+  const isCalculoTabular = usouPosicao || /PJe[\s\-]?Calc|PJC|Planilha\s+de\s+Liquid|C[ÁA]LCULO\s+TRABALHISTA|Valor\s+Corrigido/i.test(text);
   const avisoDuplicacao = isCalculoTabular
     ? ' ⚠️ Este texto parece vir de um cálculo/planilha já pronta (com colunas de Juros/Total/Valor Corrigido) — o "Principal" extraído pode já estar corrigido. NÃO preencha a Data de Origem dessas verbas antes de conferir, senão o recálculo soma a correção em dobro.'
     : '';
-  info.textContent = IA_VERBAS.length
-    ? `✅ ${IA_VERBAS.length} verba(s) identificada(s). Confira e ajuste os valores antes de usar.${avisoDuplicacao}`
-    : '⚠️ Nenhum valor identificado automaticamente — preencha manualmente com "+ Verba manual".';
+  const origemMsg = usouPosicao
+    ? `✅ ${IA_VERBAS.length} verba(s) lida(s) diretamente da tabela do PDF (por posição na página — mais confiável que busca por palavra-chave).`
+    : `✅ ${IA_VERBAS.length} verba(s) identificada(s) por reconhecimento de texto. Confira e ajuste os valores antes de usar.`;
+  info.textContent = IA_VERBAS.length ? `${origemMsg}${avisoDuplicacao}` : '⚠️ Nenhum valor identificado automaticamente — preencha manualmente com "+ Verba manual".';
 }
 
 function iaParseXLSXRows(rows){
@@ -2535,6 +2660,7 @@ async function iaHandleFile(file){
   if(!file) return;
   const info = document.querySelector('#ia-file-info');
   info.textContent = 'Lendo: ' + file.name;
+  IA_PAGINAS_ITENS = null; // só vale pro PDF que está sendo lido agora
   if(/\.xlsx?$/i.test(file.name)){
     const buf = await file.arrayBuffer();
     const wb = XLSX.read(buf, {type:'array'});
@@ -2546,7 +2672,17 @@ async function iaHandleFile(file){
     const buf = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({data: buf}).promise;
     let text = '';
-    for(let p=1; p<=pdf.numPages; p++){ const page = await pdf.getPage(p); const tc = await page.getTextContent(); text += tc.items.map(i => i.str).join(' ') + '\n'; }
+    const paginasItens = [];
+    for(let p=1; p<=pdf.numPages; p++){
+      const page = await pdf.getPage(p);
+      const tc = await page.getTextContent();
+      text += tc.items.map(i => i.str).join(' ') + '\n';
+      // Guarda a posição (x,y) real de cada texto na página — permite reconstruir a
+      // tabela por coluna de verdade, em vez de adivinhar pela ordem em que o pdf.js
+      // devolve o texto (que não segue necessariamente a ordem visual das colunas).
+      paginasItens.push(tc.items.filter(i => i.str && i.str.trim()).map(i => ({str: i.str, x: i.transform[4], y: i.transform[5]})));
+    }
+    IA_PAGINAS_ITENS = paginasItens;
     document.querySelector('#ia-texto').value = text;
     info.textContent = '✓ PDF lido: ' + file.name;
     iaProcessarTexto();
@@ -2581,6 +2717,7 @@ function iaAtualizarVerba(i, campo, valor){
 }
 function iaLimpar(){
   IA_VERBAS = [];
+  IA_PAGINAS_ITENS = null;
   ['ia-processo','ia-reclamante','ia-texto','ia-dt-ajuiz','ia-dt-base','ia-dt-origem-todas'].forEach(id => { const el = document.querySelector('#'+id); if(el) el.value = ''; });
   document.querySelector('#ia-file-info').textContent = '';
   document.querySelector('#ia-file').value = '';
