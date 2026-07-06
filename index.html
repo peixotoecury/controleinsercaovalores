@@ -2127,16 +2127,22 @@ function iaMoney(n){ return iaNum(n).toLocaleString('pt-BR', {style:'currency', 
 function iaNormTxt(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,''); }
 
 function iaExtrairValorCausa(t){
-  const pats = [/valor\s+da\s+causa[^R$]{0,80}R\$\s*([\d\.]+,\d{2})/i, /d[aá]-se\s+à\s+causa[^R$]{0,80}R\$\s*([\d\.]+,\d{2})/i, /atribui\s+à\s+causa[^R$]{0,80}R\$\s*([\d\.]+,\d{2})/i];
+  const pats = [/valor\s+da\s+causa[^\d]{0,80}(?:R\$\s*)?(\d[\d\.]*,\d{2})/i, /d[aá]-se\s+à\s+causa[^\d]{0,80}(?:R\$\s*)?(\d[\d\.]*,\d{2})/i, /atribui\s+à\s+causa[^\d]{0,80}(?:R\$\s*)?(\d[\d\.]*,\d{2})/i];
   for(const p of pats){ const m = t.match(p); if(m) return iaNum(m[1]); }
   return 0;
 }
 function iaValorProximo(text, re){
   const m = re.exec(text);
   if(!m) return 0;
-  const start = Math.max(0, m.index-250), end = Math.min(text.length, m.index+500), ctx = text.slice(start, end);
-  const vals = [...ctx.matchAll(/R\$\s*([\d\.]+,\d{2})/g)].map(x => iaNum(x[1])).filter(n => n>0);
-  return vals.length ? Math.max(...vals) : 0;
+  // Só olha PRA FRENTE do termo encontrado, numa janela curta — em planilhas/cálculos
+  // tabulares os valores da própria linha vêm logo depois do nome da verba; uma janela
+  // larga (ou olhar pra trás) acaba pegando o total de outra linha ou o total geral.
+  const start = m.index + m[0].length, end = Math.min(text.length, start+70), ctx = text.slice(start, end);
+  // Aceita valores com ou sem "R$" na frente — vários PDFs de sentença/cálculo listam
+  // os números em tabela sem repetir o "R$" em cada célula.
+  const vals = [...ctx.matchAll(/(?:R\$\s*)?(\d{1,3}(?:\.\d{3})*,\d{2})/g)].map(x => iaNum(x[1])).filter(n => n>0);
+  // Pega o último valor da janela (tipicamente a coluna final/"valor corrigido" da linha).
+  return vals.length ? vals[vals.length-1] : 0;
 }
 function iaMergeVerbas(arr){
   const m = {};
