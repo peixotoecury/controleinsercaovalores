@@ -2356,8 +2356,8 @@ const IA_PADROES = [
   ['Estabilidade / doença ocupacional', /doen[çc]a ocupacional|estabilidade acident[áa]ria|garantia de emprego/i],
   ['FGTS', /fgts/i],
   ['FGTS + 40%', /40%|multa.*fgts/i],
-  ['Multa do art. 467 da CLT', /467/i],
-  ['Multa do art. 477 da CLT', /477/i],
+  ['Multa do art. 467 da CLT', /multa[^.]{0,40}467|art\.?\s*467/i],
+  ['Multa do art. 477 da CLT', /multa[^.]{0,40}477|art\.?\s*477/i],
   ['DSR / Reflexos', /dsr|repouso semanal|reflexos/i],
   ['Horas extras', /hora extra|horas extras|sobrejornada/i],
   ['Intervalo intrajornada', /intervalo intrajornada|art\.?.*71/i],
@@ -2409,6 +2409,25 @@ function iaMergeVerbas(arr){
   arr.forEach(v => { const k = iaNormTxt(v.pedido); if(!k) return; if(!m[k] || iaNum(v.total) > iaNum(m[k].total)) m[k] = v; });
   return Object.values(m);
 }
+// Diferente de iaMergeVerbas (que agrupa pelo NOME do pedido), isto remove pedidos
+// DIFERENTES que acabaram extraindo exatamente os mesmos números — sinal de que dois
+// padrões (ex.: "FGTS" e "FGTS + 40%") bateram no mesmo trecho do texto. Mantém a
+// versão com o nome mais específico (mais longo) e descarta a genérica.
+function iaRemoverDuplicatasPorValor(verbas){
+  const porValor = {};
+  const resultado = [];
+  verbas.forEach(v => {
+    if(!v.total){ resultado.push(v); return; }
+    const chave = [v.principal, v.correcao, v.juros, v.total].map(n => Math.round(n*100)).join('|');
+    const existente = porValor[chave];
+    if(!existente){ porValor[chave] = v; resultado.push(v); }
+    else if(v.pedido.length > existente.pedido.length){
+      resultado[resultado.indexOf(existente)] = v;
+      porValor[chave] = v;
+    }
+  });
+  return resultado;
+}
 function iaPreencherDadosProcesso(text){
   const proc = (text.match(/\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}/) || [])[0];
   if(proc){ const el = document.querySelector('#ia-processo'); if(!el.value) el.value = proc; }
@@ -2457,7 +2476,7 @@ function iaProcessarTexto(){
   if(valorCausa && !verbas.some(v => v.pedido === 'Valor da Causa')){
     verbas.unshift({pedido: 'Valor da Causa', dtOrigem: '', indice: 'auto', principal: valorCausa, correcao: 0, juros: 0, total: valorCausa, probabilidade: 'Possível', obs: 'Valor da causa capturado da inicial'});
   }
-  IA_VERBAS = iaMergeVerbas(verbas);
+  IA_VERBAS = iaMergeVerbas(iaRemoverDuplicatasPorValor(verbas));
   iaDrawVerbas();
   const info = document.querySelector('#ia-file-info');
   const isCalculoTabular = /PJe[\s\-]?Calc|PJC|Planilha\s+de\s+Liquid|C[ÁA]LCULO\s+TRABALHISTA|Valor\s+Corrigido/i.test(text);
