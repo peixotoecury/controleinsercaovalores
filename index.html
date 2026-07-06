@@ -2394,10 +2394,12 @@ function iaExtrairValorCausa(t){
 function iaValoresLinha(text, re){
   const m = re.exec(text);
   if(!m) return [];
-  // Só olha PRA FRENTE do termo encontrado, numa janela curta — em planilhas/cálculos
-  // tabulares os valores da própria linha vêm logo depois do nome da verba; uma janela
-  // larga (ou olhar pra trás) acaba pegando o total de outra linha ou o total geral.
-  const start = m.index + m[0].length, end = Math.min(text.length, start+70), ctx = text.slice(start, end);
+  // Só olha PRA FRENTE do termo encontrado — em planilhas/cálculos tabulares os valores
+  // da própria linha vêm logo depois do nome da verba; olhar pra trás pega o total da
+  // linha ANTERIOR. Janela generosa (rótulos de verba longos, tipo "Repouso Semanal
+  // Remunerado e Feriado...", empurram os números pra mais longe) — quem chama usa só
+  // os primeiros valores (mais próximos), então pegar "de sobra" aqui não contamina nada.
+  const start = m.index + m[0].length, end = Math.min(text.length, start+220), ctx = text.slice(start, end);
   // Aceita valores com ou sem "R$" na frente — vários PDFs de sentença/cálculo listam
   // os números em tabela sem repetir o "R$" em cada célula.
   return [...ctx.matchAll(/(?:R\$\s*)?(\d{1,3}(?:\.\d{3})*,\d{2})/g)].map(x => iaNum(x[1])).filter(n => n>0);
@@ -2427,19 +2429,23 @@ function iaProcessarTexto(){
   const valorCausa = iaExtrairValorCausa(text);
   IA_PADROES.forEach(([nome, re]) => {
     if(re.test(text)){
-      const vals = iaValoresLinha(text, re);
+      const valsAll = iaValoresLinha(text, re);
+      // Só os 3 primeiros (mais próximos) — o resto de valsAll pode ser de OUTRAS linhas
+      // (a janela é generosa de propósito pra rótulos de verba longos); usar só os 3
+      // primeiros garante que são sempre os números da própria linha desse pedido.
+      const first3 = valsAll.slice(0, 3);
       let principal = 0, juros = 0, total = 0, obs;
-      if(vals.length >= 3 && Math.abs((vals[0] + vals[vals.length-1]) - vals[vals.length-2]) < 0.02){
+      if(first3.length === 3 && Math.abs((first3[0] + first3[2]) - first3[1]) < 0.02){
         // Padrão de tabela tipo PJe-Calc: nessa ordem de extração do PDF, os 3 números
         // de cada linha são [Juros, Total, Valor Corrigido] (Total = Valor Corrigido + Juros).
         // Confirma pela soma bater, já que a ordem de extração do texto NÃO segue a ordem
         // visual das colunas (varia conforme o gerador do PDF).
-        juros = vals[0];
-        total = vals[vals.length-2];
-        principal = vals[vals.length-1];
+        juros = first3[0];
+        total = first3[1];
+        principal = first3[2];
         obs = 'Extraído da tabela do cálculo (Valor Corrigido + Juros já discriminados)';
-      } else if(vals.length){
-        principal = vals[vals.length-1];
+      } else if(valsAll.length){
+        principal = valsAll[0];
         total = principal;
         obs = 'Valor extraído no contexto do pedido';
       } else {
