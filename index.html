@@ -2388,18 +2388,19 @@ function iaExtrairValorCausa(t){
   for(const p of pats){ const m = t.match(p); if(m) return iaNum(m[1]); }
   return 0;
 }
-function iaValorProximo(text, re){
+// Retorna TODOS os números encontrados logo depois do termo (não só um), pra dar pra
+// quem chama decidir como combiná-los — em tabelas de cálculo cada linha traz vários
+// valores (ex.: Juros/Total/Valor Corrigido) e pegar só "um" descarta informação real.
+function iaValoresLinha(text, re){
   const m = re.exec(text);
-  if(!m) return 0;
+  if(!m) return [];
   // Só olha PRA FRENTE do termo encontrado, numa janela curta — em planilhas/cálculos
   // tabulares os valores da própria linha vêm logo depois do nome da verba; uma janela
   // larga (ou olhar pra trás) acaba pegando o total de outra linha ou o total geral.
   const start = m.index + m[0].length, end = Math.min(text.length, start+70), ctx = text.slice(start, end);
   // Aceita valores com ou sem "R$" na frente — vários PDFs de sentença/cálculo listam
   // os números em tabela sem repetir o "R$" em cada célula.
-  const vals = [...ctx.matchAll(/(?:R\$\s*)?(\d{1,3}(?:\.\d{3})*,\d{2})/g)].map(x => iaNum(x[1])).filter(n => n>0);
-  // Pega o último valor da janela (tipicamente a coluna final/"valor corrigido" da linha).
-  return vals.length ? vals[vals.length-1] : 0;
+  return [...ctx.matchAll(/(?:R\$\s*)?(\d{1,3}(?:\.\d{3})*,\d{2})/g)].map(x => iaNum(x[1])).filter(n => n>0);
 }
 function iaMergeVerbas(arr){
   const m = {};
@@ -2426,9 +2427,25 @@ function iaProcessarTexto(){
   const valorCausa = iaExtrairValorCausa(text);
   IA_PADROES.forEach(([nome, re]) => {
     if(re.test(text)){
-      const val = iaValorProximo(text, re);
-      const obs = val ? 'Valor extraído no contexto do pedido' : 'Pedido identificado; sem valor individual no texto';
-      verbas.push({pedido: nome, dtOrigem: '', indice: 'auto', principal: val||0, correcao: 0, juros: 0, total: val||0, probabilidade: 'Possível', obs});
+      const vals = iaValoresLinha(text, re);
+      let principal = 0, juros = 0, total = 0, obs;
+      if(vals.length >= 3 && Math.abs((vals[0] + vals[vals.length-1]) - vals[vals.length-2]) < 0.02){
+        // Padrão de tabela tipo PJe-Calc: nessa ordem de extração do PDF, os 3 números
+        // de cada linha são [Juros, Total, Valor Corrigido] (Total = Valor Corrigido + Juros).
+        // Confirma pela soma bater, já que a ordem de extração do texto NÃO segue a ordem
+        // visual das colunas (varia conforme o gerador do PDF).
+        juros = vals[0];
+        total = vals[vals.length-2];
+        principal = vals[vals.length-1];
+        obs = 'Extraído da tabela do cálculo (Valor Corrigido + Juros já discriminados)';
+      } else if(vals.length){
+        principal = vals[vals.length-1];
+        total = principal;
+        obs = 'Valor extraído no contexto do pedido';
+      } else {
+        obs = 'Pedido identificado; sem valor individual no texto';
+      }
+      verbas.push({pedido: nome, dtOrigem: '', indice: 'auto', principal, correcao: 0, juros, total, probabilidade: 'Possível', obs});
     }
   });
   if(valorCausa && !verbas.some(v => v.pedido === 'Valor da Causa')){
