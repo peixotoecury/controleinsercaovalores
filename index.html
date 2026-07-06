@@ -2441,14 +2441,29 @@ function iaPreencherDadosProcesso(text){
   if(dtLiquid){ const el = document.querySelector('#ia-dt-base'); if(el && !el.value) el.value = dtLiquid; }
 }
 
+// Documentos tipo PJe-Calc trazem uma seção "Dados do Cálculo" com parâmetros de
+// configuração (ex.: "Prazo de Aviso Prévio: Calculado", "Projetar Aviso Prévio
+// Indenizado: Sim", "Considerar Feriados Estaduais: Sim") — são liga/desliga do
+// cálculo, não verbas devidas. Se um padrão de pedido bater ali, pega um número
+// qualquer da tabela de parâmetros ao lado (ex. o salário-base), sem relação com
+// o pedido. Removemos essa seção antes de procurar pedidos.
+function iaRemoverSecaoParametros(text){
+  const inicio = text.search(/Dados do C[áa]lculo/i);
+  if(inicio < 0) return text;
+  const fim = text.slice(inicio).search(/Faltas e F[ée]rias|Demonstrativo de Verbas|Demonstrativo de Juros|Resumo do C[áa]lculo/i);
+  if(fim < 0) return text;
+  return text.slice(0, inicio) + text.slice(inicio + fim);
+}
+
 function iaProcessarTexto(){
   const text = document.querySelector('#ia-texto').value || '';
   iaPreencherDadosProcesso(text);
+  const textoBusca = iaRemoverSecaoParametros(text);
   const verbas = [];
   const valorCausa = iaExtrairValorCausa(text);
   IA_PADROES.forEach(([nome, re]) => {
-    if(re.test(text)){
-      const valsAll = iaValoresLinha(text, re);
+    if(re.test(textoBusca)){
+      const valsAll = iaValoresLinha(textoBusca, re);
       // Só os 3 primeiros (mais próximos) — o resto de valsAll pode ser de OUTRAS linhas
       // (a janela é generosa de propósito pra rótulos de verba longos); usar só os 3
       // primeiros garante que são sempre os números da própria linha desse pedido.
