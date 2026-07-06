@@ -1859,6 +1859,7 @@ document.querySelector('#iv-flt-cliente').addEventListener('change', renderInser
 document.querySelector('#btn-salvar-valores').addEventListener('click', async function(){
   const id = document.querySelector('#iv-processo').value;
   if(!id) return;
+  const registro = SOLICITACOES.find(s => s.id === id);
   const provisao = document.querySelector('#iv-provisao-atual').value.trim();
   const novoValor = document.querySelector('#iv-novo-valor').value.trim();
   const linkCalculo = document.querySelector('#iv-link-calculo').value.trim();
@@ -1882,6 +1883,18 @@ document.querySelector('#btn-salvar-valores').addEventListener('click', async fu
   if(error){ alert('Erro ao salvar: ' + error.message); return; }
   await carregar();
   alert('Valores salvos com sucesso.');
+
+  if(acima400k && registro){
+    const emailAdvogado = emailPorNome(registro.advogado_solicitante);
+    const assunto = `Cálculo acima de R$ 400.000,00 — ${registro.cliente} — ${registro.processo}`;
+    const corpo = `Olá, ${registro.advogado_solicitante}.\n\n`
+      + `O(a) assistente ${registro.assistente_responsavel} lançou um valor acima de R$ 400.000,00 pro cálculo abaixo.\n\n`
+      + `Cliente: ${registro.cliente}\nProcesso: ${registro.processo}\nReclamante: ${registro.reclamante}\nReclamada: ${registro.reclamada}\n`
+      + `Novo Valor: ${novoValor || 'N/A'}\n\n`
+      + `Acesse o painel para mais detalhes: https://peixotoecury.github.io/controleinsercaovalores/\n\n`
+      + `Controle de Decisões e Inclusão de Valores — LAWgico`;
+    abrirEmail(emailAdvogado, assunto, corpo);
+  }
 });
 
 function renderCobrancas(){
