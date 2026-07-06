@@ -153,6 +153,13 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
 .cobranca-info{flex:1;min-width:220px;font-size:12px;color:var(--preto-pc);}
 .cobranca-info b{color:var(--escuro-pc);}
 .cobranca-info .sub{color:var(--muted);font-size:11px;margin-top:2px;}
+
+.ia-verba-head{display:grid;grid-template-columns:1.6fr .9fr .9fr .9fr 1fr .95fr 1.3fr 28px;gap:6px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);padding:0 4px;margin-bottom:6px;}
+.ia-verba-row{display:grid;grid-template-columns:1.6fr .9fr .9fr .9fr 1fr .95fr 1.3fr 28px;gap:6px;align-items:center;margin-bottom:6px;}
+.ia-verba-row input,.ia-verba-row select{width:100%;padding:7px 8px;border:1px solid #BFD6E4;border-radius:6px;font-size:11px;font-family:var(--font);outline:none;}
+.ia-verba-row input:focus,.ia-verba-row select:focus{border-color:var(--azul-pc);box-shadow:0 0 0 3px rgba(0,169,224,.14);}
+.ia-verba-del{background:none;border:none;color:var(--red);cursor:pointer;font-size:15px;padding:2px;}
+@media (max-width: 900px){ .ia-verba-head{display:none;} .ia-verba-row{grid-template-columns:1fr 1fr;} }
 </style>
 </head>
 <body>
@@ -176,6 +183,7 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
   <button class="tab-btn active" id="tab-btn-solicitacoes" onclick="mudarAba('solicitacoes')">📋 Solicitações</button>
   <button class="tab-btn" id="tab-btn-cobrancas" onclick="mudarAba('cobrancas')">📣 Cobranças</button>
   <button class="tab-btn" id="tab-btn-valores" onclick="mudarAba('valores')">💰 Inserção de Valores</button>
+  <button class="tab-btn" id="tab-btn-ia" onclick="mudarAba('ia')">🤖 Lançamento IA</button>
 </div>
 
 <div class="main">
@@ -893,8 +901,78 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
   </div>
 </div>
 
+<div id="view-lancamento-ia" style="display:none;">
+  <div class="dash-card">
+    <div class="dash-card-head">🤖 Lançamento IA — Extração de Valores</div>
+    <div class="dash-card-body">
+      <div class="hint" style="margin-bottom:14px;">Suba a inicial, cálculo ou planilha (PDF, XLSX ou texto). O sistema identifica os pedidos/verbas e monta o quadro de valores para conferência — depois é só levar o total pra aba Inserção de Valores. Nada aqui é salvo automaticamente.</div>
+
+      <div class="mc-form-grid">
+        <div class="mc-form-group">
+          <label>Cliente</label>
+          <select id="ia-cliente">
+            <option value="" disabled selected>Selecione…</option>
+            <option>Bridgestone</option>
+            <option>CBC</option>
+            <option>Embraer</option>
+            <option>T4F</option>
+            <option>Ferrero</option>
+            <option>Telefônica</option>
+            <option value="Outro">Outro…</option>
+          </select>
+        </div>
+        <div class="mc-form-group" id="wrap-ia-cliente-outro" style="display:none;">
+          <label>Nome do Cliente</label>
+          <input type="text" id="ia-cliente-outro" placeholder="Digite o nome do cliente">
+        </div>
+        <div class="mc-form-group">
+          <label>Processo (CNJ)</label>
+          <input type="text" id="ia-processo" placeholder="0000000-00.0000.0.00.0000">
+        </div>
+        <div class="mc-form-group">
+          <label>Reclamante</label>
+          <input type="text" id="ia-reclamante">
+        </div>
+        <div class="mc-form-group">
+          <label>Tipo de Documento/Cálculo</label>
+          <select id="ia-tipo-doc">
+            <option value="" disabled selected>Selecione…</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="ia-dropzone" style="border:2px dashed var(--azul-pc);border-radius:var(--radius-lg);padding:22px;text-align:center;cursor:pointer;background:#F0FAFE;margin-bottom:14px;" onclick="document.getElementById('ia-file').click()" ondragover="event.preventDefault();this.style.background='#E0F5FD'" ondragleave="this.style.background='#F0FAFE'" ondrop="iaDropFile(event)">
+        <input id="ia-file" type="file" accept=".xlsx,.xls,.pdf,.txt" style="display:none" onchange="iaUploadFile(event)">
+        <div style="font-size:22px;">📤</div>
+        <div style="margin-top:6px;font-weight:600;color:var(--escuro-pc);">Clique ou arraste o arquivo aqui</div>
+        <div class="hint">PDF, XLSX ou TXT</div>
+      </div>
+      <div id="ia-file-info" class="hint" style="margin-bottom:10px;"></div>
+
+      <textarea id="ia-texto" rows="4" placeholder="O texto extraído aparece aqui — também dá pra colar direto e clicar em 'Preencher valores automaticamente'." style="width:100%;border:1px solid #BFD6E4;border-radius:var(--radius);padding:9px 12px;font-family:var(--mono);font-size:12px;margin-bottom:10px;resize:vertical;"></textarea>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+        <button type="button" class="btn-cyan" style="width:auto;padding:11px 20px;" onclick="iaExtrairVerbas()">✨ Preencher valores automaticamente</button>
+        <button type="button" class="action-btn" onclick="iaAddVerba()">+ Verba manual</button>
+        <button type="button" class="action-btn reabrir" onclick="iaLimpar()">Limpar</button>
+      </div>
+
+      <div id="ia-verbas-wrap"></div>
+
+      <div style="display:flex;justify-content:flex-end;gap:24px;padding:12px 4px;font-weight:700;color:var(--escuro-pc);border-top:1px solid var(--border2);margin-top:10px;">
+        <span>Total</span><span id="ia-total">R$ 0,00</span>
+      </div>
+
+      <div style="margin-top:14px;">
+        <button type="button" class="btn-cyan" style="width:auto;padding:11px 20px;background:var(--green);" onclick="iaLevarParaValores()">→ Levar total para Inserção de Valores</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
 const SUPABASE_URL = 'https://sydamnqagkdmczmgkvso.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_kA_IDYtEdATSygg7EajrdQ_cEi4d57N';
@@ -1041,12 +1119,20 @@ popularSelectProfissionais(document.querySelector('#cn-advogado'), 'Advogado');
 popularSelectProfissionais(document.querySelector('#cn-assistente'), 'Assistente');
 popularSelectOpcoes(document.querySelector('#cn-tipo-decisao'), TIPOS_DECISAO);
 popularSelectOpcoes(document.querySelector('#cn-tipo-insercao'), TIPOS_CALCULO);
+popularSelectOpcoes(document.querySelector('#ia-tipo-doc'), TIPOS_CALCULO);
 
 document.querySelector('#f-cliente').addEventListener('change', function(){
   const wrap = document.querySelector('#wrap-cliente-outro');
   const outro = document.querySelector('#f-cliente-outro');
   if(this.value === 'Outro'){ wrap.style.display = ''; outro.required = true; }
   else { wrap.style.display = 'none'; outro.required = false; outro.value = ''; }
+});
+
+document.querySelector('#ia-cliente').addEventListener('change', function(){
+  const wrap = document.querySelector('#wrap-ia-cliente-outro');
+  const outro = document.querySelector('#ia-cliente-outro');
+  if(this.value === 'Outro'){ wrap.style.display = ''; }
+  else { wrap.style.display = 'none'; outro.value = ''; }
 });
 
 function limparLaudoCheckboxes(){
@@ -1400,9 +1486,11 @@ function mudarAba(aba){
   document.querySelector('#view-solicitacoes').style.display = aba === 'solicitacoes' ? '' : 'none';
   document.querySelector('#view-cobrancas').style.display = aba === 'cobrancas' ? '' : 'none';
   document.querySelector('#view-insercao-valores').style.display = aba === 'valores' ? '' : 'none';
+  document.querySelector('#view-lancamento-ia').style.display = aba === 'ia' ? '' : 'none';
   document.querySelector('#tab-btn-solicitacoes').classList.toggle('active', aba === 'solicitacoes');
   document.querySelector('#tab-btn-cobrancas').classList.toggle('active', aba === 'cobrancas');
   document.querySelector('#tab-btn-valores').classList.toggle('active', aba === 'valores');
+  document.querySelector('#tab-btn-ia').classList.toggle('active', aba === 'ia');
 }
 
 function itemCobranca(s, sub, tipo){
@@ -1994,6 +2082,224 @@ document.querySelector('#btn-exportar-valores').addEventListener('click', functi
   XLSX.utils.book_append_sheet(wb, ws, 'Valores');
   XLSX.writeFile(wb, `Insercao_Valores_${hojeISO()}.xlsx`);
 });
+
+// ══════════════════════════════════════════════════════
+// Lançamento IA — ferramenta de apoio (não salva no Supabase)
+// Lê PDF/XLSX/texto, identifica pedidos/verbas por padrão de texto
+// e monta um quadro pra conferência; o total pode ser levado manualmente
+// pra aba Inserção de Valores.
+// ══════════════════════════════════════════════════════
+let IA_VERBAS = [];
+
+const IA_PADROES = [
+  ['13º Salário', /13[ºo]\s*sal[aá]rio|d[eé]cimo terceiro/i],
+  ['Aviso prévio', /aviso pr[eé]vio/i],
+  ['Dano moral', /dano moral|danos morais/i],
+  ['Dano material', /dano material|danos materiais|pensão mensal|pensionamento/i],
+  ['Estabilidade / doença ocupacional', /doen[çc]a ocupacional|estabilidade acident[áa]ria|garantia de emprego/i],
+  ['FGTS', /fgts/i],
+  ['FGTS + 40%', /40%|multa.*fgts/i],
+  ['Multa do art. 467 da CLT', /467/i],
+  ['Multa do art. 477 da CLT', /477/i],
+  ['DSR / Reflexos', /dsr|repouso semanal|reflexos/i],
+  ['Horas extras', /hora extra|horas extras|sobrejornada/i],
+  ['Intervalo intrajornada', /intervalo intrajornada|art\.?.*71/i],
+  ['Adicional de insalubridade', /insalubridade/i],
+  ['Adicional de periculosidade', /periculosidade/i],
+  ['Adicional noturno', /adicional noturno/i],
+  ['Férias + 1/3', /f[eé]rias|ter[çc]o constitucional/i],
+  ['Honorários', /honor[áa]rios/i],
+  ['Indenização', /indeniza[çc][aã]o/i],
+  ['PLR', /plr|participa[çc][aã]o nos lucros/i],
+  ['Valor da Causa', /valor da causa/i]
+];
+
+function iaNum(v){
+  if(typeof v === 'number' && isFinite(v)) return v;
+  let s = String(v||'').replace(/R\$/g,'').trim();
+  if(!s) return 0;
+  if(s.includes(',')) s = s.replace(/\s/g,'').replace(/\./g,'').replace(',','.');
+  else s = s.replace(/\s/g,'');
+  const n = parseFloat(s);
+  return isNaN(n) ? 0 : n;
+}
+function iaMoney(n){ return iaNum(n).toLocaleString('pt-BR', {style:'currency', currency:'BRL'}); }
+function iaNormTxt(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,''); }
+
+function iaExtrairValorCausa(t){
+  const pats = [/valor\s+da\s+causa[^R$]{0,80}R\$\s*([\d\.]+,\d{2})/i, /d[aá]-se\s+à\s+causa[^R$]{0,80}R\$\s*([\d\.]+,\d{2})/i, /atribui\s+à\s+causa[^R$]{0,80}R\$\s*([\d\.]+,\d{2})/i];
+  for(const p of pats){ const m = t.match(p); if(m) return iaNum(m[1]); }
+  return 0;
+}
+function iaValorProximo(text, re){
+  const m = re.exec(text);
+  if(!m) return 0;
+  const start = Math.max(0, m.index-250), end = Math.min(text.length, m.index+500), ctx = text.slice(start, end);
+  const vals = [...ctx.matchAll(/R\$\s*([\d\.]+,\d{2})/g)].map(x => iaNum(x[1])).filter(n => n>0);
+  return vals.length ? Math.max(...vals) : 0;
+}
+function iaMergeVerbas(arr){
+  const m = {};
+  arr.forEach(v => { const k = iaNormTxt(v.pedido); if(!k) return; if(!m[k] || iaNum(v.total) > iaNum(m[k].total)) m[k] = v; });
+  return Object.values(m);
+}
+function iaPreencherDadosProcesso(text){
+  const proc = (text.match(/\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}/) || [])[0];
+  if(proc){ const el = document.querySelector('#ia-processo'); if(!el.value) el.value = proc; }
+}
+
+function iaProcessarTexto(){
+  const text = document.querySelector('#ia-texto').value || '';
+  iaPreencherDadosProcesso(text);
+  const verbas = [];
+  const valorCausa = iaExtrairValorCausa(text);
+  IA_PADROES.forEach(([nome, re]) => {
+    if(re.test(text)){
+      const val = iaValorProximo(text, re);
+      const obs = val ? 'Valor extraído no contexto do pedido' : 'Pedido identificado; sem valor individual no texto';
+      verbas.push({pedido: nome, principal: val||0, correcao: 0, juros: 0, total: val||0, probabilidade: 'Possível', obs});
+    }
+  });
+  if(valorCausa && !verbas.some(v => v.pedido === 'Valor da Causa')){
+    verbas.unshift({pedido: 'Valor da Causa', principal: valorCausa, correcao: 0, juros: 0, total: valorCausa, probabilidade: 'Possível', obs: 'Valor da causa capturado da inicial'});
+  }
+  IA_VERBAS = iaMergeVerbas(verbas);
+  iaDrawVerbas();
+  const info = document.querySelector('#ia-file-info');
+  info.textContent = IA_VERBAS.length
+    ? `✅ ${IA_VERBAS.length} verba(s) identificada(s). Confira e ajuste os valores antes de usar.`
+    : '⚠️ Nenhum valor identificado automaticamente — preencha manualmente com "+ Verba manual".';
+}
+
+function iaParseXLSXRows(rows){
+  const text = rows.map(r => r.join(' | ')).join('\n');
+  document.querySelector('#ia-texto').value = text;
+  iaPreencherDadosProcesso(text);
+  let header = [];
+  const verbas = [];
+  for(let ri=0; ri<rows.length; ri++){
+    const r = rows[ri].map(x => String(x||'').trim());
+    const joined = r.join(' ').toLowerCase();
+    if(joined.includes('valor') && (joined.includes('juros') || joined.includes('corre'))){ header = r.map(x => x.toLowerCase()); continue; }
+    const descIdx = r.findIndex((x, idx) => x && idx<4 && /[a-zA-ZÁ-ú]/.test(x) && !x.match(/^(r\$|valor|juros|total|moeda|fase)$/i));
+    if(descIdx >= 0){
+      const nums = r.map(x => iaNum(x));
+      if(nums.some(n => n>0)){
+        const pedido = r[descIdx];
+        const pick = (keys, fallback) => { for(let i=0;i<header.length;i++){ if(keys.some(k => header[i].includes(k)) && nums[i]) return nums[i]; } return nums[fallback]||0; };
+        const principal = pick(['original','corrigido','valor'], 2);
+        const correcao  = pick(['correção','correcao','monet'], 3);
+        const juros     = pick(['juros'], 4);
+        const total     = pick(['total','atualizado'], 5) || (principal+correcao+juros);
+        verbas.push({pedido, principal, correcao, juros, total, probabilidade: 'Possível', obs: 'Extraído da planilha'});
+      }
+    }
+  }
+  if(verbas.length){
+    IA_VERBAS = iaMergeVerbas(verbas);
+    iaDrawVerbas();
+    document.querySelector('#ia-file-info').textContent = `✅ ${IA_VERBAS.length} verba(s) extraída(s) da planilha.`;
+  } else iaProcessarTexto();
+}
+
+async function iaHandleFile(file){
+  if(!file) return;
+  const info = document.querySelector('#ia-file-info');
+  info.textContent = 'Lendo: ' + file.name;
+  if(/\.xlsx?$/i.test(file.name)){
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, {type:'array'});
+    let linhas = [];
+    wb.SheetNames.forEach(n => { linhas = linhas.concat(XLSX.utils.sheet_to_json(wb.Sheets[n], {header:1, defval:''})); });
+    iaParseXLSXRows(linhas);
+  } else if(/\.pdf$/i.test(file.name) && window.pdfjsLib){
+    if(window.pdfjsLib.GlobalWorkerOptions) window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    const buf = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({data: buf}).promise;
+    let text = '';
+    for(let p=1; p<=pdf.numPages; p++){ const page = await pdf.getPage(p); const tc = await page.getTextContent(); text += tc.items.map(i => i.str).join(' ') + '\n'; }
+    document.querySelector('#ia-texto').value = text;
+    info.textContent = '✓ PDF lido: ' + file.name;
+    iaProcessarTexto();
+  } else {
+    const text = await file.text().catch(() => '');
+    document.querySelector('#ia-texto').value = text;
+    info.textContent = '✓ Texto lido: ' + file.name;
+    iaProcessarTexto();
+  }
+}
+function iaDropFile(ev){ ev.preventDefault(); ev.currentTarget.style.background = '#F0FAFE'; iaHandleFile(ev.dataTransfer.files[0]); }
+function iaUploadFile(ev){ iaHandleFile(ev.target.files[0]); }
+
+function iaExtrairVerbas(){
+  const text = document.querySelector('#ia-texto').value.trim();
+  if(!text){ alert('Cole ou faça upload do documento primeiro.'); return; }
+  iaProcessarTexto();
+}
+function iaAddVerba(){
+  IA_VERBAS.push({pedido:'', principal:0, correcao:0, juros:0, total:0, probabilidade:'Possível', obs:''});
+  iaDrawVerbas();
+}
+function iaRemoverVerba(i){ IA_VERBAS.splice(i,1); iaDrawVerbas(); }
+function iaAtualizarVerba(i, campo, valor){
+  if(!IA_VERBAS[i]) return;
+  if(['principal','correcao','juros','total'].includes(campo)) IA_VERBAS[i][campo] = iaNum(valor);
+  else IA_VERBAS[i][campo] = valor;
+  if(campo === 'principal' || campo === 'correcao' || campo === 'juros'){
+    IA_VERBAS[i].total = IA_VERBAS[i].principal + IA_VERBAS[i].correcao + IA_VERBAS[i].juros;
+  }
+  iaDrawVerbas();
+}
+function iaLimpar(){
+  IA_VERBAS = [];
+  ['ia-processo','ia-reclamante','ia-texto'].forEach(id => { const el = document.querySelector('#'+id); if(el) el.value = ''; });
+  document.querySelector('#ia-file-info').textContent = '';
+  document.querySelector('#ia-file').value = '';
+  iaDrawVerbas();
+}
+function iaDrawVerbas(){
+  const wrap = document.querySelector('#ia-verbas-wrap');
+  if(!IA_VERBAS.length){
+    wrap.innerHTML = '<div class="hint" style="padding:12px 0;">Nenhuma verba ainda — suba um documento ou adicione manualmente.</div>';
+    document.querySelector('#ia-total').textContent = 'R$ 0,00';
+    return;
+  }
+  const head = `<div class="ia-verba-head"><div>Pedido</div><div>Principal</div><div>Correção</div><div>Juros</div><div>Total</div><div>Probabilidade</div><div>Observação</div><div></div></div>`;
+  const rows = IA_VERBAS.map((v,i) => `
+    <div class="ia-verba-row">
+      <input type="text" value="${e(v.pedido)}" onchange="iaAtualizarVerba(${i},'pedido',this.value)">
+      <input type="text" value="${iaMoney(v.principal)}" onchange="iaAtualizarVerba(${i},'principal',this.value)">
+      <input type="text" value="${iaMoney(v.correcao)}" onchange="iaAtualizarVerba(${i},'correcao',this.value)">
+      <input type="text" value="${iaMoney(v.juros)}" onchange="iaAtualizarVerba(${i},'juros',this.value)">
+      <input type="text" value="${iaMoney(v.total)}" onchange="iaAtualizarVerba(${i},'total',this.value)">
+      <select onchange="iaAtualizarVerba(${i},'probabilidade',this.value)">
+        <option ${v.probabilidade==='Possível'?'selected':''}>Possível</option>
+        <option ${v.probabilidade==='Provável'?'selected':''}>Provável</option>
+        <option ${v.probabilidade==='Remoto'?'selected':''}>Remoto</option>
+      </select>
+      <input type="text" value="${e(v.obs)}" onchange="iaAtualizarVerba(${i},'obs',this.value)">
+      <button type="button" class="ia-verba-del" onclick="iaRemoverVerba(${i})" title="Remover">✕</button>
+    </div>`).join('');
+  wrap.innerHTML = head + rows;
+  const total = IA_VERBAS.reduce((s,v) => s + iaNum(v.total), 0);
+  document.querySelector('#ia-total').textContent = iaMoney(total);
+}
+
+function iaLevarParaValores(){
+  const total = IA_VERBAS.reduce((s,v) => s + iaNum(v.total), 0);
+  if(!total){ alert('Ainda não há total calculado — extraia ou preencha as verbas primeiro.'); return; }
+  mudarAba('valores');
+  const sel = document.querySelector('#iv-processo');
+  if(!sel.value){
+    alert('Selecione o cliente/processo aqui na aba Inserção de Valores, depois volte e clique de novo. Total calculado: ' + iaMoney(total));
+    sel.scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
+  document.querySelector('#iv-novo-valor').value = iaMoney(total);
+  document.querySelector('#iv-novo-valor').scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+iaDrawVerbas();
 
 function iniciarRealtime(){
   getClient().channel('solicitacoes_calculo_changes')
