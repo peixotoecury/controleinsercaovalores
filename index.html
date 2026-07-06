@@ -1869,6 +1869,7 @@ document.querySelector('#btn-salvar-valores').addEventListener('click', async fu
 
   if(acima400k && !enviadoClienteVal){ alert('Informe se já foi enviado para o cliente.'); return; }
   if(acima400k && enviadoClienteVal === 'Não' && !justificativaEnvio){ alert('Informe a justificativa.'); return; }
+  if(linkCalculo && !/^https?:\/\//i.test(linkCalculo)){ alert('O Link do Cálculo precisa ser um endereço completo, começando com http:// ou https:// — senão o botão "Abrir" não funciona.'); return; }
 
   this.disabled = true; this.textContent = 'Salvando…';
   const { error } = await getClient().from(TABLE).update({
@@ -2172,6 +2173,8 @@ document.querySelector('#form-caso-novo').addEventListener('submit', async funct
 
   if(acima400kVal && !enviadoClienteVal){ alert('Informe se já foi enviado para o cliente.'); return; }
   if(acima400kVal && enviadoClienteVal === 'Não' && !justificativaEnvioVal){ alert('Informe a justificativa.'); return; }
+  const linkCalculoCn = document.querySelector('#cn-link-calculo').value.trim();
+  if(linkCalculoCn && !/^https?:\/\//i.test(linkCalculoCn)){ alert('O Link do Cálculo precisa ser um endereço completo, começando com http:// ou https:// — senão o botão "Abrir" não funciona.'); return; }
 
   const payload = {
     cliente,
@@ -2187,7 +2190,7 @@ document.querySelector('#form-caso-novo').addEventListener('submit', async funct
     tipo_calculo: document.querySelector('#cn-tipo-insercao').value,
     provisao_atual: document.querySelector('#cn-provisao-atual').value.trim(),
     novo_valor: document.querySelector('#cn-novo-valor').value.trim(),
-    link_calculo_pdf: document.querySelector('#cn-link-calculo').value.trim(),
+    link_calculo_pdf: linkCalculoCn,
     acima_400k: acima400kVal,
     enviado_cliente_400k: acima400kVal ? (enviadoClienteVal === 'Sim') : null,
     justificativa_envio_400k: acima400kVal ? justificativaEnvioVal : null,
