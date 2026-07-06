@@ -977,6 +977,7 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
           </div>
         </div>
         <div class="hint">Informe a <b>Data de Origem</b> de cada verba na grade abaixo e clique em "Recalcular" — o sistema aplica IPCA-E/SELIC conforme a regra do Tema 1191 (correção IPCA-E desde a origem; juros de 1% a.m. até 10/11/2021 e SELIC acumulada depois).</div>
+        <div class="hint" style="color:var(--red);font-weight:600;margin-top:6px;">⚠️ Só preencha a Data de Origem em verbas cujo <b>Principal</b> seja o valor ORIGINAL (sem correção prévia). Se o valor veio de um cálculo/PDF que já traz colunas de Juros/Total/Valor Corrigido, o "Principal" extraído automaticamente pode já estar corrigido — recalcular por cima disso soma a correção em dobro. Nesses casos, confira o Principal manualmente antes de preencher a Data de Origem.</div>
       </div>
 
       <div id="ia-dropzone" style="border:2px dashed var(--azul-pc);border-radius:var(--radius-lg);padding:22px;text-align:center;cursor:pointer;background:#F0FAFE;margin-bottom:14px;" onclick="document.getElementById('ia-file').click()" ondragover="event.preventDefault();this.style.background='#E0F5FD'" ondragleave="this.style.background='#F0FAFE'" ondrop="iaDropFile(event)">
@@ -2420,8 +2421,12 @@ function iaProcessarTexto(){
   IA_VERBAS = iaMergeVerbas(verbas);
   iaDrawVerbas();
   const info = document.querySelector('#ia-file-info');
+  const isCalculoTabular = /PJe[\s\-]?Calc|PJC|Planilha\s+de\s+Liquid|C[ÁA]LCULO\s+TRABALHISTA|Valor\s+Corrigido/i.test(text);
+  const avisoDuplicacao = isCalculoTabular
+    ? ' ⚠️ Este texto parece vir de um cálculo/planilha já pronta (com colunas de Juros/Total/Valor Corrigido) — o "Principal" extraído pode já estar corrigido. NÃO preencha a Data de Origem dessas verbas antes de conferir, senão o recálculo soma a correção em dobro.'
+    : '';
   info.textContent = IA_VERBAS.length
-    ? `✅ ${IA_VERBAS.length} verba(s) identificada(s). Confira e ajuste os valores antes de usar.`
+    ? `✅ ${IA_VERBAS.length} verba(s) identificada(s). Confira e ajuste os valores antes de usar.${avisoDuplicacao}`
     : '⚠️ Nenhum valor identificado automaticamente — preencha manualmente com "+ Verba manual".';
 }
 
