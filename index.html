@@ -184,6 +184,7 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
   <button class="tab-btn" id="tab-btn-cobrancas" onclick="mudarAba('cobrancas')">📣 Cobranças</button>
   <button class="tab-btn" id="tab-btn-valores" onclick="mudarAba('valores')">💰 Inserção de Valores</button>
   <button class="tab-btn" id="tab-btn-ia" onclick="mudarAba('ia')">🤖 Lançamento IA</button>
+  <button class="tab-btn" id="tab-btn-ficha" onclick="mudarAba('ficha')">📁 Ficha de Caso</button>
 </div>
 
 <div class="main">
@@ -1017,6 +1018,185 @@ td.mono{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:no
   </div>
 </div>
 
+<div id="view-ficha-caso" style="display:none;">
+  <div class="dash-card">
+    <div class="dash-card-head">📁 Ficha de Caso — Registro para Controle Interno</div>
+    <div class="dash-card-body">
+      <div class="hint" style="margin-bottom:14px;">Preencha os dados do caso (modelo de controle interno de acompanhamento). Nada aqui é salvo automaticamente no sistema — clique em "+ Adicionar à Lista" pra guardar o caso na tabela abaixo e limpar o formulário para o próximo, e use "⬇ Exportar Excel" no final pra levar tudo pra planilha.</div>
+
+      <div class="mc-form-grid">
+        <div class="mc-form-group">
+          <label>Cliente</label>
+          <select id="ct-cliente">
+            <option value="" disabled selected>Selecione…</option>
+            <option>Bridgestone</option>
+            <option>CBC</option>
+            <option>Embraer</option>
+            <option>T4F</option>
+            <option>Ferrero</option>
+            <option>Telefônica</option>
+            <option value="Outro">Outro…</option>
+          </select>
+        </div>
+        <div class="mc-form-group" id="wrap-ct-cliente-outro" style="display:none;">
+          <label>Nome do Cliente</label>
+          <input type="text" id="ct-cliente-outro" placeholder="Digite o nome do cliente">
+        </div>
+        <div class="mc-form-group">
+          <label>Pasta</label>
+          <input type="text" id="ct-pasta" placeholder="Nº interno da pasta">
+        </div>
+        <div class="mc-form-group">
+          <label>Processo (CNJ)</label>
+          <input type="text" id="ct-processo" placeholder="0000000-00.0000.0.00.0000">
+        </div>
+        <div class="mc-form-group">
+          <label>Reclamante</label>
+          <input type="text" id="ct-reclamante">
+        </div>
+        <div class="mc-form-group">
+          <label>Data da Solicitação</label>
+          <input type="date" id="ct-dt-solicitacao">
+        </div>
+        <div class="mc-form-group">
+          <label>Data Prevista de Retorno do Cálculo</label>
+          <input type="date" id="ct-dt-prevista-retorno">
+        </div>
+        <div class="mc-form-group">
+          <label>Data da Decisão</label>
+          <input type="date" id="ct-dt-decisao">
+        </div>
+        <div class="mc-form-group">
+          <label>Tipo de Cálculo Solicitado</label>
+          <select id="ct-tipo-calculo"><option value="" disabled selected>Selecione…</option></select>
+        </div>
+        <div class="mc-form-group">
+          <label>Advogado Responsável</label>
+          <select id="ct-advogado"><option value="" disabled selected>Selecione…</option></select>
+        </div>
+        <div class="mc-form-group">
+          <label>Data do Retorno do Cálculo</label>
+          <input type="date" id="ct-dt-retorno-calculo">
+        </div>
+        <div class="mc-form-group">
+          <label>Responsável pela Revisão</label>
+          <select id="ct-revisor"><option value="" disabled selected>Selecione…</option></select>
+        </div>
+        <div class="mc-form-group">
+          <label>Data do Retorno da Revisão</label>
+          <input type="date" id="ct-dt-retorno-revisao">
+        </div>
+        <div class="mc-form-group">
+          <label>Responsável pelo Lançamento no Sistema do Cliente</label>
+          <select id="ct-resp-lancamento"><option value="" disabled selected>Selecione…</option></select>
+        </div>
+        <div class="mc-form-group">
+          <label>Data do Lançamento no Sistema do Cliente</label>
+          <input type="date" id="ct-dt-lancamento">
+        </div>
+        <div class="mc-form-group">
+          <label>Ajuste</label>
+          <input type="text" id="ct-ajuste" placeholder="Descrição livre do ajuste, se houver">
+        </div>
+        <div class="mc-form-group">
+          <label>Status</label>
+          <select id="ct-status">
+            <option value="" disabled selected>Selecione…</option>
+            <option>Pendente de Análise</option>
+            <option>Pendente Revisão</option>
+            <option>Cálculo Atrasado</option>
+            <option>Pendente Lançamento no Sistema</option>
+            <option>Lançamento Concluído</option>
+          </select>
+        </div>
+        <div class="mc-form-group">
+          <label>Responsabilidade</label>
+          <select id="ct-responsabilidade">
+            <option value="" disabled selected>Selecione…</option>
+            <option>Responsabilidade Direta</option>
+            <option>Responsabilidade Subsidiária</option>
+            <option>Responsabilidade Solidária</option>
+            <option>Terceirizada em Inadimplência</option>
+          </select>
+        </div>
+        <div class="mc-form-group">
+          <label>Tipo de Ajuste</label>
+          <select id="ct-tipo-ajuste">
+            <option value="" disabled selected>Selecione…</option>
+            <option>Nova Avaliação</option>
+            <option>Novo Caso Avaliado</option>
+            <option>Decisão Desfavorável</option>
+            <option>Decisão Favorável</option>
+            <option>Mudança de Fase</option>
+            <option>Ajuste Monetário</option>
+            <option>Pagamento</option>
+          </select>
+        </div>
+        <div class="mc-form-group">
+          <label>Fase Atual</label>
+          <select id="ct-fase-atual">
+            <option value="" disabled selected>Selecione…</option>
+            <option>Inicial</option>
+            <option>Instrução</option>
+            <option>Recursal</option>
+            <option>Recursal TRT</option>
+            <option>Recursal TST</option>
+            <option>Recursal com Execução Provisória</option>
+            <option>Execução</option>
+          </select>
+        </div>
+        <div class="mc-form-group">
+          <label>Data Prevista no Forecast</label>
+          <input type="date" id="ct-dt-forecast">
+        </div>
+      </div>
+
+      <div class="mc-form-group">
+        <label>Observações Internas</label>
+        <textarea id="ct-obs-internas" rows="2"></textarea>
+      </div>
+      <div class="mc-form-group">
+        <label>Observações para Relatório ao Cliente</label>
+        <textarea id="ct-obs-relatorio" rows="2"></textarea>
+      </div>
+
+      <div style="margin:16px 0 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--escuro-pc);">Quadro de Verbas do Caso</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+        <button type="button" class="action-btn" onclick="ctAddVerba()">+ Verba manual</button>
+        <button type="button" class="action-btn reabrir" onclick="ctLimparVerbas()">Limpar verbas</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <div id="ct-verbas-wrap" style="min-width:1180px;"></div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:24px;padding:12px 4px;font-weight:700;color:var(--escuro-pc);border-top:1px solid var(--border2);margin-top:10px;">
+        <span>Total das Verbas</span><span id="ct-total">R$ 0,00</span>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;">
+        <button type="button" class="btn-cyan" style="width:auto;padding:11px 24px;" onclick="ctAdicionarCaso()">+ Adicionar Caso à Lista</button>
+        <button type="button" class="action-btn reabrir" onclick="ctLimparFormulario()">Limpar formulário</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash-card" style="margin-top:18px;">
+    <div class="dash-card-head">📋 Casos Adicionados nesta Sessão
+      <button class="export-btn" id="btn-exportar-ficha" style="margin-left:auto;" onclick="ctExportarExcel()">⬇ Exportar Excel</button>
+    </div>
+    <div class="table-wrap">
+      <table class="sol-table">
+        <thead>
+          <tr>
+            <th>Cliente</th><th>Pasta</th><th>Processo</th><th>Reclamante</th><th>Status</th><th>Fase Atual</th><th>Total Verbas</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="ct-tbody-casos"></tbody>
+      </table>
+      <div class="empty-state" id="ct-empty-state">Nenhum caso adicionado ainda nesta sessão.</div>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -1167,6 +1347,10 @@ popularSelectProfissionais(document.querySelector('#cn-assistente'), 'Assistente
 popularSelectOpcoes(document.querySelector('#cn-tipo-decisao'), TIPOS_DECISAO);
 popularSelectOpcoes(document.querySelector('#cn-tipo-insercao'), TIPOS_CALCULO);
 popularSelectOpcoes(document.querySelector('#ia-tipo-doc'), TIPOS_CALCULO);
+popularSelectOpcoes(document.querySelector('#ct-tipo-calculo'), TIPOS_CALCULO);
+popularSelectProfissionais(document.querySelector('#ct-advogado'), 'Advogado');
+popularSelectProfissionais(document.querySelector('#ct-revisor'));
+popularSelectProfissionais(document.querySelector('#ct-resp-lancamento'), 'Assistente');
 
 document.querySelector('#f-cliente').addEventListener('change', function(){
   const wrap = document.querySelector('#wrap-cliente-outro');
@@ -1178,6 +1362,13 @@ document.querySelector('#f-cliente').addEventListener('change', function(){
 document.querySelector('#ia-cliente').addEventListener('change', function(){
   const wrap = document.querySelector('#wrap-ia-cliente-outro');
   const outro = document.querySelector('#ia-cliente-outro');
+  if(this.value === 'Outro'){ wrap.style.display = ''; }
+  else { wrap.style.display = 'none'; outro.value = ''; }
+});
+
+document.querySelector('#ct-cliente').addEventListener('change', function(){
+  const wrap = document.querySelector('#wrap-ct-cliente-outro');
+  const outro = document.querySelector('#ct-cliente-outro');
   if(this.value === 'Outro'){ wrap.style.display = ''; }
   else { wrap.style.display = 'none'; outro.value = ''; }
 });
@@ -1534,10 +1725,12 @@ function mudarAba(aba){
   document.querySelector('#view-cobrancas').style.display = aba === 'cobrancas' ? '' : 'none';
   document.querySelector('#view-insercao-valores').style.display = aba === 'valores' ? '' : 'none';
   document.querySelector('#view-lancamento-ia').style.display = aba === 'ia' ? '' : 'none';
+  document.querySelector('#view-ficha-caso').style.display = aba === 'ficha' ? '' : 'none';
   document.querySelector('#tab-btn-solicitacoes').classList.toggle('active', aba === 'solicitacoes');
   document.querySelector('#tab-btn-cobrancas').classList.toggle('active', aba === 'cobrancas');
   document.querySelector('#tab-btn-valores').classList.toggle('active', aba === 'valores');
   document.querySelector('#tab-btn-ia').classList.toggle('active', aba === 'ia');
+  document.querySelector('#tab-btn-ficha').classList.toggle('active', aba === 'ficha');
 }
 
 function itemCobranca(s, sub, tipo){
@@ -2600,6 +2793,187 @@ function iaRecalcularTudo(){
 }
 
 iaDrawVerbas();
+
+// ══════════════════════════════════════════════════════
+// Ficha de Caso — ferramenta de apoio (não salva no Supabase)
+// Formulário no modelo da planilha de controle interno, com quadro de
+// verbas próprio; "+ Adicionar à Lista" acumula casos na sessão e
+// "Exportar Excel" gera a planilha (Controle + Verbas) pra levar pra fora.
+// ══════════════════════════════════════════════════════
+let CT_VERBAS = [];
+let CT_CASOS = [];
+
+function ctAddVerba(){
+  CT_VERBAS.push({pedido:'', dtOrigem:'', indice:'auto', principal:0, correcao:0, juros:0, total:0, probabilidade:'Possível', obs:''});
+  ctDrawVerbas();
+}
+function ctRemoverVerba(i){ CT_VERBAS.splice(i,1); ctDrawVerbas(); }
+function ctAtualizarVerba(i, campo, valor){
+  if(!CT_VERBAS[i]) return;
+  if(['principal','correcao','juros','total'].includes(campo)) CT_VERBAS[i][campo] = iaNum(valor);
+  else CT_VERBAS[i][campo] = valor;
+  if(campo === 'principal' || campo === 'correcao' || campo === 'juros'){
+    CT_VERBAS[i].total = CT_VERBAS[i].principal + CT_VERBAS[i].correcao + CT_VERBAS[i].juros;
+  }
+  ctDrawVerbas();
+}
+function ctLimparVerbas(){ CT_VERBAS = []; ctDrawVerbas(); }
+function ctDrawVerbas(){
+  const wrap = document.querySelector('#ct-verbas-wrap');
+  if(!CT_VERBAS.length){
+    wrap.innerHTML = '<div class="hint" style="padding:12px 0;">Nenhuma verba ainda — adicione manualmente ou traga do Lançamento IA.</div>';
+    document.querySelector('#ct-total').textContent = 'R$ 0,00';
+    return;
+  }
+  const optsIndice = '<option value="auto">Auto (Tema 1191)</option><option value="ipca">IPCA-E</option><option value="tr_ipca">TR+IPCA-E</option><option value="selic">SELIC</option><option value="nenhum">Sem correção</option>';
+  const head = `<div class="ia-verba-head"><div>Pedido</div><div>Data Origem</div><div>Índice</div><div>Principal</div><div>Correção</div><div>Juros</div><div>Total</div><div>Probabilidade</div><div>Observação</div><div></div></div>`;
+  const rows = CT_VERBAS.map((v,i) => `
+    <div class="ia-verba-row">
+      <input type="text" value="${e(v.pedido)}" onchange="ctAtualizarVerba(${i},'pedido',this.value)">
+      <input type="text" value="${e(v.dtOrigem||'')}" placeholder="dd/mm/aaaa" onchange="ctAtualizarVerba(${i},'dtOrigem',this.value)">
+      <select onchange="ctAtualizarVerba(${i},'indice',this.value)">${optsIndice.replace('value="'+(v.indice||'auto')+'"','value="'+(v.indice||'auto')+'" selected')}</select>
+      <input type="text" value="${iaMoney(v.principal)}" onchange="ctAtualizarVerba(${i},'principal',this.value)">
+      <input type="text" value="${iaMoney(v.correcao)}" onchange="ctAtualizarVerba(${i},'correcao',this.value)">
+      <input type="text" value="${iaMoney(v.juros)}" onchange="ctAtualizarVerba(${i},'juros',this.value)">
+      <input type="text" value="${iaMoney(v.total)}" onchange="ctAtualizarVerba(${i},'total',this.value)">
+      <select onchange="ctAtualizarVerba(${i},'probabilidade',this.value)">
+        <option ${v.probabilidade==='Possível'?'selected':''}>Possível</option>
+        <option ${v.probabilidade==='Provável'?'selected':''}>Provável</option>
+        <option ${v.probabilidade==='Remoto'?'selected':''}>Remoto</option>
+      </select>
+      <input type="text" value="${e(v.obs)}" onchange="ctAtualizarVerba(${i},'obs',this.value)">
+      <button type="button" class="ia-verba-del" onclick="ctRemoverVerba(${i})" title="Remover">✕</button>
+    </div>`).join('');
+  wrap.innerHTML = head + rows;
+  const total = CT_VERBAS.reduce((s,v) => s + iaNum(v.total), 0);
+  document.querySelector('#ct-total').textContent = iaMoney(total);
+}
+
+function ctLimparFormulario(){
+  const cliente = document.querySelector('#ct-cliente');
+  cliente.value = '';
+  document.querySelector('#wrap-ct-cliente-outro').style.display = 'none';
+  ['ct-cliente-outro','ct-pasta','ct-processo','ct-reclamante','ct-dt-solicitacao','ct-dt-prevista-retorno',
+   'ct-dt-decisao','ct-dt-retorno-calculo','ct-dt-retorno-revisao','ct-dt-lancamento','ct-ajuste',
+   'ct-obs-internas','ct-obs-relatorio','ct-dt-forecast'].forEach(id => { const el = document.querySelector('#'+id); if(el) el.value = ''; });
+  ['ct-tipo-calculo','ct-advogado','ct-revisor','ct-resp-lancamento','ct-status','ct-responsabilidade','ct-tipo-ajuste','ct-fase-atual']
+    .forEach(id => { const el = document.querySelector('#'+id); if(el) el.selectedIndex = 0; });
+  CT_VERBAS = [];
+  ctDrawVerbas();
+}
+
+function ctAdicionarCaso(){
+  const clienteSel = document.querySelector('#ct-cliente').value;
+  const cliente = clienteSel === 'Outro' ? document.querySelector('#ct-cliente-outro').value.trim() : clienteSel;
+  const processo = document.querySelector('#ct-processo').value.trim();
+  const reclamante = document.querySelector('#ct-reclamante').value.trim();
+  if(!cliente){ alert('Informe o cliente.'); return; }
+  if(!processo && !reclamante){ alert('Informe ao menos o processo ou o reclamante.'); return; }
+
+  const caso = {
+    cliente,
+    pasta: document.querySelector('#ct-pasta').value.trim(),
+    processo,
+    reclamante,
+    dt_solicitacao: document.querySelector('#ct-dt-solicitacao').value,
+    dt_prevista_retorno: document.querySelector('#ct-dt-prevista-retorno').value,
+    dt_decisao: document.querySelector('#ct-dt-decisao').value,
+    tipo_calculo: document.querySelector('#ct-tipo-calculo').value,
+    advogado: document.querySelector('#ct-advogado').value,
+    dt_retorno_calculo: document.querySelector('#ct-dt-retorno-calculo').value,
+    revisor: document.querySelector('#ct-revisor').value,
+    dt_retorno_revisao: document.querySelector('#ct-dt-retorno-revisao').value,
+    resp_lancamento: document.querySelector('#ct-resp-lancamento').value,
+    dt_lancamento: document.querySelector('#ct-dt-lancamento').value,
+    ajuste: document.querySelector('#ct-ajuste').value.trim(),
+    status: document.querySelector('#ct-status').value,
+    responsabilidade: document.querySelector('#ct-responsabilidade').value,
+    tipo_ajuste: document.querySelector('#ct-tipo-ajuste').value,
+    fase_atual: document.querySelector('#ct-fase-atual').value,
+    obs_internas: document.querySelector('#ct-obs-internas').value.trim(),
+    obs_relatorio: document.querySelector('#ct-obs-relatorio').value.trim(),
+    dt_forecast: document.querySelector('#ct-dt-forecast').value,
+    verbas: CT_VERBAS.map(v => ({...v}))
+  };
+  CT_CASOS.push(caso);
+  ctRenderCasos();
+  ctLimparFormulario();
+  document.querySelector('#ct-processo').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function ctRemoverCaso(i){ CT_CASOS.splice(i,1); ctRenderCasos(); }
+
+function ctRenderCasos(){
+  const tbody = document.querySelector('#ct-tbody-casos');
+  const vazio = document.querySelector('#ct-empty-state');
+  vazio.style.display = CT_CASOS.length ? 'none' : '';
+  tbody.innerHTML = CT_CASOS.map((c,i) => {
+    const totalVerbas = (c.verbas||[]).reduce((s,v) => s + iaNum(v.total), 0);
+    return `<tr>
+      <td>${e(c.cliente)}</td>
+      <td class="mono">${e(c.pasta)}</td>
+      <td class="mono">${e(c.processo)}</td>
+      <td>${e(c.reclamante)}</td>
+      <td>${e(c.status)}</td>
+      <td>${e(c.fase_atual)}</td>
+      <td>${iaMoney(totalVerbas)}</td>
+      <td><button class="action-btn excluir" onclick="ctRemoverCaso(${i})" title="Remover">🗑</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function ctExportarExcel(){
+  if(!CT_CASOS.length){ alert('Adicione ao menos um caso à lista antes de exportar.'); return; }
+  const linhasControle = CT_CASOS.map(c => ({
+    'Cliente': naSeVazio(c.cliente),
+    'Pasta': naSeVazio(c.pasta),
+    'Processo': naSeVazio(c.processo),
+    'Reclamante': naSeVazio(c.reclamante),
+    'Data da Solicitação': formatarData(c.dt_solicitacao),
+    'Data Prevista de Retorno do Cálculo': formatarData(c.dt_prevista_retorno),
+    'Data da Decisão': formatarData(c.dt_decisao),
+    'Tipo de Cálculo Solicitado': naSeVazio(c.tipo_calculo),
+    'Advogado Responsável': naSeVazio(c.advogado),
+    'Data do Retorno do Cálculo': formatarData(c.dt_retorno_calculo),
+    'Responsável pela Revisão': naSeVazio(c.revisor),
+    'Data do Retorno da Revisão': formatarData(c.dt_retorno_revisao),
+    'Responsável pelo Lançamento no Sistema do Cliente': naSeVazio(c.resp_lancamento),
+    'Data do Lançamento no Sistema do Cliente': formatarData(c.dt_lancamento),
+    'Ajuste': naSeVazio(c.ajuste),
+    'Status': naSeVazio(c.status),
+    'Responsabilidade': naSeVazio(c.responsabilidade),
+    'Tipo de Ajuste': naSeVazio(c.tipo_ajuste),
+    'Fase Atual': naSeVazio(c.fase_atual),
+    'Observações Internas': naSeVazio(c.obs_internas),
+    'Observações para Relatório ao Cliente': naSeVazio(c.obs_relatorio),
+    'Data Prevista no Forecast': formatarData(c.dt_forecast),
+    'Total das Verbas': (c.verbas||[]).reduce((s,v) => s + iaNum(v.total), 0)
+  }));
+  const linhasVerbas = [];
+  CT_CASOS.forEach(c => {
+    (c.verbas||[]).forEach(v => {
+      linhasVerbas.push({
+        'Cliente': naSeVazio(c.cliente),
+        'Pasta': naSeVazio(c.pasta),
+        'Processo': naSeVazio(c.processo),
+        'Reclamante': naSeVazio(c.reclamante),
+        'Pedido': naSeVazio(v.pedido),
+        'Data Origem': naSeVazio(v.dtOrigem),
+        'Índice': naSeVazio(v.indice),
+        'Principal': v.principal||0,
+        'Correção': v.correcao||0,
+        'Juros': v.juros||0,
+        'Total': v.total||0,
+        'Probabilidade': naSeVazio(v.probabilidade),
+        'Observação': naSeVazio(v.obs)
+      });
+    });
+  });
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(linhasControle), 'Controle');
+  if(linhasVerbas.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(linhasVerbas), 'Verbas');
+  XLSX.writeFile(wb, `Ficha_de_Caso_${hojeISO()}_${agoraHHmm()}.xlsx`);
+}
 
 function iniciarRealtime(){
   getClient().channel('solicitacoes_calculo_changes')
