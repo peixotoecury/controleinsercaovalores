@@ -2853,8 +2853,10 @@ function iaPreencherDtOrigemAjuiz(){
 }
 function iaRecalcularTudo(){
   const dtAjuiz = iaParseData(document.querySelector('#ia-dt-ajuiz').value);
-  const dtBase = iaParseData(document.querySelector('#ia-dt-base').value);
-  if(!dtBase){ alert('Informe a Data-base da Atualização (ou clique em "Hoje").'); return; }
+  const elDtBase = document.querySelector('#ia-dt-base');
+  if(!elDtBase.value){ elDtBase.value = iaDataHoje(); } // padrão: "até hoje", que é o caso mais comum
+  const dtBase = iaParseData(elDtBase.value);
+  if(!dtBase){ alert('A Data-base da Atualização informada é inválida. Use o formato dd/mm/aaaa.'); return; }
   const indicePadrao = document.querySelector('#ia-indice-padrao').value;
   const jurosPadrao = document.querySelector('#ia-juros-padrao').value;
   let semData = 0;
