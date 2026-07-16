@@ -244,8 +244,9 @@ h4.sub{font-size:14px;font-weight:700;color:#fff;margin:22px 0 10px;}
     <a class="toc-item" href="#status"><span class="toc-num">04</span> Fluxo de status</a>
     <a class="toc-item" href="#cobrancas"><span class="toc-num">05</span> Aba Cobranças</a>
     <a class="toc-item" href="#valores"><span class="toc-num">06</span> Aba Inserção de Valores</a>
-    <a class="toc-item" href="#emails"><span class="toc-num">07</span> E-mails automáticos</a>
-    <a class="toc-item" href="#faq"><span class="toc-num">08</span> Perguntas frequentes</a>
+    <a class="toc-item" href="#lancamento-ia"><span class="toc-num">07</span> Aba Lançamento IA</a>
+    <a class="toc-item" href="#emails"><span class="toc-num">08</span> E-mails automáticos</a>
+    <a class="toc-item" href="#faq"><span class="toc-num">09</span> Perguntas frequentes</a>
   </div>
 </div>
 
@@ -361,20 +362,62 @@ h4.sub{font-size:14px;font-weight:700;color:#fff;margin:22px 0 10px;}
     <p>A tabela "Valores Lançados" mostra tudo já cadastrado, com filtro por Cliente e um botão <strong>"🔗 Selecionar"</strong> em cada linha que carrega aquele processo direto no painel de edição — útil pra conferir os dados antes de cadastrar algo novo.</p>
   </div>
 
-  <!-- 07 E-MAILS -->
+  <!-- 07 ABA LANÇAMENTO IA -->
+  <div class="section">
+    <span class="sec-anchor" id="lancamento-ia"></span>
+    <div class="sec-header"><div class="sec-num">07</div><div class="sec-title">Aba Lançamento IA</div><div class="sec-line"></div></div>
+    <p>Ferramenta de apoio pra quem vai preencher a aba Inserção de Valores a partir de um cálculo já pronto (PDF, XLSX ou texto). <strong>Não gera e-mail nem salva nada no banco de dados</strong> — é só uma extração automática pra montar o quadro de verbas antes de usar.</p>
+
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Suba o arquivo</h4><p>PDF, XLSX ou TXT na área de upload, ou cole o texto direto na caixa, e clique em <strong>"✨ Preencher valores automaticamente"</strong>. O sistema identifica os pedidos/verbas do documento e monta uma grade editável (Pedido, Data Origem, Índice, Principal, Correção, Juros, Total, Probabilidade, Observação).</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Confira e ajuste</h4><p>É uma leitura automática — confira as verbas e valores extraídos antes de usar. Dá pra editar qualquer campo direto na grade, adicionar verba manual ou remover uma verba errada.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Leve pra Inserção de Valores</h4><p>O botão <strong>"→ Levar Histórico/Provisão/Accrual para Inserção de Valores"</strong> muda de aba, preenche Processo e Reclamante (se vazios) e calcula os três valores a partir da grade.</p></div></div>
+    </div>
+
+    <h4 class="sub">Como funciona a leitura do PDF</h4>
+    <p>Não chama nenhuma IA/LLM externa — é extração feita inteiramente no navegador, por dois caminhos:</p>
+    <div class="card-grid">
+      <div class="mini-card"><span class="tag cyan">📍 Leitura por posição real</span><p>Via pdf.js: quando o documento tem as tabelas padrão de um cálculo (ex. PJe-Calc da MADI), o sistema reconstrói a tabela pela posição real de cada texto na página — inclusive quando a página do PDF vem rotacionada (comum nesses cálculos, que chegam em formato paisagem).</p></div>
+      <div class="mini-card"><span class="tag amber">🔤 Busca por palavra-chave</span><p>Reserva: quando não há essa estrutura de tabela (texto colado, XLSX, ou PDF fora do padrão), o sistema procura por uma lista de pedidos comuns e pega os valores mais próximos de cada um.</p></div>
+    </div>
+
+    <div class="alert info">
+      <div class="alert-icon">📎</div>
+      <div class="alert-body"><strong>Débitos com terceiros não somam no Histórico.</strong> Honorários periciais, honorários do patrono do reclamante e contribuição social ao INSS são mostrados numa caixa separada, só de referência — não entram em nenhuma das somas abaixo, porque são devidos a terceiros, não ao reclamante.</div>
+    </div>
+
+    <h4 class="sub">Histórico, Provisão e Accrual</h4>
+    <div class="card-grid">
+      <div class="mini-card"><span class="tag purple">Novo Valor do Histórico</span><p>Soma do <strong>Principal</strong> de todas as verbas — valor na data da distribuição, sem correção nem juros.</p></div>
+      <div class="mini-card"><span class="tag purple">Novo Valor da Provisão</span><p>Soma do <strong>Total</strong> de todas as verbas — valor corrigido + juros, melhor estimativa atual do passivo.</p></div>
+      <div class="mini-card"><span class="tag purple">Novo Valor do Accrual</span><p>Percentual da <strong>Fase do processo</strong> (selecionada na aba) × soma do Principal só das verbas marcadas como <strong>Provável</strong>.</p></div>
+    </div>
+    <div class="card-grid">
+      <div class="mini-card"><span class="tag cyan">Fase 1 — Conhecimento e Instrução</span><p>40,5% do provável</p></div>
+      <div class="mini-card"><span class="tag cyan">Fase 2 — Recursal (TRT/TST)</span><p>54% do provável</p></div>
+      <div class="mini-card"><span class="tag cyan">Fase 3 — Execução</span><p>100% do provável</p></div>
+    </div>
+
+    <div class="alert danger">
+      <div class="alert-icon">⚠️</div>
+      <div class="alert-body">Se nenhuma Fase for selecionada, o Accrual não é calculado — preencha manualmente na aba Inserção de Valores. E, se o documento já vier com colunas de Juros/Total/Valor Corrigido (cálculo pronto), não preencha a Data de Origem sem antes conferir o Principal — recalcular por cima disso soma a correção monetária em dobro.</div>
+    </div>
+  </div>
+
+  <!-- 08 E-MAILS -->
   <div class="section">
     <span class="sec-anchor" id="emails"></span>
-    <div class="sec-header"><div class="sec-num">07</div><div class="sec-title">E-mails Automáticos</div><div class="sec-line"></div></div>
+    <div class="sec-header"><div class="sec-num">08</div><div class="sec-title">E-mails Automáticos</div><div class="sec-line"></div></div>
     <div class="alert info">
       <div class="alert-icon">✉️</div>
       <div class="alert-body">O sistema <strong>não envia e-mail sozinho</strong>. Ele abre um rascunho pronto (assunto, destinatário e corpo já preenchidos) no seu programa de e-mail padrão — Outlook ou Gmail — e a pessoa só precisa clicar em "Enviar". Isso acontece automaticamente ao enviar uma nova solicitação, ao concluir um cálculo, ao registrar uma decisão identificada, e sempre que clicar em "Cobrar" na aba Cobranças.</div>
     </div>
   </div>
 
-  <!-- 08 FAQ -->
+  <!-- 09 FAQ -->
   <div class="section">
     <span class="sec-anchor" id="faq"></span>
-    <div class="sec-header"><div class="sec-num">08</div><div class="sec-title">Perguntas Frequentes</div><div class="sec-line"></div></div>
+    <div class="sec-header"><div class="sec-num">09</div><div class="sec-title">Perguntas Frequentes</div><div class="sec-line"></div></div>
     <div class="faq">
       <div class="faq-item"><div class="faq-q">A tela não atualizou depois de uma mudança que fizemos no sistema</div><p class="faq-a">É cache do navegador. Aperte <strong>Ctrl+Shift+R</strong> pra recarregar ignorando o cache, ou feche e abra a aba de novo.</p></div>
       <div class="faq-item"><div class="faq-q">Por que os campos de valor estão cinza e não deixam digitar?</div><p class="faq-a">No painel "Inserir/Atualizar Valores", os campos só liberam depois que você escolhe um processo no dropdown "Cliente/Processo" acima deles. Se o seu caso ainda não existe em lugar nenhum, use o card "Cadastrar Caso Novo" em vez disso.</p></div>
